@@ -13,6 +13,9 @@ public sealed class AppSettings
     public float TopP { get; set; } = 0.9f;
     public int MaxTokens { get; set; } = 2048;
 
+    // System Prompt Settings
+    public Guid? CurrentSystemPromptId { get; set; }
+
     // UI Settings
     public string Theme { get; set; } = "Dark";
     public double SidebarWidth { get; set; } = 280;

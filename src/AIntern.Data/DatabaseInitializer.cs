@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using AIntern.Core.Entities;
+using AIntern.Core.Templates;
 
 namespace AIntern.Data;
 
@@ -40,64 +41,14 @@ public sealed class DatabaseInitializer
 
     private static async Task SeedSystemPromptsAsync(AInternDbContext context, CancellationToken ct)
     {
-        if (await context.SystemPrompts.AnyAsync(ct))
+        // Check if any built-in prompts exist (use IsBuiltIn to allow user prompts to coexist)
+        if (await context.SystemPrompts.AnyAsync(sp => sp.IsBuiltIn, ct))
         {
             return; // Already seeded
         }
 
-        var defaultPrompts = new List<SystemPromptEntity>
-        {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Name = "Default Assistant",
-                Content = "You are a helpful, harmless, and honest AI assistant.",
-                Description = "A general-purpose helpful assistant",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                IsDefault = true,
-                IsBuiltIn = true,
-                UsageCount = 0
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Name = "Code Assistant",
-                Content = "You are an expert programmer and software engineer. Help the user with coding tasks, debugging, code review, and software architecture. Provide clear, well-documented code examples when appropriate.",
-                Description = "Specialized assistant for programming and software development",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                IsDefault = false,
-                IsBuiltIn = true,
-                UsageCount = 0
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Name = "Writing Assistant",
-                Content = "You are a skilled writer and editor. Help the user with writing tasks including drafting, editing, proofreading, and improving clarity and style. Adapt your tone based on the context.",
-                Description = "Specialized assistant for writing and editing tasks",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                IsDefault = false,
-                IsBuiltIn = true,
-                UsageCount = 0
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Name = "Concise Responder",
-                Content = "You are a helpful assistant that provides brief, direct answers. Keep responses short and to the point. Avoid unnecessary elaboration unless specifically asked for more details.",
-                Description = "Provides short, direct responses",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                IsDefault = false,
-                IsBuiltIn = true,
-                UsageCount = 0
-            }
-        };
-
-        context.SystemPrompts.AddRange(defaultPrompts);
+        var templates = SystemPromptTemplates.GetAllTemplates();
+        context.SystemPrompts.AddRange(templates);
         await context.SaveChangesAsync(ct);
     }
 

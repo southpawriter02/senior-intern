@@ -25,6 +25,14 @@ public class SystemPromptConfiguration : IEntityTypeConfiguration<SystemPromptEn
         builder.Property(sp => sp.Description)
             .HasMaxLength(500);
 
+        builder.Property(sp => sp.Category)
+            .IsRequired()
+            .HasMaxLength(50)
+            .HasDefaultValue("Custom");
+
+        builder.Property(sp => sp.TagsJson)
+            .HasMaxLength(1000);
+
         builder.Property(sp => sp.CreatedAt)
             .IsRequired();
 
@@ -43,5 +51,11 @@ public class SystemPromptConfiguration : IEntityTypeConfiguration<SystemPromptEn
         // Unique index on Name
         builder.HasIndex(sp => sp.Name)
             .IsUnique();
+
+        // Index on Category for filtering
+        builder.HasIndex(sp => sp.Category);
+
+        // Index on IsDefault for quick lookup
+        builder.HasIndex(sp => sp.IsDefault);
     }
 }

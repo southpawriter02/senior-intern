@@ -46,4 +46,41 @@ public interface ISystemPromptRepository
     /// Increments the usage count for a system prompt.
     /// </summary>
     Task IncrementUsageCountAsync(Guid id, CancellationToken ct = default);
+
+    /// <summary>
+    /// Gets a system prompt by name.
+    /// </summary>
+    Task<SystemPromptEntity?> GetByNameAsync(string name, CancellationToken ct = default);
+
+    /// <summary>
+    /// Gets all user-created (non-built-in) prompts.
+    /// </summary>
+    Task<IReadOnlyList<SystemPromptEntity>> GetUserPromptsAsync(CancellationToken ct = default);
+
+    /// <summary>
+    /// Gets all built-in prompts.
+    /// </summary>
+    Task<IReadOnlyList<SystemPromptEntity>> GetBuiltInPromptsAsync(CancellationToken ct = default);
+
+    /// <summary>
+    /// Gets all prompts in a specific category.
+    /// </summary>
+    Task<IReadOnlyList<SystemPromptEntity>> GetByCategoryAsync(string category, CancellationToken ct = default);
+
+    /// <summary>
+    /// Searches prompts by name, description, or content.
+    /// </summary>
+    Task<IReadOnlyList<SystemPromptEntity>> SearchAsync(string query, CancellationToken ct = default);
+
+    /// <summary>
+    /// Checks if a prompt name already exists.
+    /// </summary>
+    /// <param name="name">The name to check.</param>
+    /// <param name="excludeId">Optional ID to exclude (for updates).</param>
+    Task<bool> NameExistsAsync(string name, Guid? excludeId = null, CancellationToken ct = default);
+
+    /// <summary>
+    /// Seeds built-in prompts if they don't already exist.
+    /// </summary>
+    Task SeedBuiltInPromptsAsync(CancellationToken ct = default);
 }
