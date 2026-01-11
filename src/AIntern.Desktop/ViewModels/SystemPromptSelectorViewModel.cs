@@ -29,6 +29,12 @@ public sealed partial class SystemPromptSelectorViewModel : ViewModelBase, IDisp
 
     public string DisplayText => SelectedPrompt?.Name ?? "No prompt selected";
 
+    /// <summary>
+    /// Action to open the system prompt editor window.
+    /// Set by the parent view/viewmodel to handle opening the editor.
+    /// </summary>
+    public Action? OpenEditorAction { get; set; }
+
     public SystemPromptSelectorViewModel(
         ISystemPromptService promptService,
         IConversationService conversationService)
@@ -145,6 +151,12 @@ public sealed partial class SystemPromptSelectorViewModel : ViewModelBase, IDisp
     {
         // When conversation changes, sync with current prompt
         await SyncWithCurrentPromptAsync();
+    }
+
+    [RelayCommand]
+    private void OpenEditor()
+    {
+        OpenEditorAction?.Invoke();
     }
 
     public void Dispose()

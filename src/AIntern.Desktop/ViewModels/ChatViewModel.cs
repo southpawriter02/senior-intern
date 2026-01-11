@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using AIntern.Core.Events;
 using AIntern.Core.Exceptions;
 using AIntern.Core.Interfaces;
 using AIntern.Core.Models;
@@ -32,6 +33,19 @@ public partial class ChatViewModel : ViewModelBase
     [ObservableProperty]
     private bool _canSend;
 
+    // System prompt integration properties
+    [ObservableProperty]
+    private SystemPromptSelectorViewModel? _systemPromptSelectorViewModel;
+
+    [ObservableProperty]
+    private bool _hasSystemPrompt;
+
+    [ObservableProperty]
+    private string? _currentPromptName;
+
+    [ObservableProperty]
+    private string? _currentPromptContent;
+
     public ChatViewModel(
         ILlmService llmService,
         IConversationService conversationService,
@@ -42,6 +56,11 @@ public partial class ChatViewModel : ViewModelBase
         _conversationService = conversationService;
         _inferenceSettingsService = inferenceSettingsService;
         _systemPromptService = systemPromptService;
+
+        // Initialize system prompt selector
+        _systemPromptSelectorViewModel = new SystemPromptSelectorViewModel(
+            _systemPromptService, _conversationService);
+        _systemPromptSelectorViewModel.OpenEditorAction = OpenSystemPromptEditor;
 
         // Update CanSend when dependencies change
         PropertyChanged += (_, e) =>
@@ -56,6 +75,45 @@ public partial class ChatViewModel : ViewModelBase
 
         // Subscribe to conversation changes to reload messages when switching conversations
         _conversationService.ConversationChanged += OnConversationChanged;
+
+        // Subscribe to system prompt changes
+        _systemPromptService.CurrentPromptChanged += OnCurrentPromptChanged;
+        UpdateSystemPromptDisplay();
+    }
+
+    private void OnCurrentPromptChanged(object? sender, CurrentPromptChangedEventArgs e)
+    {
+        Dispatcher.UIThread.InvokeAsync(UpdateSystemPromptDisplay);
+    }
+
+    private void UpdateSystemPromptDisplay()
+    {
+        var prompt = _systemPromptService.CurrentPrompt;
+        HasSystemPrompt = prompt != null;
+        CurrentPromptName = prompt?.Name;
+        CurrentPromptContent = prompt?.Content;
+    }
+
+    private IEnumerable<ChatMessage> BuildContextWithSystemPrompt()
+    {
+        var systemPrompt = _systemPromptService.CurrentPrompt;
+
+        // Prepend system message if prompt is selected
+        if (systemPrompt != null)
+        {
+            yield return new ChatMessage
+            {
+                Role = MessageRole.System,
+                Content = _systemPromptService.FormatPromptForContext(systemPrompt),
+                Timestamp = DateTime.UtcNow
+            };
+        }
+
+        // Then yield all conversation messages
+        foreach (var message in _conversationService.GetMessages())
+        {
+            yield return message;
+        }
     }
 
     private void OnConversationChanged(object? sender, EventArgs e)
@@ -123,7 +181,7 @@ public partial class ChatViewModel : ViewModelBase
                 TopP: settings.TopP
             );
 
-            var conversation = _conversationService.GetMessages();
+            var conversation = BuildContextWithSystemPrompt();
 
             await foreach (var token in _llmService.GenerateStreamingAsync(
                 conversation, options, _generationCts.Token))

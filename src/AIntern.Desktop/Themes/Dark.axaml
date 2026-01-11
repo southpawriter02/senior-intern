@@ -80,6 +80,9 @@
     <SolidColorBrush x:Key="WarningBackground" Color="#4D3D00" />
     <SolidColorBrush x:Key="WarningForeground" Color="#FFD700" />
 
+    <!-- System Prompt Colors -->
+    <SolidColorBrush x:Key="SystemPromptBackground" Color="#1A3A5C" />
+
     <!-- Link Colors -->
     <SolidColorBrush x:Key="LinkForeground" Color="#3794FF" />
     <SolidColorBrush x:Key="LinkHoverForeground" Color="#4DA8FF" />

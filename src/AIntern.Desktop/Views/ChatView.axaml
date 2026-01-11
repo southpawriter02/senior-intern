@@ -6,32 +6,49 @@
              x:DataType="vm:ChatViewModel"
              Background="{DynamicResource WindowBackground}">
 
-    <Grid RowDefinitions="Auto, *, Auto">
-        <!-- Chat Header -->
-        <Border Grid.Row="0"
-                Background="{DynamicResource SidebarBackground}"
+    <Grid RowDefinitions="Auto, Auto, *, Auto">
+        <!-- Row 0: System Prompt Selector -->
+        <views:SystemPromptSelector Grid.Row="0"
+                                    DataContext="{Binding SystemPromptSelectorViewModel}" />
+
+        <!-- Row 1: System Prompt Display Expander (conditional) -->
+        <Border Grid.Row="1"
+                IsVisible="{Binding HasSystemPrompt}"
+                Background="{DynamicResource SystemPromptBackground}"
                 BorderBrush="{DynamicResource BorderBrush}"
                 BorderThickness="0,0,0,1"
-                Padding="16,8">
-            <Grid ColumnDefinitions="*, Auto">
-                <TextBlock Text="Chat"
-                           FontWeight="SemiBold"
-                           FontSize="14"
-                           VerticalAlignment="Center"
-                           Foreground="{DynamicResource TextPrimary}" />
-                <Button Grid.Column="1"
-                        Command="{Binding OpenSystemPromptEditorCommand}"
-                        ToolTip.Tip="Edit System Prompts"
-                        Theme="{StaticResource SubtleButton}">
-                    <PathIcon Data="M3,17.25V21h3.75L17.81,9.94l-3.75-3.75L3,17.25zM20.71,7.04c0.39-0.39,0.39-1.02,0-1.41l-2.34-2.34c-0.39-0.39-1.02-0.39-1.41,0l-1.83,1.83l3.75,3.75L20.71,7.04z"
-                              Width="16" Height="16"
-                              Foreground="{DynamicResource TextPrimary}" />
-                </Button>
-            </Grid>
+                Padding="8,4">
+            <Expander>
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="System Prompt:"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextMuted}"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding CurrentPromptName}"
+                                   FontWeight="Medium"
+                                   Foreground="{DynamicResource TextPrimary}"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </Expander.Header>
+                <Border Background="{DynamicResource ControlBackground}"
+                        CornerRadius="4"
+                        Padding="12"
+                        Margin="0,8,0,0"
+                        MaxHeight="200">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <TextBlock Text="{Binding CurrentPromptContent}"
+                                   TextWrapping="Wrap"
+                                   FontFamily="Consolas, Menlo, monospace"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource TextPrimary}" />
+                    </ScrollViewer>
+                </Border>
+            </Expander>
         </Border>
 
         <!-- Messages List -->
-        <ScrollViewer Grid.Row="1"
+        <ScrollViewer Grid.Row="2"
                       x:Name="MessagesScrollViewer"
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
@@ -66,7 +83,7 @@
         </ScrollViewer>
 
         <!-- Error Display -->
-        <Border Grid.Row="1"
+        <Border Grid.Row="2"
                 IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                 Background="{DynamicResource ErrorBackground}"
                 Padding="16"
@@ -78,7 +95,7 @@
         </Border>
 
         <!-- Input Area -->
-        <Border Grid.Row="2"
+        <Border Grid.Row="3"
                 Background="{DynamicResource SidebarBackground}"
                 BorderBrush="{DynamicResource BorderBrush}"
                 BorderThickness="0,1,0,0"
