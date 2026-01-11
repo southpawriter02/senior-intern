@@ -29,6 +29,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IConversationService, DatabaseConversationService>();
         services.AddSingleton<IInferenceSettingsService, InferenceSettingsService>();
         services.AddSingleton<ISystemPromptService, SystemPromptService>();
+        services.AddSingleton<ISearchService, SearchService>();
 
         // ViewModels (transient - created as needed)
         services.AddTransient<MainWindowViewModel>();
