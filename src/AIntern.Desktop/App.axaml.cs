@@ -37,6 +37,15 @@ public partial class App : Application
         services.AddAInternServices();
         Services = services.BuildServiceProvider();
 
+        // Run migration if needed (before database initialization)
+        var migrationService = Services.GetRequiredService<IMigrationService>();
+        var migrationResult = migrationService.MigrateIfNeededAsync().GetAwaiter().GetResult();
+        if (!migrationResult.Success)
+        {
+            // Log migration failure but continue - database init will handle fresh installs
+            System.Diagnostics.Debug.WriteLine($"Migration failed: {migrationResult.ErrorMessage}");
+        }
+
         // Initialize database (create tables, seed defaults)
         Services.InitializeDatabaseAsync().GetAwaiter().GetResult();
 

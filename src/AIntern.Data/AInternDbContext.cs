@@ -13,6 +13,7 @@ public class AInternDbContext : DbContext
     public DbSet<MessageEntity> Messages => Set<MessageEntity>();
     public DbSet<SystemPromptEntity> SystemPrompts => Set<SystemPromptEntity>();
     public DbSet<InferencePresetEntity> InferencePresets => Set<InferencePresetEntity>();
+    public DbSet<AppVersionEntity> AppVersions => Set<AppVersionEntity>();
 
     public AInternDbContext(DbContextOptions<AInternDbContext> options)
         : base(options)
