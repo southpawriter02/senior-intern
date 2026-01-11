@@ -27,6 +27,9 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     [ObservableProperty]
     private string _tokenInfo = string.Empty;
 
+    [ObservableProperty]
+    private bool _isModelLoaded;
+
     public MainWindowViewModel(
         ChatViewModel chatViewModel,
         ModelSelectorViewModel modelSelectorViewModel,
@@ -64,6 +67,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     private void OnModelStateChanged(object? sender, ModelStateChangedEventArgs e)
     {
+        IsModelLoaded = e.IsLoaded;
         StatusMessage = e.IsLoaded
             ? $"Model: {e.ModelName}"
             : "No model loaded";
@@ -111,6 +115,26 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             var dialog = new ExportDialog(viewModel);
             await dialog.ShowDialog(desktop.MainWindow);
         }
+    }
+
+    [RelayCommand]
+    private async Task NewConversationAsync()
+    {
+        await ConversationListViewModel.CreateNewConversationCommand.ExecuteAsync(null);
+    }
+
+    [RelayCommand]
+    private void OpenSystemPrompt()
+    {
+        ChatViewModel.OpenSystemPromptEditorCommand.Execute(null);
+    }
+
+    [RelayCommand(CanExecute = nameof(HasActiveConversation))]
+    private async Task SaveConversationAsync()
+    {
+        if (ConversationListViewModel.SelectedConversation is null) return;
+
+        await _conversationService.SaveCurrentConversationAsync();
     }
 
     public void Dispose()

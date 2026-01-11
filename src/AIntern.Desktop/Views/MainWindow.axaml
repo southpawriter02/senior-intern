@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:AIntern.Desktop.ViewModels"
         xmlns:views="using:AIntern.Desktop.Views"
+        xmlns:conv="using:AIntern.Desktop.Converters"
         x:Class="AIntern.Desktop.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="AIntern"
@@ -9,9 +10,16 @@
         MinWidth="800" MinHeight="600"
         Background="{DynamicResource WindowBackground}">
 
+    <Window.Resources>
+        <conv:BoolToColorConverter x:Key="BoolToColorConverter" />
+    </Window.Resources>
+
     <Window.KeyBindings>
         <KeyBinding Gesture="Ctrl+K" Command="{Binding OpenSearchCommand}" />
         <KeyBinding Gesture="Ctrl+E" Command="{Binding OpenExportCommand}" />
+        <KeyBinding Gesture="Ctrl+N" Command="{Binding NewConversationCommand}" />
+        <KeyBinding Gesture="Ctrl+P" Command="{Binding OpenSystemPromptCommand}" />
+        <KeyBinding Gesture="Ctrl+Shift+S" Command="{Binding SaveConversationCommand}" />
     </Window.KeyBindings>
 
     <Grid RowDefinitions="*, Auto">
@@ -52,23 +60,57 @@
                 Background="{DynamicResource StatusBarBackground}"
                 BorderBrush="{DynamicResource BorderBrush}"
                 BorderThickness="0,1,0,0"
-                Padding="12,6">
-            <Grid ColumnDefinitions="*, Auto, Auto">
-                <TextBlock Text="{Binding StatusMessage}"
+                Padding="12,6"
+                Height="32">
+            <Grid ColumnDefinitions="Auto, Auto, *, Auto, Auto, Auto">
+                <!-- Model Name (colored based on load state) -->
+                <TextBlock Grid.Column="0"
+                           Text="{Binding StatusMessage}"
                            VerticalAlignment="Center"
-                           Foreground="{DynamicResource TextSecondary}" />
+                           Foreground="{Binding IsModelLoaded, Converter={StaticResource BoolToColorConverter}}" />
 
-                <TextBlock Grid.Column="1"
+                <!-- Separator -->
+                <Border Grid.Column="1"
+                        Width="1"
+                        Background="{DynamicResource BorderBrush}"
+                        Margin="12,4"
+                        IsVisible="{Binding TokenInfo, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+                <!-- Token Info -->
+                <TextBlock Grid.Column="2"
                            Text="{Binding TokenInfo}"
                            VerticalAlignment="Center"
-                           Foreground="{DynamicResource TextMuted}"
-                           Margin="16,0" />
+                           Foreground="{DynamicResource AccentColor}"
+                           IsVisible="{Binding TokenInfo, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
 
-                <ProgressBar Grid.Column="2"
+                <!-- Temperature Display -->
+                <StackPanel Grid.Column="3"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center"
+                            Margin="12,0">
+                    <TextBlock Text="T:"
+                               Foreground="{DynamicResource TextMuted}"
+                               VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding InferenceSettingsViewModel.Temperature, StringFormat='{}{0:F1}'}"
+                               Foreground="{DynamicResource AccentColor}"
+                               VerticalAlignment="Center"
+                               Margin="4,0,0,0" />
+                </StackPanel>
+
+                <!-- Separator -->
+                <Border Grid.Column="4"
+                        Width="1"
+                        Background="{DynamicResource BorderBrush}"
+                        Margin="0,4,12,4"
+                        IsVisible="{Binding ChatViewModel.IsGenerating}" />
+
+                <!-- Progress Bar -->
+                <ProgressBar Grid.Column="5"
                              IsVisible="{Binding ChatViewModel.IsGenerating}"
                              IsIndeterminate="True"
                              Width="80"
-                             Height="4" />
+                             Height="4"
+                             VerticalAlignment="Center" />
             </Grid>
         </Border>
     </Grid>
