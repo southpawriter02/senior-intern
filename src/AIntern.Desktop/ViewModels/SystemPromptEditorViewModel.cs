@@ -393,6 +393,18 @@ public sealed partial class SystemPromptEditorViewModel : ViewModelBase, IDispos
         }
     }
 
+    [RelayCommand]
+    private void SelectPrompt(SystemPromptViewModel? prompt)
+    {
+        SelectedPrompt = prompt;
+    }
+
+    [RelayCommand]
+    private void ClearValidationError()
+    {
+        ValidationError = null;
+    }
+
     #endregion
 
     #region Private Helpers

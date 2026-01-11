@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using AIntern.Core.Exceptions;
 using AIntern.Core.Interfaces;
 using AIntern.Core.Models;
+using AIntern.Desktop.Views;
 
 namespace AIntern.Desktop.ViewModels;
 
@@ -13,6 +14,7 @@ public partial class ChatViewModel : ViewModelBase
     private readonly ILlmService _llmService;
     private readonly IConversationService _conversationService;
     private readonly IInferenceSettingsService _inferenceSettingsService;
+    private readonly ISystemPromptService _systemPromptService;
     private CancellationTokenSource? _generationCts;
 
     [ObservableProperty]
@@ -33,11 +35,13 @@ public partial class ChatViewModel : ViewModelBase
     public ChatViewModel(
         ILlmService llmService,
         IConversationService conversationService,
-        IInferenceSettingsService inferenceSettingsService)
+        IInferenceSettingsService inferenceSettingsService,
+        ISystemPromptService systemPromptService)
     {
         _llmService = llmService;
         _conversationService = conversationService;
         _inferenceSettingsService = inferenceSettingsService;
+        _systemPromptService = systemPromptService;
 
         // Update CanSend when dependencies change
         PropertyChanged += (_, e) =>
@@ -188,5 +192,16 @@ public partial class ChatViewModel : ViewModelBase
         {
             SendMessageCommand.Execute(null);
         }
+    }
+
+    [RelayCommand]
+    private void OpenSystemPromptEditor()
+    {
+        var viewModel = new SystemPromptEditorViewModel(_systemPromptService);
+        var window = new SystemPromptEditorWindow
+        {
+            DataContext = viewModel
+        };
+        window.Show();
     }
 }

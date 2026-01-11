@@ -72,4 +72,67 @@
         </Style>
     </ControlTheme>
 
+    <!-- Hover/Selection Colors -->
+    <SolidColorBrush x:Key="HoverBackground" Color="#2A2D2E" />
+    <SolidColorBrush x:Key="SelectedBackground" Color="#094771" />
+
+    <!-- Warning Colors -->
+    <SolidColorBrush x:Key="WarningBackground" Color="#4D3D00" />
+    <SolidColorBrush x:Key="WarningForeground" Color="#FFD700" />
+
+    <!-- Link Colors -->
+    <SolidColorBrush x:Key="LinkForeground" Color="#3794FF" />
+    <SolidColorBrush x:Key="LinkHoverForeground" Color="#4DA8FF" />
+
+    <!-- Prompt Item Button -->
+    <ControlTheme x:Key="PromptItemButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        <Setter Property="Padding" Value="12,10" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="Cursor" Value="Hand" />
+
+        <Style Selector="^:pointerover">
+            <Setter Property="Background" Value="{DynamicResource HoverBackground}" />
+        </Style>
+
+        <Style Selector="^:pressed">
+            <Setter Property="Background" Value="{DynamicResource SelectedBackground}" />
+        </Style>
+    </ControlTheme>
+
+    <!-- Link Button -->
+    <ControlTheme x:Key="LinkButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource LinkForeground}" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="BorderThickness" Value="0" />
+
+        <Style Selector="^:pointerover">
+            <Setter Property="Foreground" Value="{DynamicResource LinkHoverForeground}" />
+        </Style>
+
+        <Style Selector="^:disabled">
+            <Setter Property="Opacity" Value="0.5" />
+        </Style>
+    </ControlTheme>
+
+    <!-- Code Editor TextBox -->
+    <ControlTheme x:Key="CodeEditorTextBox" TargetType="TextBox">
+        <Setter Property="Background" Value="{DynamicResource InputBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        <Setter Property="FontFamily" Value="Consolas, 'Courier New', monospace" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Padding" Value="12" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="AcceptsReturn" Value="True" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="VerticalContentAlignment" Value="Top" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </ControlTheme>
+
 </ResourceDictionary>
