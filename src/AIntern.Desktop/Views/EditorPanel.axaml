@@ -1,0 +1,125 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ae="using:AvaloniaEdit"
+             xmlns:vm="using:AIntern.Desktop.ViewModels"
+             xmlns:conv="using:AIntern.Desktop.Converters"
+             x:Class="AIntern.Desktop.Views.EditorPanel"
+             x:DataType="vm:EditorPanelViewModel">
+
+    <UserControl.Resources>
+        <conv:LanguageToIconConverter x:Key="LanguageIconConverter" />
+    </UserControl.Resources>
+
+    <Grid RowDefinitions="Auto, *">
+        <!-- Tab Bar -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource TabBarBackgroundBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,0,0,1"
+                IsVisible="{Binding HasOpenTabs}">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                          VerticalScrollBarVisibility="Disabled"
+                          Padding="4,0">
+                <ItemsControl ItemsSource="{Binding Tabs}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="2" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:EditorTabViewModel">
+                            <Button Classes="editor-tab"
+                                    Classes.active="{Binding IsActive}"
+                                    Classes.dirty="{Binding IsDirty}"
+                                    Command="{Binding $parent[UserControl].((vm:EditorPanelViewModel)DataContext).ActivateTabCommand}"
+                                    CommandParameter="{Binding}"
+                                    ToolTip.Tip="{Binding FilePath}">
+                                <Grid ColumnDefinitions="Auto, Auto, Auto" Margin="8,4">
+                                    <!-- Language Icon -->
+                                    <PathIcon Grid.Column="0"
+                                              Data="{Binding Language, Converter={StaticResource LanguageIconConverter}}"
+                                              Width="14" Height="14"
+                                              Margin="0,0,6,0"
+                                              Foreground="{DynamicResource TextSecondaryBrush}" />
+
+                                    <!-- File Name -->
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding DisplayTitle}"
+                                               VerticalAlignment="Center"
+                                               Foreground="{DynamicResource TextPrimaryBrush}" />
+
+                                    <!-- Close Button -->
+                                    <Button Grid.Column="2"
+                                            Classes="tab-close-button"
+                                            Command="{Binding $parent[UserControl].((vm:EditorPanelViewModel)DataContext).CloseTabCommand}"
+                                            CommandParameter="{Binding}"
+                                            Margin="8,0,0,0"
+                                            ToolTip.Tip="Close (Ctrl+W)">
+                                        <PathIcon Data="{StaticResource CloseIcon}"
+                                                  Width="10" Height="10" />
+                                    </Button>
+                                </Grid>
+
+                                <!-- Tab Context Menu -->
+                                <Button.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Close"
+                                                  Command="{Binding $parent[UserControl].((vm:EditorPanelViewModel)DataContext).CloseTabCommand}"
+                                                  CommandParameter="{Binding}"
+                                                  InputGesture="Ctrl+W" />
+                                        <MenuItem Header="Close Others"
+                                                  Command="{Binding $parent[UserControl].((vm:EditorPanelViewModel)DataContext).CloseOtherTabsCommand}"
+                                                  CommandParameter="{Binding}" />
+                                        <MenuItem Header="Close Tabs to the Right"
+                                                  Command="{Binding $parent[UserControl].((vm:EditorPanelViewModel)DataContext).CloseTabsToRightCommand}"
+                                                  CommandParameter="{Binding}" />
+                                        <MenuItem Header="Close All"
+                                                  Command="{Binding $parent[UserControl].((vm:EditorPanelViewModel)DataContext).CloseAllTabsCommand}" />
+                                    </ContextMenu>
+                                </Button.ContextMenu>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Editor Area -->
+        <Grid Grid.Row="1">
+            <!-- TextEditor -->
+            <ae:TextEditor x:Name="Editor"
+                           IsVisible="{Binding ActiveTab, Converter={x:Static ObjectConverters.IsNotNull}}"
+                           HorizontalScrollBarVisibility="Auto"
+                           VerticalScrollBarVisibility="Auto"
+                           Background="{DynamicResource EditorBackgroundBrush}"
+                           Foreground="{DynamicResource EditorForegroundBrush}" />
+
+            <!-- Empty State -->
+            <StackPanel IsVisible="{Binding !HasOpenTabs}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="16"
+                        Opacity="0.6">
+                <PathIcon Data="{StaticResource FileCodeIcon}"
+                          Width="64" Height="64"
+                          Foreground="{DynamicResource TextMutedBrush}" />
+                <TextBlock Text="No file open"
+                           FontSize="18"
+                           FontWeight="SemiBold"
+                           HorizontalAlignment="Center"
+                           Foreground="{DynamicResource TextSecondaryBrush}" />
+                <TextBlock Text="Open a file from the Explorer or use Ctrl+O"
+                           HorizontalAlignment="Center"
+                           Foreground="{DynamicResource TextMutedBrush}" />
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Spacing="8"
+                            Margin="0,16,0,0">
+                    <Button Content="New File"
+                            Command="{Binding NewFileCommand}"
+                            Classes="primary" />
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

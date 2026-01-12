@@ -146,4 +146,18 @@
         <Setter Property="BorderThickness" Value="1" />
     </ControlTheme>
 
+    <!-- Tab Bar Colors -->
+    <SolidColorBrush x:Key="TabBarBackgroundBrush" Color="#252526" />
+    <SolidColorBrush x:Key="TabActiveBackgroundBrush" Color="#1E1E1E" />
+    <SolidColorBrush x:Key="TabHoverBackgroundBrush" Color="#2D2D2D" />
+
+    <!-- Editor Colors -->
+    <SolidColorBrush x:Key="EditorBackgroundBrush" Color="#1E1E1E" />
+    <SolidColorBrush x:Key="EditorForegroundBrush" Color="#D4D4D4" />
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="#CCCCCC" />
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="TextMutedBrush" Color="#808080" />
+    <SolidColorBrush x:Key="HoverBackgroundBrush" Color="#2A2D2E" />
+
 </ResourceDictionary>
+
