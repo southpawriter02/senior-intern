@@ -26,6 +26,7 @@ packages/
 
 # Build
 *.log
+logs/
 
 # Documentation
 ROADMAP.md
