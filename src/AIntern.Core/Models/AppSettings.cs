@@ -36,8 +36,10 @@ public sealed class AppSettings
     // Editor Settings (v0.3.0)
     public bool WordWrap { get; set; } = false;
     public int TabSize { get; set; } = 4;
+    public bool ConvertTabsToSpaces { get; set; } = true;
     public bool ShowLineNumbers { get; set; } = true;
     public bool HighlightCurrentLine { get; set; } = true;
     public string EditorFontFamily { get; set; } = "Cascadia Code, Consolas, monospace";
     public int EditorFontSize { get; set; } = 14;
+    public int RulerColumn { get; set; } = 0;
 }
