@@ -14,6 +14,8 @@ public class AInternDbContext : DbContext
     public DbSet<SystemPromptEntity> SystemPrompts => Set<SystemPromptEntity>();
     public DbSet<InferencePresetEntity> InferencePresets => Set<InferencePresetEntity>();
     public DbSet<AppVersionEntity> AppVersions => Set<AppVersionEntity>();
+    public DbSet<RecentWorkspaceEntity> RecentWorkspaces => Set<RecentWorkspaceEntity>();
+    public DbSet<FileContextEntity> FileContextHistory => Set<FileContextEntity>();
 
     public AInternDbContext(DbContextOptions<AInternDbContext> options)
         : base(options)
