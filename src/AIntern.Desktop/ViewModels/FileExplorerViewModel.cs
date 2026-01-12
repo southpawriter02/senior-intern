@@ -605,6 +605,19 @@ public partial class FileExplorerViewModel : ViewModelBase, IFileExplorerParent,
         ErrorMessage = message;
     }
 
+    /// <summary>Command to clear the error message.</summary>
+    [RelayCommand]
+    private new void ClearError()
+    {
+        ErrorMessage = null;
+    }
+
+    /// <summary>Deletes an item (internal, for use by view after confirmation).</summary>
+    public async Task DeleteItemInternalAsync(FileTreeItemViewModel item)
+    {
+        await DeleteAsync(item);
+    }
+
     #endregion
 
     #region Helper Methods
