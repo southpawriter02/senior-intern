@@ -1,0 +1,37 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:converters="using:AIntern.Desktop.Converters">
+
+    <!-- Converter -->
+    <converters:FileIconConverter x:Key="FileIconConverter" />
+
+    <!-- Language Colors -->
+    <SolidColorBrush x:Key="FolderIconBrush" Color="#E8A838" />
+    <SolidColorBrush x:Key="FileIconBrush" Color="#8B8B8B" />
+    <SolidColorBrush x:Key="CSharpIconBrush" Color="#68217A" />
+    <SolidColorBrush x:Key="JavaScriptIconBrush" Color="#F7DF1E" />
+    <SolidColorBrush x:Key="TypeScriptIconBrush" Color="#3178C6" />
+    <SolidColorBrush x:Key="PythonIconBrush" Color="#3776AB" />
+    <SolidColorBrush x:Key="JsonIconBrush" Color="#CBB078" />
+    <SolidColorBrush x:Key="MarkdownIconBrush" Color="#083FA1" />
+    <SolidColorBrush x:Key="HtmlIconBrush" Color="#E34F26" />
+    <SolidColorBrush x:Key="CssIconBrush" Color="#1572B6" />
+    <SolidColorBrush x:Key="GitIconBrush" Color="#F05032" />
+
+    <!-- Static UI Icons -->
+    <StreamGeometry x:Key="FolderIcon">M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z</StreamGeometry>
+    <StreamGeometry x:Key="FolderOpenIcon">M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z</StreamGeometry>
+    <StreamGeometry x:Key="FileIcon">M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z</StreamGeometry>
+    <StreamGeometry x:Key="NewFileIcon">M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 14h-3v3h-2v-3H8v-2h3v-3h2v3h3v2z</StreamGeometry>
+    <StreamGeometry x:Key="NewFolderIcon">M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-3 9h-2v2h-2v-2H11v-2h2v-2h2v2h2v2z</StreamGeometry>
+    <StreamGeometry x:Key="RefreshIcon">M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z</StreamGeometry>
+    <StreamGeometry x:Key="DeleteIcon">M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z</StreamGeometry>
+    <StreamGeometry x:Key="RenameIcon">M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 000-1.41l-2.34-2.34a.996.996 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z</StreamGeometry>
+    <StreamGeometry x:Key="CopyIcon">M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z</StreamGeometry>
+    <StreamGeometry x:Key="SearchIcon">M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z</StreamGeometry>
+    <StreamGeometry x:Key="ClearIcon">M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z</StreamGeometry>
+    <StreamGeometry x:Key="ChevronRightIcon">M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z</StreamGeometry>
+    <StreamGeometry x:Key="ChevronDownIcon">M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z</StreamGeometry>
+    <StreamGeometry x:Key="AttachIcon">M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z</StreamGeometry>
+
+</ResourceDictionary>

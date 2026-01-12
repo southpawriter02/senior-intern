@@ -326,7 +326,7 @@ public class FileTreeItemViewModelTests
     [InlineData("app.tsx", "file-typescript-react")]
     [InlineData("readme.md", "file-markdown")]
     [InlineData("config.json", "file-json")]
-    [InlineData("unknown.xyz", "file")]
+    [InlineData("unknown.xyz", "file-code")]
     public void IconKey_ReturnsCorrectKey_ForFiles(string name, string expected)
     {
         var vm = new FileTreeItemViewModel(_mockParent)
