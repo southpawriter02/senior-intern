@@ -29,3 +29,5 @@ packages/
 
 # Documentation
 ROADMAP.md
+docs/design/
+docs/templates/
