@@ -24,6 +24,9 @@
 
     <!-- Code Editor -->
     <PackageReference Include="Avalonia.AvaloniaEdit" />
+    <PackageReference Include="AvaloniaEdit.TextMate" />
+    <PackageReference Include="TextMateSharp" />
+    <PackageReference Include="TextMateSharp.Grammars" />
 
     <!-- MVVM -->
     <PackageReference Include="CommunityToolkit.Mvvm" />
