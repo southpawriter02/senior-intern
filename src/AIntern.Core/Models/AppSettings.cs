@@ -25,4 +25,7 @@ public sealed class AppSettings
     public double WindowHeight { get; set; } = 800;
     public double? WindowX { get; set; }
     public double? WindowY { get; set; }
+
+    // Workspace Settings
+    public bool RestoreLastWorkspace { get; set; } = true;
 }
