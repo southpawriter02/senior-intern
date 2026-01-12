@@ -1,0 +1,206 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AIntern.Desktop.ViewModels"
+             xmlns:conv="using:AIntern.Desktop.Converters"
+             x:Class="AIntern.Desktop.Views.ChatContextBar"
+             x:DataType="vm:ChatViewModel">
+
+    <UserControl.Resources>
+        <conv:TokenCountConverter x:Key="TokenCountConverter" />
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <!-- Context Pill Style -->
+        <Style Selector="Border.context-pill">
+            <Setter Property="Background" Value="{DynamicResource ContextPillBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ContextPillBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding" Value="8,4,4,4" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+
+        <Style Selector="Border.context-pill:pointerover">
+            <Setter Property="Background" Value="{DynamicResource ContextPillHoverBrush}" />
+        </Style>
+
+        <Style Selector="Border.context-pill.selection">
+            <Setter Property="BorderBrush" Value="{DynamicResource SelectionAccentBrush}" />
+        </Style>
+
+        <!-- Close Button Style -->
+        <Style Selector="Button.pill-close">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Width" Value="20" />
+            <Setter Property="Height" Value="20" />
+            <Setter Property="Opacity" Value="0.6" />
+        </Style>
+
+        <Style Selector="Button.pill-close:pointerover">
+            <Setter Property="Background" Value="{DynamicResource CloseButtonHoverBrush}" />
+            <Setter Property="Opacity" Value="1" />
+        </Style>
+
+        <!-- Token Warning/Danger Styles -->
+        <Style Selector="TextBlock.token-warning">
+            <Setter Property="Foreground" Value="{DynamicResource WarningBrush}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <Style Selector="TextBlock.token-danger">
+            <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+    </UserControl.Styles>
+
+    <!-- Main Container - Only visible when contexts attached -->
+    <Border Background="{DynamicResource ContextBarBackgroundBrush}"
+            BorderBrush="{DynamicResource BorderBrush}"
+            BorderThickness="0,0,0,1"
+            Padding="12,8"
+            IsVisible="{Binding HasAttachedContexts}">
+
+        <Grid RowDefinitions="Auto, Auto, Auto">
+            <!-- Header Row -->
+            <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto, Auto" Margin="0,0,0,8">
+                <!-- Icon and Title -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6">
+                    <PathIcon Data="{StaticResource AttachIcon}"
+                              Width="14" Height="14"
+                              Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBlock Text="Attached Context"
+                               FontWeight="SemiBold"
+                               FontSize="12"
+                               Foreground="{DynamicResource TextMutedBrush}" />
+                </StackPanel>
+
+                <!-- Token Count -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" Margin="0,0,12,0">
+                    <TextBlock Text="~"
+                               FontSize="11"
+                               Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBlock Text="{Binding TotalContextTokens, Converter={StaticResource TokenCountConverter}}"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Classes.token-warning="{Binding IsNearTokenLimit}"
+                               Classes.token-danger="{Binding IsOverTokenLimit}" />
+                    <TextBlock Text="/"
+                               FontSize="11"
+                               Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBlock Text="{Binding MaxContextTokens, Converter={StaticResource TokenCountConverter}}"
+                               FontSize="11"
+                               Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBlock Text="tokens"
+                               FontSize="11"
+                               Foreground="{DynamicResource TextMutedBrush}" />
+                </StackPanel>
+
+                <!-- Clear All Button -->
+                <Button Grid.Column="3"
+                        Content="Clear All"
+                        Theme="{StaticResource LinkButton}"
+                        FontSize="11"
+                        Command="{Binding ClearAllContextsCommand}"
+                        IsVisible="{Binding HasMultipleContexts}" />
+            </Grid>
+
+            <!-- Context Pills -->
+            <ItemsControl Grid.Row="1" ItemsSource="{Binding AttachedContexts}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:FileContextViewModel">
+                        <Border Classes="context-pill"
+                                Classes.selection="{Binding IsPartialContent}"
+                                Margin="0,0,6,6"
+                                ToolTip.Tip="{Binding Tooltip}"
+                                PointerPressed="OnContextPillPressed"
+                                PointerEntered="OnContextPillEntered"
+                                PointerExited="OnContextPillExited">
+
+                            <Grid ColumnDefinitions="Auto, Auto, Auto, Auto">
+                                <!-- Language Badge -->
+                                <Border Grid.Column="0"
+                                        Background="{DynamicResource BadgeBackgroundBrush}"
+                                        CornerRadius="4"
+                                        Padding="4,2"
+                                        Margin="0,0,6,0"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Badge}"
+                                               FontSize="9"
+                                               FontWeight="Bold"
+                                               Foreground="{DynamicResource BadgeForegroundBrush}" />
+                                </Border>
+
+                                <!-- File Name -->
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding ShortLabel}"
+                                           FontSize="12"
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource TextPrimaryBrush}" />
+
+                                <!-- Token Count -->
+                                <TextBlock Grid.Column="2"
+                                           Text="{Binding EstimatedTokens, StringFormat='~{0}'}"
+                                           FontSize="10"
+                                           Margin="6,0"
+                                           VerticalAlignment="Center"
+                                           Foreground="{DynamicResource TextMutedBrush}" />
+
+                                <!-- Close Button -->
+                                <Button Grid.Column="3"
+                                        Classes="pill-close"
+                                        Command="{Binding $parent[UserControl].((vm:ChatViewModel)DataContext).RemoveContextCommand}"
+                                        CommandParameter="{Binding}"
+                                        VerticalAlignment="Center">
+                                    <PathIcon Data="{StaticResource CloseIcon}"
+                                              Width="8" Height="8" />
+                                </Button>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Warning Messages -->
+            <StackPanel Grid.Row="2" Margin="0,4,0,0">
+                <!-- Near limit warning -->
+                <Border Background="{DynamicResource WarningBackgroundBrush}"
+                        CornerRadius="4"
+                        Padding="8,4"
+                        IsVisible="{Binding IsNearTokenLimit}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="{StaticResource WarningIcon}"
+                                  Width="12" Height="12"
+                                  Foreground="{DynamicResource WarningBrush}" />
+                        <TextBlock Text="Approaching context limit. Consider removing some files."
+                                   FontSize="11"
+                                   Foreground="{DynamicResource WarningBrush}" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Over limit error -->
+                <Border Background="{DynamicResource ErrorBackgroundBrush}"
+                        CornerRadius="4"
+                        Padding="8,4"
+                        IsVisible="{Binding IsOverTokenLimit}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <PathIcon Data="{StaticResource ErrorIcon}"
+                                  Width="12" Height="12"
+                                  Foreground="{DynamicResource ErrorBrush}" />
+                        <TextBlock Text="Context limit exceeded. Remove some files to send message."
+                                   FontSize="11"
+                                   Foreground="{DynamicResource ErrorBrush}" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

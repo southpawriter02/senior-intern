@@ -159,5 +159,23 @@
     <SolidColorBrush x:Key="TextMutedBrush" Color="#808080" />
     <SolidColorBrush x:Key="HoverBackgroundBrush" Color="#2A2D2E" />
 
+    <!-- Context Bar Colors (v0.3.4d) -->
+    <SolidColorBrush x:Key="ContextBarBackgroundBrush" Color="#1E1E1E" />
+    <SolidColorBrush x:Key="ContextPillBackgroundBrush" Color="#2D2D2D" />
+    <SolidColorBrush x:Key="ContextPillBorderBrush" Color="#3E3E3E" />
+    <SolidColorBrush x:Key="ContextPillHoverBrush" Color="#383838" />
+    <SolidColorBrush x:Key="SelectionAccentBrush" Color="#569CD6" />
+    <SolidColorBrush x:Key="CloseButtonHoverBrush" Color="#4E4E4E" />
+
+    <!-- Badge Colors -->
+    <SolidColorBrush x:Key="BadgeBackgroundBrush" Color="#3E3E3E" />
+    <SolidColorBrush x:Key="BadgeForegroundBrush" Color="#CCCCCC" />
+
+    <!-- Token Limit Warning/Error Colors -->
+    <SolidColorBrush x:Key="WarningBrush" Color="#DDB700" />
+    <SolidColorBrush x:Key="WarningBackgroundBrush" Color="#332D00" />
+    <SolidColorBrush x:Key="ErrorBrush" Color="#F14C4C" />
+    <SolidColorBrush x:Key="ErrorBackgroundBrush" Color="#331111" />
+
 </ResourceDictionary>
 

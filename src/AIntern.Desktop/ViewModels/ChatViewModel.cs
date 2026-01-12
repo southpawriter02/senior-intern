@@ -46,6 +46,36 @@ public partial class ChatViewModel : ViewModelBase
     [ObservableProperty]
     private string? _currentPromptContent;
 
+    // Context attachment properties (v0.3.4d)
+    [ObservableProperty]
+    private ObservableCollection<FileContextViewModel> _attachedContexts = new();
+
+    [ObservableProperty]
+    private int _totalContextTokens;
+
+    [ObservableProperty]
+    private int _maxContextTokens = 8000;
+
+    /// <summary>
+    /// Whether any contexts are currently attached.
+    /// </summary>
+    public bool HasAttachedContexts => AttachedContexts.Count > 0;
+
+    /// <summary>
+    /// Whether multiple contexts are attached (shows Clear All button).
+    /// </summary>
+    public bool HasMultipleContexts => AttachedContexts.Count > 1;
+
+    /// <summary>
+    /// Whether token count is approaching the limit (80-100%).
+    /// </summary>
+    public bool IsNearTokenLimit => TotalContextTokens >= MaxContextTokens * 0.8 && TotalContextTokens < MaxContextTokens;
+
+    /// <summary>
+    /// Whether token count exceeds the limit (>100%).
+    /// </summary>
+    public bool IsOverTokenLimit => TotalContextTokens >= MaxContextTokens;
+
     public ChatViewModel(
         ILlmService llmService,
         IConversationService conversationService,
@@ -262,4 +292,83 @@ public partial class ChatViewModel : ViewModelBase
         };
         window.Show();
     }
+
+    partial void OnTotalContextTokensChanged(int value)
+    {
+        OnPropertyChanged(nameof(IsNearTokenLimit));
+        OnPropertyChanged(nameof(IsOverTokenLimit));
+    }
+
+    partial void OnMaxContextTokensChanged(int value)
+    {
+        OnPropertyChanged(nameof(IsNearTokenLimit));
+        OnPropertyChanged(nameof(IsOverTokenLimit));
+    }
+
+    #region Context Management (v0.3.4d)
+
+    /// <summary>
+    /// Adds a file context to the attached contexts.
+    /// </summary>
+    public void AddContext(FileContextViewModel context)
+    {
+        AttachedContexts.Add(context);
+        UpdateContextTokens();
+        NotifyContextPropertiesChanged();
+    }
+
+    /// <summary>
+    /// Removes a specific context from attached contexts.
+    /// </summary>
+    [RelayCommand]
+    private void RemoveContext(FileContextViewModel? context)
+    {
+        if (context != null && AttachedContexts.Remove(context))
+        {
+            UpdateContextTokens();
+            NotifyContextPropertiesChanged();
+        }
+    }
+
+    /// <summary>
+    /// Clears all attached contexts.
+    /// </summary>
+    [RelayCommand]
+    private void ClearAllContexts()
+    {
+        AttachedContexts.Clear();
+        TotalContextTokens = 0;
+        NotifyContextPropertiesChanged();
+    }
+
+    /// <summary>
+    /// Shows a preview of the selected context (placeholder for future implementation).
+    /// </summary>
+    [RelayCommand]
+    private void ShowPreview(FileContextViewModel? context)
+    {
+        // TODO: Implement preview functionality in a future version
+        // This will open a preview panel or dialog showing the context content
+    }
+
+    /// <summary>
+    /// Updates the total token count from all attached contexts.
+    /// </summary>
+    private void UpdateContextTokens()
+    {
+        TotalContextTokens = AttachedContexts.Sum(c => c.EstimatedTokens);
+    }
+
+    /// <summary>
+    /// Notifies property changes for computed context properties.
+    /// </summary>
+    private void NotifyContextPropertiesChanged()
+    {
+        OnPropertyChanged(nameof(HasAttachedContexts));
+        OnPropertyChanged(nameof(HasMultipleContexts));
+        OnPropertyChanged(nameof(IsNearTokenLimit));
+        OnPropertyChanged(nameof(IsOverTokenLimit));
+    }
+
+    #endregion
 }
