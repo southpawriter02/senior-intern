@@ -44,11 +44,13 @@ public static class ServiceCollectionExtensions
     /// </list>
     /// </para>
     /// <para>
-    /// <b>ViewModels:</b> Registered as transient (new instance per request):
+    /// <b>ViewModels:</b> Registered with appropriate lifetimes:
     /// <list type="bullet">
-    /// <item><see cref="MainWindowViewModel"/></item>
-    /// <item><see cref="ChatViewModel"/></item>
-    /// <item><see cref="ModelSelectorViewModel"/></item>
+    /// <item><see cref="MainWindowViewModel"/> - Transient</item>
+    /// <item><see cref="ChatViewModel"/> - Transient</item>
+    /// <item><see cref="ModelSelectorViewModel"/> - Transient</item>
+    /// <item><see cref="ConversationListViewModel"/> - Transient</item>
+    /// <item><see cref="InferenceSettingsViewModel"/> - Singleton (maintains state)</item>
     /// </list>
     /// </para>
     /// </remarks>
@@ -139,6 +141,11 @@ public static class ServiceCollectionExtensions
         
         // Conversation list: sidebar with grouped conversations
         services.AddTransient<ConversationListViewModel>();
+
+        // Inference settings: parameter sliders and preset management.
+        // Singleton to maintain state across the application lifecycle.
+        // Subscribes to IInferenceSettingsService events for two-way sync.
+        services.AddSingleton<InferenceSettingsViewModel>();
 
         return services;
     }

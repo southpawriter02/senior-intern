@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.2.3c] - 2026-01-13
+
+ViewModels for inference settings panel. See [detailed notes](docs/changelog/v0.2.3c.md).
+
+### Added
+
+- InferenceSettingsViewModel: Full ViewModel for parameter sliders with:
+  - 7 parameter properties (Temperature, TopP, TopK, MaxTokens, ContextSize, RepetitionPenalty, Seed)
+  - 7 computed description properties with context-aware text
+  - 200ms debounce timer for batched service updates
+  - Feedback loop prevention via `_isUpdatingFromService` flag
+  - 10 commands for preset and UI operations
+  - IDisposable for proper event cleanup
+- InferencePresetViewModel: Lightweight wrapper for preset display with:
+  - All preset properties (Id, Name, Description, Category, IsBuiltIn, IsDefault)
+  - Computed ParameterSummary and TypeIndicator
+- DI registration for InferenceSettingsViewModel (singleton)
+
 ## [0.2.3b] - 2026-01-13
 
 Inference settings service with event-driven architecture. See [detailed notes](docs/changelog/v0.2.3b.md).
