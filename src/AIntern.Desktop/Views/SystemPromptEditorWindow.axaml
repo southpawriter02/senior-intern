@@ -1,0 +1,457 @@
+<!--
+    SystemPromptEditorWindow.axaml - System Prompt Editor Dialog
+
+    Version: v0.2.4d
+    Created: 2026-01-13
+
+    This window provides a full editor for managing system prompts with:
+    - Split-pane layout: prompt list sidebar (260px) + editor panel
+    - User prompts section with default indicator and usage count
+    - Templates section with category badges and descriptions
+    - Name, description, and content editing with validation
+    - Character count and estimated token count display
+    - "Modified" indicator for unsaved changes
+    - Read-only mode for built-in templates with "Create Copy" action
+    - Loading overlay and error banner
+
+    Keyboard Shortcuts:
+    - Ctrl+S: Save current prompt
+    - Ctrl+N: Create new prompt
+    - Escape: Discard changes (if dirty) or close window
+
+    Bound to: SystemPromptEditorViewModel (v0.2.4c)
+-->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:AIntern.Desktop.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="650"
+        x:Class="AIntern.Desktop.Views.SystemPromptEditorWindow"
+        x:DataType="vm:SystemPromptEditorViewModel"
+        Title="System Prompt Editor"
+        Width="900" Height="650"
+        MinWidth="700" MinHeight="500"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource WindowBackground}">
+
+    <!-- ================================================================== -->
+    <!-- Window Styles - Selector-based styles for prompt list items        -->
+    <!-- ================================================================== -->
+    <Window.Styles>
+        <!-- Prompt Item Base Style - For user prompt list items in editor sidebar.
+             Provides hover and selection states for interactive list items. -->
+        <Style Selector="Border.prompt-item">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style Selector="Border.prompt-item:pointerover">
+            <Setter Property="Background" Value="{DynamicResource ControlBackground}" />
+        </Style>
+        <Style Selector="Border.prompt-item.selected">
+            <Setter Property="Background" Value="{DynamicResource ConversationItemSelectedBackground}" />
+        </Style>
+
+        <!-- Template Item Style - For template prompt list items in editor sidebar.
+             Similar to prompt-item but for read-only template prompts. -->
+        <Style Selector="Border.template-item">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style Selector="Border.template-item:pointerover">
+            <Setter Property="Background" Value="{DynamicResource ControlBackground}" />
+        </Style>
+    </Window.Styles>
+
+    <!-- ================================================================== -->
+    <!-- Window Resources - DataTemplates for prompt list items             -->
+    <!-- ================================================================== -->
+    <Window.Resources>
+
+        <!-- UserPromptItemTemplate - Template for user-created prompts in the sidebar.
+             Shows: star indicator (if default), name, usage count, and content preview. -->
+        <DataTemplate x:Key="UserPromptItemTemplate" x:DataType="vm:SystemPromptViewModel">
+            <Border Classes="prompt-item" Classes.selected="{Binding IsSelected}"
+                    Padding="12,8" Margin="2,1" CornerRadius="4">
+                <Grid RowDefinitions="Auto,Auto">
+                    <!-- Row 0: Name with default star and usage count -->
+                    <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto">
+                        <!-- Default star indicator -->
+                        <PathIcon Grid.Column="0"
+                                  Data="{StaticResource StarIcon}"
+                                  Width="12" Height="12"
+                                  Foreground="{DynamicResource AccentBrush}"
+                                  IsVisible="{Binding IsDefault}"
+                                  Margin="0,0,6,0"
+                                  VerticalAlignment="Center" />
+                        <!-- Prompt name -->
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding Name}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimary}"
+                                   TextTrimming="CharacterEllipsis"
+                                   VerticalAlignment="Center" />
+                        <!-- Usage count (hidden if 0) -->
+                        <TextBlock Grid.Column="2"
+                                   Text="{Binding UsageCount, StringFormat='Used {0}x'}"
+                                   FontSize="10"
+                                   Foreground="{DynamicResource TextMuted}"
+                                   IsVisible="{Binding UsageCount}"
+                                   VerticalAlignment="Center"
+                                   Margin="8,0,0,0" />
+                    </Grid>
+                    <!-- Row 1: Content preview -->
+                    <TextBlock Grid.Row="1"
+                               Text="{Binding ContentPreview}"
+                               FontSize="11"
+                               Foreground="{DynamicResource TextMuted}"
+                               TextTrimming="CharacterEllipsis"
+                               Margin="0,4,0,0" />
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <!-- TemplateItemTemplate - Template for built-in template prompts.
+             Shows: icon, name, category badge, and description. -->
+        <DataTemplate x:Key="TemplateItemTemplate" x:DataType="vm:SystemPromptViewModel">
+            <Border Classes="template-item" Padding="12,8" Margin="2,1" CornerRadius="4">
+                <Grid ColumnDefinitions="Auto,*">
+                    <!-- Category icon -->
+                    <Border Grid.Column="0"
+                            Background="{DynamicResource ControlBackground}"
+                            CornerRadius="4"
+                            Padding="6"
+                            Margin="0,0,10,0"
+                            VerticalAlignment="Center">
+                        <PathIcon Data="{StaticResource PromptIcon}"
+                                  Width="16" Height="16"
+                                  Foreground="{DynamicResource AccentBrush}" />
+                    </Border>
+                    <!-- Name, category, and description -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="{Binding Name}"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimary}" />
+                            <!-- Category badge -->
+                            <Border Background="{DynamicResource ControlBackground}"
+                                    CornerRadius="2"
+                                    Padding="4,1">
+                                <TextBlock Text="{Binding Category}"
+                                           FontSize="10"
+                                           Foreground="{DynamicResource TextMuted}" />
+                            </Border>
+                        </StackPanel>
+                        <!-- Description -->
+                        <TextBlock Text="{Binding Description}"
+                                   FontSize="11"
+                                   Foreground="{DynamicResource TextMuted}"
+                                   TextTrimming="CharacterEllipsis"
+                                   Margin="0,2,0,0" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+    </Window.Resources>
+
+    <!-- ================================================================== -->
+    <!-- Main Content Panel - Contains main grid + overlays                 -->
+    <!-- ================================================================== -->
+    <Panel>
+        <!-- Main layout grid: content area + action bar -->
+        <Grid RowDefinitions="*,Auto">
+
+            <!-- ============================================================ -->
+            <!-- Content Area (Row 0): Split pane with sidebar + editor       -->
+            <!-- ============================================================ -->
+            <Grid Grid.Row="0" ColumnDefinitions="260,*">
+
+                <!-- ======================================================== -->
+                <!-- Left Panel: Prompt Lists Sidebar (260px)                 -->
+                <!-- ======================================================== -->
+                <Border Grid.Column="0"
+                        Background="{DynamicResource SidebarBackground}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="0,0,1,0">
+                    <Grid RowDefinitions="Auto,*,Auto,Auto">
+
+                        <!-- My Prompts Header + New Button -->
+                        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="12,12,12,8">
+                            <TextBlock Grid.Column="0"
+                                       Text="My Prompts"
+                                       FontWeight="SemiBold"
+                                       FontSize="13"
+                                       Foreground="{DynamicResource TextPrimary}"
+                                       VerticalAlignment="Center" />
+                            <Button Grid.Column="1"
+                                    Theme="{StaticResource IconButton}"
+                                    Command="{Binding CreateNewPromptCommand}"
+                                    ToolTip.Tip="New Prompt (Ctrl+N)">
+                                <PathIcon Data="{StaticResource PlusIcon}"
+                                          Width="14" Height="14" />
+                            </Button>
+                        </Grid>
+
+                        <!-- User Prompts List (scrollable, fills available space) -->
+                        <ScrollViewer Grid.Row="1"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled">
+                            <ListBox ItemsSource="{Binding UserPrompts}"
+                                     SelectedItem="{Binding SelectedPrompt}"
+                                     ItemTemplate="{StaticResource UserPromptItemTemplate}"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     Padding="4,0">
+                                <ListBox.Styles>
+                                    <Style Selector="ListBoxItem">
+                                        <Setter Property="Padding" Value="0" />
+                                        <Setter Property="Margin" Value="0" />
+                                        <Setter Property="Background" Value="Transparent" />
+                                    </Style>
+                                    <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                        <Setter Property="Background" Value="Transparent" />
+                                    </Style>
+                                </ListBox.Styles>
+                            </ListBox>
+                        </ScrollViewer>
+
+                        <!-- Templates Header -->
+                        <TextBlock Grid.Row="2"
+                                   Text="Templates"
+                                   FontWeight="SemiBold"
+                                   FontSize="13"
+                                   Foreground="{DynamicResource TextPrimary}"
+                                   Margin="12,16,12,8" />
+
+                        <!-- Templates List (max height 200, scrollable) -->
+                        <ScrollViewer Grid.Row="3"
+                                      MaxHeight="200"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      Margin="0,0,0,8">
+                            <ListBox ItemsSource="{Binding Templates}"
+                                     SelectedItem="{Binding SelectedPrompt}"
+                                     ItemTemplate="{StaticResource TemplateItemTemplate}"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     Padding="4,0">
+                                <ListBox.Styles>
+                                    <Style Selector="ListBoxItem">
+                                        <Setter Property="Padding" Value="0" />
+                                        <Setter Property="Margin" Value="0" />
+                                        <Setter Property="Background" Value="Transparent" />
+                                    </Style>
+                                    <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                        <Setter Property="Background" Value="Transparent" />
+                                    </Style>
+                                </ListBox.Styles>
+                            </ListBox>
+                        </ScrollViewer>
+
+                    </Grid>
+                </Border>
+
+                <!-- ======================================================== -->
+                <!-- Right Panel: Editor                                      -->
+                <!-- ======================================================== -->
+                <Grid Grid.Column="1" RowDefinitions="Auto,Auto,*,Auto" Margin="16">
+
+                    <!-- Name Field with Validation -->
+                    <StackPanel Grid.Row="0" Margin="0,0,0,12">
+                        <TextBlock Text="Name"
+                                   FontWeight="SemiBold"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource TextMuted}"
+                                   Margin="0,0,0,4" />
+                        <TextBox Text="{Binding PromptName, Mode=TwoWay}"
+                                 Watermark="Enter a name for your prompt"
+                                 MaxLength="100"
+                                 IsReadOnly="{Binding !CanEdit}" />
+                        <!-- Validation error -->
+                        <TextBlock Text="{Binding ValidationError}"
+                                   FontSize="11"
+                                   Foreground="{DynamicResource ErrorForeground}"
+                                   IsVisible="{Binding ValidationError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                   Margin="0,4,0,0" />
+                    </StackPanel>
+
+                    <!-- Description Field (optional) -->
+                    <StackPanel Grid.Row="1" Margin="0,0,0,12">
+                        <TextBlock Text="Description (optional)"
+                                   FontWeight="SemiBold"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource TextMuted}"
+                                   Margin="0,0,0,4" />
+                        <TextBox Text="{Binding PromptDescription, Mode=TwoWay}"
+                                 Watermark="Brief description of what this prompt does"
+                                 MaxLength="500"
+                                 IsReadOnly="{Binding !CanEdit}" />
+                    </StackPanel>
+
+                    <!-- Content Editor (multiline, monospace) -->
+                    <Grid Grid.Row="2" RowDefinitions="Auto,*">
+                        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,4">
+                            <TextBlock Grid.Column="0"
+                                       Text="System Prompt Content"
+                                       FontWeight="SemiBold"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource TextMuted}" />
+                            <!-- "Create Copy to Edit" link for templates -->
+                            <Button Grid.Column="1"
+                                    Theme="{StaticResource LinkButton}"
+                                    Content="Create Copy to Edit"
+                                    Command="{Binding CreateFromTemplateCommand}"
+                                    CommandParameter="{Binding SelectedPrompt}"
+                                    IsVisible="{Binding !CanEdit}"
+                                    ToolTip.Tip="Create an editable copy of this template" />
+                        </Grid>
+                        <TextBox Grid.Row="1"
+                                 Theme="{StaticResource CodeEditorTextBox}"
+                                 Text="{Binding EditorContent, Mode=TwoWay}"
+                                 Watermark="Enter your system prompt here..."
+                                 IsReadOnly="{Binding !CanEdit}"
+                                 VerticalAlignment="Stretch" />
+                    </Grid>
+
+                    <!-- Stats Footer -->
+                    <Border Grid.Row="3" Margin="0,12,0,0">
+                        <StackPanel Orientation="Horizontal" Spacing="16">
+                            <!-- Character count -->
+                            <TextBlock Text="{Binding CharacterCountText}"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource TextMuted}" />
+                            <!-- Separator -->
+                            <TextBlock Text="|"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource TextMuted}" />
+                            <!-- Token count -->
+                            <TextBlock Text="{Binding TokenCountText}"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource TextMuted}" />
+                            <!-- Modified indicator -->
+                            <TextBlock Text="| Modified"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource AccentBrush}"
+                                       FontWeight="SemiBold"
+                                       IsVisible="{Binding IsDirty}" />
+                            <!-- Read-only badge for templates -->
+                            <Border Background="{DynamicResource ControlBackground}"
+                                    CornerRadius="2"
+                                    Padding="6,2"
+                                    IsVisible="{Binding !CanEdit}">
+                                <TextBlock Text="Read-only Template"
+                                           FontSize="10"
+                                           Foreground="{DynamicResource TextMuted}" />
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                </Grid>
+
+            </Grid>
+
+            <!-- ============================================================ -->
+            <!-- Bottom Action Bar (Row 1)                                    -->
+            <!-- ============================================================ -->
+            <Border Grid.Row="1"
+                    Background="{DynamicResource PanelBackgroundColor}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="0,1,0,0"
+                    Padding="16,12">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <!-- Left: Destructive/Secondary Actions -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+                        <Button Content="Delete"
+                                Theme="{StaticResource DestructiveButton}"
+                                Command="{Binding DeletePromptCommand}"
+                                IsVisible="{Binding CanDelete}"
+                                ToolTip.Tip="Delete this prompt" />
+                        <Button Content="Duplicate"
+                                Theme="{StaticResource SubtleButton}"
+                                Command="{Binding DuplicatePromptCommand}"
+                                IsVisible="{Binding CanDuplicate}"
+                                ToolTip.Tip="Create a copy of this prompt">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <PathIcon Data="{StaticResource CopyIcon}"
+                                              Width="14" Height="14" />
+                                    <TextBlock Text="Duplicate" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                        <Button Theme="{StaticResource SubtleButton}"
+                                Command="{Binding SetAsDefaultCommand}"
+                                IsVisible="{Binding CanSetDefault}"
+                                ToolTip.Tip="Set as the default prompt for new conversations">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <PathIcon Data="{StaticResource DefaultIcon}"
+                                          Width="14" Height="14" />
+                                <TextBlock Text="Set as Default" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <!-- Right: Primary Actions -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                        <Button Content="Discard"
+                                Theme="{StaticResource SubtleButton}"
+                                Command="{Binding DiscardChangesCommand}"
+                                IsVisible="{Binding IsDirty}"
+                                ToolTip.Tip="Discard unsaved changes (Escape)" />
+                        <Button Content="Save"
+                                Theme="{StaticResource AccentButton}"
+                                Command="{Binding SavePromptCommand}"
+                                ToolTip.Tip="Save changes (Ctrl+S)" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+        </Grid>
+
+        <!-- ================================================================ -->
+        <!-- Loading Overlay - Shown during async operations                  -->
+        <!-- ================================================================ -->
+        <Border Background="#80000000"
+                IsVisible="{Binding IsLoading}"
+                ZIndex="100">
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="12"
+                        Width="200">
+                <ProgressBar IsIndeterminate="True"
+                             Height="4" />
+                <TextBlock Text="Loading..."
+                           Foreground="{DynamicResource TextPrimary}"
+                           FontSize="12"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+        </Border>
+
+        <!-- ================================================================ -->
+        <!-- Error Banner - Shown when ErrorMessage is set                    -->
+        <!-- ================================================================ -->
+        <Border Background="{DynamicResource ErrorBackground}"
+                IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                VerticalAlignment="Top"
+                Padding="16,12"
+                ZIndex="99">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0"
+                           Text="{Binding ErrorMessage}"
+                           Foreground="{DynamicResource ErrorForeground}"
+                           TextWrapping="Wrap"
+                           VerticalAlignment="Center" />
+                <Button Grid.Column="1"
+                        Theme="{StaticResource SmallIconButton}"
+                        Command="{Binding ClearErrorMessageCommand}"
+                        ToolTip.Tip="Dismiss">
+                    <PathIcon Data="{StaticResource CloseIcon}"
+                              Width="12" Height="12" />
+                </Button>
+            </Grid>
+        </Border>
+
+    </Panel>
+
+</Window>

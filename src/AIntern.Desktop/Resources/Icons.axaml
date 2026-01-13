@@ -132,4 +132,36 @@
     -->
     <StreamGeometry x:Key="SettingsIcon">M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22l-1.92 3.32c-.12.21-.07.47.12.61l2.03 1.58c-.04.31-.05.63-.05.94 0 .31.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z</StreamGeometry>
 
+    <!-- ================================================================== -->
+    <!-- System Prompt Editor Icons (v0.2.4d)                              -->
+    <!-- ================================================================== -->
+
+    <!--
+        StarIcon - Used for default prompt indicator in system prompt list
+        Filled star indicating the default/favorite prompt
+        ViewBox: 0 0 24 24
+    -->
+    <StreamGeometry x:Key="StarIcon">M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z</StreamGeometry>
+
+    <!--
+        CopyIcon - Used for duplicate prompt action in system prompt editor
+        Two overlapping documents representing copy/duplicate
+        ViewBox: 0 0 24 24
+    -->
+    <StreamGeometry x:Key="CopyIcon">M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z</StreamGeometry>
+
+    <!--
+        DefaultIcon - Used for "set as default" action in system prompt editor
+        Checkmark in circle indicating selection/default status
+        ViewBox: 0 0 24 24
+    -->
+    <StreamGeometry x:Key="DefaultIcon">M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z</StreamGeometry>
+
+    <!--
+        PromptIcon - Default icon for system prompts in template list
+        Chat bubble with dots representing system prompt/instruction
+        ViewBox: 0 0 24 24
+    -->
+    <StreamGeometry x:Key="PromptIcon">M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 11H7V9h2v2zm4 0h-2V9h2v2zm4 0h-2V9h2v2z</StreamGeometry>
+
 </ResourceDictionary>

@@ -1239,6 +1239,22 @@ public sealed partial class SystemPromptEditorViewModel : ViewModelBase, IDispos
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Clears the current error message.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Used by the error banner dismiss button in the UI.
+    /// Added in v0.2.4d.
+    /// </para>
+    /// </remarks>
+    [RelayCommand]
+    private void ClearErrorMessage()
+    {
+        _logger?.LogDebug("[INFO] ClearErrorMessage - Clearing error from UI");
+        ClearError();
+    }
+
     #endregion
 
     #region IDisposable

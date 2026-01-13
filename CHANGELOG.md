@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.2.4d] - 2026-01-13
+
+System prompt editor window UI. See [detailed notes](docs/changelog/v0.2.4d.md).
+
+### Added
+
+- SystemPromptEditorWindow.axaml: Full editor dialog (428 lines)
+  - Split-pane layout: 260px prompt list sidebar + editor panel
+  - User prompts section with default star indicator and usage count
+  - Templates section with category badges and descriptions
+  - Name, description, and content editing with validation
+  - Character count and estimated token count display
+  - "Modified" indicator for unsaved changes
+  - Read-only mode for built-in templates with "Create Copy to Edit" action
+  - Loading overlay and error banner
+- SystemPromptEditorWindow.axaml.cs: Code-behind with lifecycle management (377 lines)
+  - OnOpened: Initializes ViewModel
+  - OnClosing: Unsaved changes handling with UnsavedChangesDialog
+  - OnKeyDown: Keyboard shortcuts (Ctrl+S, Ctrl+N, Escape)
+  - IDisposable for ViewModel cleanup
+  - Exhaustive logging with [ENTER]/[EXIT]/[INFO]/[SKIP]/[ERROR]/[INIT]/[DISPOSE] markers
+- Keyboard shortcuts: Ctrl+S (save), Ctrl+N (new), Escape (discard/close)
+- Editor styles: Window.Styles (prompt-item, template-item), Dark.axaml (CodeEditorTextBox, LinkButton)
+- Icons in Icons.axaml: StarIcon, CopyIcon, DefaultIcon, PromptIcon
+- ClearErrorMessageCommand in SystemPromptEditorViewModel for error banner dismiss
+
 ## [0.2.4c] - 2026-01-13
 
 Editor ViewModels for system prompt management. See [detailed notes](docs/changelog/v0.2.4c.md).

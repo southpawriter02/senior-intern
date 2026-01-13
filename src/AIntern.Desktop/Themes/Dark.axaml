@@ -229,4 +229,65 @@
         </Style>
     </ControlTheme>
 
+    <!-- ============================================================== -->
+    <!-- System Prompt Editor ControlThemes (v0.2.4d)                   -->
+    <!-- ControlThemes for the system prompt editor window.             -->
+    <!-- ============================================================== -->
+
+    <!-- Code Editor TextBox ControlTheme - Monospace content editor for system prompts.
+         Features: monospace font, multi-line support, focus highlight.
+         Usage: <TextBox Theme="{StaticResource CodeEditorTextBox}" /> -->
+    <ControlTheme x:Key="CodeEditorTextBox" TargetType="TextBox">
+        <Setter Property="Background" Value="{DynamicResource InputBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        <Setter Property="CaretBrush" Value="{DynamicResource TextPrimary}" />
+        <Setter Property="SelectionBrush" Value="{DynamicResource AccentBrush}" />
+        <Setter Property="FontFamily" Value="Cascadia Code, Consolas, monospace" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Padding" Value="12" />
+        <Setter Property="AcceptsReturn" Value="True" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="VerticalContentAlignment" Value="Top" />
+
+        <Style Selector="^:focus">
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+        </Style>
+
+        <Style Selector="^:pointerover">
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+        </Style>
+
+        <Style Selector="^:disabled">
+            <Setter Property="Opacity" Value="0.5" />
+        </Style>
+    </ControlTheme>
+
+    <!-- Link Button ControlTheme - For "Create Copy to Edit" action on templates.
+         Styled as a text hyperlink without button chrome.
+         Usage: <Button Theme="{StaticResource LinkButton}" Content="Create Copy" /> -->
+    <ControlTheme x:Key="LinkButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FontSize" Value="12" />
+
+        <Style Selector="^:pointerover">
+            <Setter Property="Foreground" Value="{DynamicResource AccentHoverBrush}" />
+        </Style>
+
+        <Style Selector="^:pressed">
+            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="Opacity" Value="0.8" />
+        </Style>
+
+        <Style Selector="^:disabled">
+            <Setter Property="Opacity" Value="0.5" />
+        </Style>
+    </ControlTheme>
+
 </ResourceDictionary>
