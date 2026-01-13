@@ -3,7 +3,9 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using AIntern.Core.Interfaces;
+using AIntern.Data;
 using AIntern.Desktop.Extensions;
 using AIntern.Desktop.ViewModels;
 using AIntern.Desktop.Views;
@@ -56,6 +58,12 @@ public partial class App : Application
         services.AddAInternServices();
         Services = services.BuildServiceProvider();
 
+        // Initialize the database (apply migrations and seed data).
+        // This must happen before the main window opens to ensure data is available.
+        // Using GetAwaiter().GetResult() is safe here because this runs before
+        // the Avalonia dispatcher is fully active.
+        InitializeDatabaseAsync().GetAwaiter().GetResult();
+
         // Configure the desktop application lifetime
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
@@ -71,6 +79,55 @@ public partial class App : Application
 
         // Call base implementation to complete initialization
         base.OnFrameworkInitializationCompleted();
+    }
+
+    /// <summary>
+    /// Initializes the database by applying pending migrations and seeding default data.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// This method is called during application startup before the main window is shown.
+    /// It ensures the database schema is up-to-date and that required seed data
+    /// (system prompts, inference presets) exists.
+    /// </para>
+    /// <para>
+    /// If initialization fails, the error is logged but the application continues.
+    /// This prevents the app from crashing due to database issues while still
+    /// making the problem visible in logs for debugging.
+    /// </para>
+    /// </remarks>
+    private static async Task InitializeDatabaseAsync()
+    {
+        var logger = Services.GetRequiredService<ILogger<App>>();
+
+        try
+        {
+            // Create a scope to properly handle scoped services like DbContext.
+            // The scope ensures the DbContext is disposed after initialization.
+            using var scope = Services.CreateScope();
+            var initializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
+
+            await initializer.InitializeAsync();
+
+            logger.LogInformation("Database initialization completed successfully");
+        }
+        catch (DatabaseInitializationException ex)
+        {
+            // Log the failure but don't crash - allow app to start even if DB has issues.
+            // User will see errors when trying to use features that require the database.
+            logger.LogError(
+                ex,
+                "Database initialization failed: {Message}",
+                ex.Message);
+        }
+        catch (Exception ex)
+        {
+            // Catch any unexpected errors during initialization.
+            logger.LogError(
+                ex,
+                "Unexpected error during database initialization: {Message}",
+                ex.Message);
+        }
     }
 
     /// <summary>

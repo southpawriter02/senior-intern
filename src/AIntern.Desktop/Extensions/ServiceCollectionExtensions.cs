@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using AIntern.Core.Interfaces;
+using AIntern.Data;
 using AIntern.Desktop.ViewModels;
 using AIntern.Services;
 using Serilog;
@@ -24,6 +25,14 @@ public static class ServiceCollectionExtensions
     /// <remarks>
     /// <para>
     /// <b>Logging:</b> Replaces the default logging providers with Serilog.
+    /// </para>
+    /// <para>
+    /// <b>Data Layer:</b> Registered via <see cref="DataServiceCollectionExtensions.AddDataServices"/>:
+    /// <list type="bullet">
+    /// <item><see cref="AInternDbContext"/> - Database context (scoped)</item>
+    /// <item>Repository interfaces - Data access (scoped)</item>
+    /// <item><see cref="DatabaseInitializer"/> - Migration and seeding (scoped)</item>
+    /// </list>
     /// </para>
     /// <para>
     /// <b>Services:</b> Registered as singletons to maintain shared state:
@@ -58,6 +67,14 @@ public static class ServiceCollectionExtensions
             // dispose: true ensures Serilog is properly disposed on app shutdown
             builder.AddSerilog(dispose: true);
         });
+
+        // ┌─────────────────────────────────────────────────────────────────┐
+        // │ DATA LAYER (Scoped - shared DbContext per request)              │
+        // └─────────────────────────────────────────────────────────────────┘
+        
+        // Register DbContext, repositories, and database initializer.
+        // This enables conversation persistence, system prompts, and inference presets.
+        services.AddDataServices();
 
         // ┌─────────────────────────────────────────────────────────────────┐
         // │ CORE SERVICES (Singletons - shared state across app)            │
