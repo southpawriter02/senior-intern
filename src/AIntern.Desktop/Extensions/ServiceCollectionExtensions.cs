@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using AIntern.Core.Interfaces;
 using AIntern.Data;
+using AIntern.Data.Repositories;
 using AIntern.Desktop.ViewModels;
 using AIntern.Services;
 using Serilog;
@@ -86,8 +87,20 @@ public static class ServiceCollectionExtensions
         // LLM: manages model loading, inference, and resource cleanup
         services.AddSingleton<ILlmService, LlmService>();
         
-        // Conversation: maintains current chat state and message history
-        services.AddSingleton<IConversationService, ConversationService>();
+        // Conversation: manages current chat state with database persistence.
+        // Uses a factory to resolve scoped repository dependencies.
+        // The service maintains a long-lived singleton while creating scoped
+        // DbContext instances for each database operation.
+        services.AddSingleton<IConversationService>(sp =>
+        {
+            // Create a scope to resolve scoped services (repositories).
+            // The service will manage its own scopes for database operations.
+            var scope = sp.CreateScope();
+            return new DatabaseConversationService(
+                scope.ServiceProvider.GetRequiredService<IConversationRepository>(),
+                scope.ServiceProvider.GetRequiredService<ISystemPromptRepository>(),
+                sp.GetRequiredService<ILogger<DatabaseConversationService>>());
+        });
 
         // ┌─────────────────────────────────────────────────────────────────┐
         // │ VIEWMODELS (Transient - created fresh when requested)           │

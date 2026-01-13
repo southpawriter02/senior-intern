@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.2.2a] - 2026-01-12
+
+Service layer for conversation persistence. See [detailed notes](docs/changelog/v0.2.2a.md).
+
+### Added
+
+- DatabaseConversationService with auto-save (500ms debounce)
+- Domain model persistence tracking (IsPersisted, HasUnsavedChanges)
+- ConversationSummary and DateGroup for sidebar display
+- Event-driven UI synchronization (3 events)
+- Message SequenceNumber for ordering
+
+### Removed
+
+- ConversationService (replaced by DatabaseConversationService)
+
+## [0.2.1e] - 2026-01-12
+
+Database initialization and seeding. See [detailed notes](docs/changelog/v0.2.1e.md).
+
+### Added
+
+- DatabaseInitializer for migrations and seeding
+- Built-in system prompts (3): Default, Code, Writing Assistant
+- Built-in inference presets (4): Balanced, Creative, Precise, Fast
+- Automatic backup before migrations
+- DataServiceCollectionExtensions for DI registration
+
+## [0.2.1d] - 2026-01-12
+
+Repository layer implementation. See [detailed notes](docs/changelog/v0.2.1d.md).
+
+### Added
+
+- IConversationRepository with message-level operations
+- ISystemPromptRepository with category filtering
+- IInferencePresetRepository with default management
+- Repository implementations with exhaustive logging
+- 29 unit tests for repository layer
+
 ## [0.2.1c] - 2026-01-12
 
 DbContext and Entity Framework Core configurations. See [detailed notes](docs/changelog/v0.2.1c.md).
@@ -18,6 +58,7 @@ DbContext and Entity Framework Core configurations. See [detailed notes](docs/ch
 - 19 database indexes for query optimization
 - Unit tests for DbContext and configurations (22 tests)
 - Feature documentation (docs/features/dbcontext.md)
+
 
 ## [0.2.1b] - 2026-01-12
 

@@ -4,4 +4,10 @@
     <RootNamespace>AIntern.Core</RootNamespace>
   </PropertyGroup>
 
+  <!-- Allow internal members to be visible to test and services assemblies -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="AIntern.Core.Tests" />
+    <InternalsVisibleTo Include="AIntern.Services" />
+  </ItemGroup>
+
 </Project>

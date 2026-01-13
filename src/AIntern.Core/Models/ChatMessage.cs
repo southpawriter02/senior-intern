@@ -79,4 +79,14 @@ public sealed class ChatMessage
     /// Only populated for Assistant messages after generation completes.
     /// </summary>
     public TimeSpan? GenerationTime { get; set; }
+
+    /// <summary>
+    /// Gets or sets the sequence number for ordering within a conversation.
+    /// Assigned automatically when adding messages to a conversation.
+    /// </summary>
+    /// <remarks>
+    /// Used for database storage and ensuring consistent message ordering.
+    /// Starts at 1 for the first message in a conversation.
+    /// </remarks>
+    public int SequenceNumber { get; set; }
 }
