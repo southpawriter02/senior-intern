@@ -25,6 +25,10 @@ namespace AIntern.Services;
 /// On other platforms, CPU inference is used by default but can be configured
 /// via <see cref="ModelLoadOptions.GpuLayerCount"/>.
 /// </para>
+/// <para>
+/// <b>v0.2.3e:</b> Integrates with <see cref="IInferenceSettingsService"/> to use
+/// user-configured inference parameters (Temperature, TopP, TopK, RepetitionPenalty, etc.).
+/// </para>
 /// </remarks>
 public sealed class LlmService : ILlmService
 {
@@ -34,13 +38,47 @@ public sealed class LlmService : ILlmService
     private LLamaWeights? _model;           // Loaded model weights (VRAM/RAM)
     private LLamaContext? _context;         // Model context for inference
     private InteractiveExecutor? _executor; // Handles the actual text generation
-    
+
     // Thread synchronization locks
     private readonly SemaphoreSlim _loadLock = new(1, 1);      // Protects load/unload operations
     private readonly SemaphoreSlim _inferenceLock = new(1, 1); // Protects inference operations
-    
+
     // Allows cancellation of the current inference operation
     private CancellationTokenSource? _currentInferenceCts;
+
+    // Service dependencies (v0.2.3e)
+    private readonly IInferenceSettingsService? _inferenceSettings;
+
+    #endregion
+
+    #region Constructor
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LlmService"/> class.
+    /// </summary>
+    /// <remarks>
+    /// Default constructor for backward compatibility and simpler DI scenarios.
+    /// </remarks>
+    public LlmService()
+    {
+        _inferenceSettings = null;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LlmService"/> class with inference settings.
+    /// </summary>
+    /// <param name="inferenceSettings">The inference settings service for user-configured parameters.</param>
+    /// <remarks>
+    /// <para>
+    /// Added in v0.2.3e to support user-configured inference parameters from the settings panel.
+    /// When provided, the service uses <see cref="IInferenceSettingsService.CurrentSettings"/>
+    /// for inference parameters instead of hardcoded defaults.
+    /// </para>
+    /// </remarks>
+    public LlmService(IInferenceSettingsService inferenceSettings)
+    {
+        _inferenceSettings = inferenceSettings ?? throw new ArgumentNullException(nameof(inferenceSettings));
+    }
 
     #endregion
 
@@ -200,6 +238,16 @@ public sealed class LlmService : ILlmService
 
     /// <inheritdoc />
     /// <exception cref="InferenceException">Thrown when no model is loaded.</exception>
+    /// <remarks>
+    /// <para>
+    /// <b>v0.2.3e Parameter Resolution:</b> Parameters are resolved in the following order:
+    /// <list type="number">
+    ///   <item>Use <paramref name="options"/> values if explicitly provided</item>
+    ///   <item>Fall back to <see cref="IInferenceSettingsService.CurrentSettings"/> if service is available</item>
+    ///   <item>Use hardcoded defaults as last resort</item>
+    /// </list>
+    /// </para>
+    /// </remarks>
     public async IAsyncEnumerable<string> GenerateStreamingAsync(
         IEnumerable<ChatMessage> conversation,
         InferenceOptions options,
@@ -227,16 +275,32 @@ public sealed class LlmService : ILlmService
             // Format the conversation into a prompt string
             var prompt = FormatConversation(conversation);
 
-            // Build inference parameters from options
+            // v0.2.3e: Resolve inference parameters from settings service or options
+            // Use inference settings service if available, otherwise fall back to options/defaults
+            var settings = _inferenceSettings?.CurrentSettings;
+
+            // Build inference parameters, preferring service settings when available
             var inferenceParams = new InferenceParams
             {
-                MaxTokens = options.MaxTokens,  // Maximum response length
-                AntiPrompts = options.StopSequences?.ToList() 
+                // MaxTokens: options override > service settings > hardcoded default
+                MaxTokens = options.MaxTokens > 0
+                    ? options.MaxTokens
+                    : settings?.MaxTokens ?? 2048,
+                AntiPrompts = options.StopSequences?.ToList()
                     ?? ["User:", "\n\nUser:", "\nUser:"],  // Stop when user turn detected
                 SamplingPipeline = new DefaultSamplingPipeline
                 {
-                    Temperature = options.Temperature,  // Randomness (0 = deterministic)
-                    TopP = options.TopP                  // Nucleus sampling threshold
+                    // Temperature: options override > service settings > hardcoded default
+                    Temperature = options.Temperature > 0
+                        ? options.Temperature
+                        : settings?.Temperature ?? 0.7f,
+                    // TopP: options override > service settings > hardcoded default
+                    TopP = options.TopP > 0
+                        ? options.TopP
+                        : settings?.TopP ?? 0.9f,
+                    // TopK and RepetitionPenalty from settings only (v0.2.3e)
+                    TopK = settings?.TopK ?? 40,
+                    RepeatPenalty = settings?.RepetitionPenalty ?? 1.1f
                 }
             };
 

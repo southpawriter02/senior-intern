@@ -199,6 +199,13 @@
     </ControlTheme>
 
     <!-- ============================================================== -->
+    <!-- Settings Panel Colors (v0.2.3e)                               -->
+    <!-- ============================================================== -->
+    <SolidColorBrush x:Key="PanelBackgroundColor" Color="#252526" />
+    <SolidColorBrush x:Key="WarningBackground" Color="#3D3D1D" />
+    <SolidColorBrush x:Key="WarningForeground" Color="#E8D44D" />
+
+    <!-- ============================================================== -->
     <!-- Destructive Button ControlTheme (v0.2.2e)                      -->
     <!-- Theme for delete/destructive actions with red styling.         -->
     <!-- Usage: <Button Theme="{StaticResource DestructiveButton}">     -->

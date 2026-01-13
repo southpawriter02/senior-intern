@@ -85,10 +85,7 @@ public static class ServiceCollectionExtensions
         
         // Settings: persists and retrieves app configuration
         services.AddSingleton<ISettingsService, SettingsService>();
-        
-        // LLM: manages model loading, inference, and resource cleanup
-        services.AddSingleton<ILlmService, LlmService>();
-        
+
         // Conversation: manages current chat state with database persistence.
         // Uses a factory to resolve scoped repository dependencies.
         // The service maintains a long-lived singleton while creating scoped
@@ -116,6 +113,15 @@ public static class ServiceCollectionExtensions
                 scope.ServiceProvider.GetRequiredService<IInferencePresetRepository>(),
                 sp.GetRequiredService<ISettingsService>(),
                 sp.GetRequiredService<ILogger<InferenceSettingsService>>());
+        });
+
+        // LLM: manages model loading, inference, and resource cleanup.
+        // v0.2.3e: Updated to inject IInferenceSettingsService for user-configured parameters.
+        // Must be registered after IInferenceSettingsService.
+        services.AddSingleton<ILlmService>(sp =>
+        {
+            return new LlmService(
+                sp.GetRequiredService<IInferenceSettingsService>());
         });
 
         // ┌─────────────────────────────────────────────────────────────────┐

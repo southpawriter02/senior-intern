@@ -18,6 +18,7 @@ namespace AIntern.Desktop.ViewModels;
 /// <item><see cref="ChatViewModel"/> - Chat message panel</item>
 /// <item><see cref="ModelSelectorViewModel"/> - Model file selection</item>
 /// <item><see cref="ConversationListViewModel"/> - Sidebar conversation list</item>
+/// <item><see cref="InferenceSettingsViewModel"/> - Inference parameter sliders (v0.2.3e)</item>
 /// </list>
 /// </para>
 /// <para>
@@ -64,6 +65,16 @@ public partial class MainWindowViewModel : ViewModelBase
     /// Manages conversation history, search, and selection.
     /// </summary>
     public ConversationListViewModel ConversationListViewModel { get; }
+
+    /// <summary>
+    /// Gets the ViewModel for the inference settings panel.
+    /// Manages parameter sliders, presets, and inference configuration.
+    /// </summary>
+    /// <remarks>
+    /// Added in v0.2.3e to provide user control over inference parameters
+    /// (Temperature, TopP, MaxTokens, etc.) with preset management.
+    /// </remarks>
+    public InferenceSettingsViewModel InferenceSettingsViewModel { get; }
 
     #endregion
 
@@ -118,6 +129,7 @@ public partial class MainWindowViewModel : ViewModelBase
     /// <param name="chatViewModel">The chat panel ViewModel.</param>
     /// <param name="modelSelectorViewModel">The model selector ViewModel.</param>
     /// <param name="conversationListViewModel">The conversation list ViewModel.</param>
+    /// <param name="inferenceSettingsViewModel">The inference settings panel ViewModel (v0.2.3e).</param>
     /// <param name="llmService">The LLM service for model state events.</param>
     /// <param name="settingsService">The settings service for loading configuration.</param>
     /// <param name="logger">Optional logger for diagnostics.</param>
@@ -133,6 +145,7 @@ public partial class MainWindowViewModel : ViewModelBase
         ChatViewModel chatViewModel,
         ModelSelectorViewModel modelSelectorViewModel,
         ConversationListViewModel conversationListViewModel,
+        InferenceSettingsViewModel inferenceSettingsViewModel,
         ILlmService llmService,
         ISettingsService settingsService,
         ILogger<MainWindowViewModel>? logger = null)
@@ -145,6 +158,7 @@ public partial class MainWindowViewModel : ViewModelBase
         ChatViewModel = chatViewModel ?? throw new ArgumentNullException(nameof(chatViewModel));
         ModelSelectorViewModel = modelSelectorViewModel ?? throw new ArgumentNullException(nameof(modelSelectorViewModel));
         ConversationListViewModel = conversationListViewModel ?? throw new ArgumentNullException(nameof(conversationListViewModel));
+        InferenceSettingsViewModel = inferenceSettingsViewModel ?? throw new ArgumentNullException(nameof(inferenceSettingsViewModel));
 
         // Store services for event subscriptions
         _llmService = llmService ?? throw new ArgumentNullException(nameof(llmService));
@@ -204,6 +218,12 @@ public partial class MainWindowViewModel : ViewModelBase
             await ConversationListViewModel.InitializeAsync();
             _logger?.LogInformation("[INFO] ConversationListViewModel initialized with {GroupCount} groups",
                 ConversationListViewModel.Groups.Count);
+
+            // Initialize inference settings (loads presets from database) - v0.2.3e
+            _logger?.LogDebug("[INFO] Initializing InferenceSettingsViewModel");
+            await InferenceSettingsViewModel.InitializeCommand.ExecuteAsync(null);
+            _logger?.LogInformation("[INFO] InferenceSettingsViewModel initialized with {PresetCount} presets",
+                InferenceSettingsViewModel.Presets.Count);
 
             // Update status bar with model state
             StatusMessage = _llmService.IsModelLoaded

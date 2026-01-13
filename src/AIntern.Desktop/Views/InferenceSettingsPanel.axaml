@@ -1,0 +1,299 @@
+<!--
+    InferenceSettingsPanel.axaml
+    AIntern.Desktop - Inference Settings Panel (v0.2.3e)
+
+    Sidebar panel for adjusting inference parameters and managing presets.
+    Provides collapsible UI with preset dropdown, parameter sliders, and
+    save/reset functionality.
+
+    Structure:
+    ├── Header Section (Row 0)
+    │   ├── Expand/Collapse toggle button
+    │   ├── "Inference Settings" title
+    │   ├── Reset to Defaults button
+    │   └── Save Preset button (when modified)
+    ├── Preset Selector (Row 1, when expanded)
+    │   ├── ComboBox with custom ItemTemplate
+    │   └── "Modified" badge (when HasUnsavedChanges)
+    ├── Parameter Sliders (Row 2, when expanded)
+    │   ├── Temperature slider
+    │   ├── Top-P slider
+    │   ├── Max Tokens slider
+    │   ├── Context Size slider
+    │   └── Advanced Expander
+    │       ├── Repetition Penalty slider
+    │       └── Top-K slider
+    └── Error Banner (Row 3, conditional)
+
+    ViewModel: InferenceSettingsViewModel
+    Commands: ToggleExpanded, ResetToDefaults, SaveAsPreset, ToggleAdvanced, ApplyPreset
+-->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:AIntern.Desktop.ViewModels"
+             xmlns:controls="using:AIntern.Desktop.Controls"
+             xmlns:converters="using:AIntern.Desktop.Converters"
+             mc:Ignorable="d"
+             d:DesignWidth="280"
+             d:DesignHeight="500"
+             x:Class="AIntern.Desktop.Views.InferenceSettingsPanel"
+             x:DataType="vm:InferenceSettingsViewModel">
+
+    <!--
+        Main Container
+        Uses PanelBackgroundColor with rounded corners and padding
+    -->
+    <Border Background="{DynamicResource PanelBackgroundColor}"
+            CornerRadius="8"
+            Padding="12"
+            Margin="8,8,8,0">
+
+        <!--
+            Main Layout Grid
+            Row 0: Header (always visible)
+            Row 1: Preset selector (when expanded)
+            Row 2: Parameter sliders (when expanded)
+            Row 3: Error message (conditional)
+        -->
+        <Grid RowDefinitions="Auto, Auto, Auto, Auto">
+
+            <!-- ============================================================ -->
+            <!-- HEADER SECTION (Row 0)                                        -->
+            <!-- Always visible, contains expand toggle, title, and buttons    -->
+            <!-- ============================================================ -->
+            <Grid Grid.Row="0"
+                  ColumnDefinitions="Auto, *, Auto, Auto"
+                  Margin="0,0,0,8">
+
+                <!-- Expand/Collapse Toggle Button -->
+                <Button Grid.Column="0"
+                        Theme="{StaticResource SmallIconButton}"
+                        Command="{Binding ToggleExpandedCommand}"
+                        ToolTip.Tip="Expand/Collapse Settings"
+                        Width="24"
+                        Height="24"
+                        Margin="0,0,8,0">
+                    <PathIcon Data="{Binding IsExpanded, Converter={x:Static converters:ExpandIconConverter.Instance}}"
+                              Width="12"
+                              Height="12" />
+                </Button>
+
+                <!-- Title with Settings Icon -->
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <PathIcon Data="{StaticResource SettingsIcon}"
+                              Width="14"
+                              Height="14"
+                              Foreground="{DynamicResource TextMuted}"
+                              Margin="0,0,6,0" />
+                    <TextBlock Text="Inference Settings"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimary}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- Reset to Defaults Button -->
+                <Button Grid.Column="2"
+                        Theme="{StaticResource SmallIconButton}"
+                        Command="{Binding ResetToDefaultsCommand}"
+                        ToolTip.Tip="Reset to Defaults"
+                        Width="24"
+                        Height="24"
+                        Margin="4,0">
+                    <PathIcon Data="{StaticResource ResetIcon}"
+                              Width="14"
+                              Height="14" />
+                </Button>
+
+                <!-- Save Preset Button (visible when modified) -->
+                <Button Grid.Column="3"
+                        Theme="{StaticResource SmallIconButton}"
+                        Command="{Binding SaveAsPresetCommand}"
+                        ToolTip.Tip="Save as Preset"
+                        IsVisible="{Binding HasUnsavedChanges}"
+                        Width="24"
+                        Height="24">
+                    <PathIcon Data="{StaticResource SaveIcon}"
+                              Width="14"
+                              Height="14"
+                              Foreground="{DynamicResource AccentBrush}" />
+                </Button>
+            </Grid>
+
+            <!-- ============================================================ -->
+            <!-- PRESET SELECTOR (Row 1)                                       -->
+            <!-- ComboBox with custom item template and modified indicator     -->
+            <!-- Visible only when panel is expanded                           -->
+            <!-- ============================================================ -->
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="*, Auto"
+                  Margin="0,0,0,12"
+                  IsVisible="{Binding IsExpanded}">
+
+                <!-- Preset ComboBox -->
+                <ComboBox Grid.Column="0"
+                          ItemsSource="{Binding Presets}"
+                          SelectedItem="{Binding SelectedPreset}"
+                          HorizontalAlignment="Stretch"
+                          Padding="8,6">
+
+                    <!-- Custom Item Template -->
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:InferencePresetViewModel">
+                            <Grid ColumnDefinitions="*, Auto" Margin="0,2">
+                                <StackPanel Grid.Column="0" Orientation="Vertical">
+                                    <!-- Preset Name with Bold for Default -->
+                                    <TextBlock Text="{Binding Name}"
+                                               FontWeight="{Binding IsDefault, Converter={x:Static converters:BoolToFontWeightConverter.Instance}}"
+                                               Foreground="{DynamicResource TextPrimary}" />
+                                    <!-- Parameter Summary -->
+                                    <TextBlock Text="{Binding ParameterSummary}"
+                                               FontSize="11"
+                                               Foreground="{DynamicResource TextMuted}"
+                                               TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                                <!-- Type Indicator Badge (Built-in or Custom) -->
+                                <Border Grid.Column="1"
+                                        Background="{DynamicResource ControlBackground}"
+                                        CornerRadius="2"
+                                        Padding="4,1"
+                                        VerticalAlignment="Center"
+                                        Margin="8,0,0,0">
+                                    <TextBlock Text="{Binding TypeIndicator}"
+                                               FontSize="10"
+                                               Foreground="{DynamicResource TextMuted}" />
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <!-- Modified Badge -->
+                <Border Grid.Column="1"
+                        Background="{DynamicResource WarningBackground}"
+                        CornerRadius="4"
+                        Padding="6,2"
+                        Margin="8,0,0,0"
+                        VerticalAlignment="Center"
+                        IsVisible="{Binding HasUnsavedChanges}">
+                    <TextBlock Text="Modified"
+                               FontSize="10"
+                               Foreground="{DynamicResource WarningForeground}" />
+                </Border>
+            </Grid>
+
+            <!-- ============================================================ -->
+            <!-- PARAMETER SLIDERS (Row 2)                                     -->
+            <!-- Main parameter controls with descriptions                     -->
+            <!-- Visible only when panel is expanded                           -->
+            <!-- ============================================================ -->
+            <StackPanel Grid.Row="2"
+                        IsVisible="{Binding IsExpanded}"
+                        Spacing="4">
+
+                <!-- Temperature Slider -->
+                <controls:ParameterSlider Label="Temperature"
+                                          Value="{Binding Temperature}"
+                                          Minimum="0"
+                                          Maximum="2"
+                                          Step="0.05"
+                                          Description="{Binding TemperatureDescription}"
+                                          ValueFormat="F2" />
+
+                <!-- Top-P Slider -->
+                <controls:ParameterSlider Label="Top-P"
+                                          Value="{Binding TopP}"
+                                          Minimum="0"
+                                          Maximum="1"
+                                          Step="0.05"
+                                          Description="{Binding TopPDescription}"
+                                          ValueFormat="F2" />
+
+                <!-- Max Tokens Slider -->
+                <controls:ParameterSlider Label="Max Response Tokens"
+                                          Value="{Binding MaxTokens}"
+                                          Minimum="64"
+                                          Maximum="8192"
+                                          Step="64"
+                                          Description="{Binding MaxTokensDescription}"
+                                          IsInteger="True" />
+
+                <!-- Context Size Slider -->
+                <controls:ParameterSlider Label="Context Window Size"
+                                          Value="{Binding ContextSize}"
+                                          Minimum="512"
+                                          Maximum="32768"
+                                          Step="512"
+                                          Description="{Binding ContextSizeDescription}"
+                                          IsInteger="True" />
+
+                <!-- ======================================================== -->
+                <!-- ADVANCED PARAMETERS EXPANDER                              -->
+                <!-- Collapsed by default, contains RepetitionPenalty & TopK   -->
+                <!-- ======================================================== -->
+                <Expander IsExpanded="{Binding ShowAdvanced}"
+                          Margin="0,8,0,0">
+                    <Expander.Header>
+                        <TextBlock Text="Advanced"
+                                   FontSize="12"
+                                   FontWeight="Medium"
+                                   Foreground="{DynamicResource TextMuted}" />
+                    </Expander.Header>
+
+                    <StackPanel Spacing="4" Margin="0,8,0,0">
+                        <!-- Repetition Penalty Slider -->
+                        <controls:ParameterSlider Label="Repetition Penalty"
+                                                  Value="{Binding RepetitionPenalty}"
+                                                  Minimum="1"
+                                                  Maximum="2"
+                                                  Step="0.05"
+                                                  Description="{Binding RepetitionPenaltyDescription}"
+                                                  ValueFormat="F2" />
+
+                        <!-- Top-K Slider -->
+                        <controls:ParameterSlider Label="Top-K"
+                                                  Value="{Binding TopK}"
+                                                  Minimum="0"
+                                                  Maximum="100"
+                                                  Step="1"
+                                                  Description="{Binding TopKDescription}"
+                                                  IsInteger="True" />
+
+                        <!-- Seed Slider (hidden for now as it's less commonly used) -->
+                        <!-- Can be enabled later if needed:
+                        <controls:ParameterSlider Label="Seed"
+                                                  Value="{Binding Seed}"
+                                                  Minimum="-1"
+                                                  Maximum="999999"
+                                                  Step="1"
+                                                  Description="{Binding SeedDescription}"
+                                                  IsInteger="True" />
+                        -->
+                    </StackPanel>
+                </Expander>
+            </StackPanel>
+
+            <!-- ============================================================ -->
+            <!-- ERROR BANNER (Row 3)                                          -->
+            <!-- Displayed at bottom when ErrorMessage is set                  -->
+            <!-- ============================================================ -->
+            <Border Grid.Row="3"
+                    IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                    Background="{DynamicResource ErrorBackground}"
+                    CornerRadius="4"
+                    Padding="8,6"
+                    Margin="0,8,0,0">
+                <TextBlock Text="{Binding ErrorMessage}"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource ErrorForeground}"
+                           FontSize="11" />
+            </Border>
+
+        </Grid>
+    </Border>
+
+</UserControl>

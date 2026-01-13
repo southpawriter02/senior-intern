@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.2.3e] - 2026-01-13
+
+Settings panel UI with preset selector and MainWindow integration. See [detailed notes](docs/changelog/v0.2.3e.md).
+
+### Added
+
+- InferenceSettingsPanel: Complete settings panel UserControl
+  - Collapsible header with expand toggle, reset, and save buttons
+  - Preset ComboBox with custom item template (name, summary, badges)
+  - 4 primary ParameterSlider controls (Temperature, TopP, MaxTokens, ContextSize)
+  - Advanced Expander with RepetitionPenalty and TopK sliders
+  - Error message banner with conditional visibility
+- SavePresetDialog: Static dialog helper for saving custom presets
+  - Programmatic UI construction following existing dialog pattern
+  - Name validation (required) and optional description
+  - Exhaustive logging with [ENTER]/[INFO]/[EXIT] markers
+- BoolToFontWeightConverter: Singleton converter for default preset emphasis
+- ExpandIconConverter: Singleton converter for expand/collapse chevron icons
+- Theme resources: PanelBackgroundColor, WarningBackground, WarningForeground
+- Icons: ResetIcon, SaveIcon, SettingsIcon
+
+### Changed
+
+- MainWindow.axaml: Added InferenceSettingsPanel to sidebar, updated status bar with preset/temperature indicators
+- MainWindowViewModel: Added InferenceSettingsViewModel property and initialization
+- LlmService: Uses IInferenceSettingsService.CurrentSettings for inference parameters (Temperature, TopP, TopK, RepetitionPenalty)
+- ServiceCollectionExtensions: Updated LlmService DI registration with IInferenceSettingsService
+
 ## [0.2.3d] - 2026-01-13
 
 Parameter slider control for inference settings UI. See [detailed notes](docs/changelog/v0.2.3d.md).

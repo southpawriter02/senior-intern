@@ -1,13 +1,13 @@
 <!--
     MainWindow.axaml - Main Application Window
 
-    Version: v0.2.2e
+    Version: v0.2.3e
 
     Layout:
     - SplitView with collapsible sidebar pane
-    - Sidebar contains: ModelSelectorView + ConversationListView
+    - Sidebar contains: ModelSelectorView + InferenceSettingsPanel + ConversationListView
     - Content area contains: ChatView
-    - Status bar at bottom with model info and token statistics
+    - Status bar at bottom with model info, preset indicator, and token statistics
 
     Keyboard Shortcuts:
     - Ctrl+N: Create new conversation
@@ -70,7 +70,7 @@
                 <Border Background="{DynamicResource SidebarBackground}"
                         BorderBrush="{DynamicResource BorderBrush}"
                         BorderThickness="0,0,1,0">
-                    <Grid RowDefinitions="Auto, *">
+                    <Grid RowDefinitions="Auto, Auto, *">
                         <!--
                             Model Selector
                             Allows user to select and load GGUF model files.
@@ -79,11 +79,19 @@
                                                  DataContext="{Binding ModelSelectorViewModel}" />
 
                         <!--
+                            Inference Settings Panel (v0.2.3e)
+                            Provides parameter sliders and preset management.
+                            Collapsible to save sidebar space when not actively tuning.
+                        -->
+                        <views:InferenceSettingsPanel Grid.Row="1"
+                                                       DataContext="{Binding InferenceSettingsViewModel}" />
+
+                        <!--
                             Conversation List
                             Shows conversation history grouped by date.
                             Provides search, rename, delete, and pin functionality.
                         -->
-                        <views:ConversationListView Grid.Row="1"
+                        <views:ConversationListView Grid.Row="2"
                                                     DataContext="{Binding ConversationListViewModel}" />
                     </Grid>
                 </Border>
@@ -122,14 +130,14 @@
 
         <!--
             Status Bar
-            Shows model state, token statistics, and generation progress.
+            Shows model state, preset info, token statistics, and generation progress.
         -->
         <Border Grid.Row="1"
                 Background="{DynamicResource StatusBarBackground}"
                 BorderBrush="{DynamicResource BorderBrush}"
                 BorderThickness="0,1,0,0"
                 Padding="12,6">
-            <Grid ColumnDefinitions="*, Auto, Auto, Auto">
+            <Grid ColumnDefinitions="*, Auto, Auto, Auto, Auto, Auto">
                 <!--
                     Status Message
                     Shows "No model loaded" or "Model: {name}"
@@ -139,10 +147,32 @@
                            Foreground="{DynamicResource TextSecondary}" />
 
                 <!--
+                    Preset Indicator (v0.2.3e)
+                    Shows "Preset: {name}" with the active preset name
+                -->
+                <TextBlock Grid.Column="1"
+                           Text="{Binding InferenceSettingsViewModel.SelectedPreset.Name, StringFormat='Preset: {0}', FallbackValue='Preset: None'}"
+                           FontSize="11"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource TextMuted}"
+                           Margin="16,0,0,0" />
+
+                <!--
+                    Temperature Indicator (v0.2.3e)
+                    Shows "T:0.70" for quick reference to temperature setting
+                -->
+                <TextBlock Grid.Column="2"
+                           Text="{Binding InferenceSettingsViewModel.Temperature, StringFormat='T:{0:F2}'}"
+                           FontSize="11"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource TextMuted}"
+                           Margin="16,0,0,0" />
+
+                <!--
                     Save Status Indicator
                     Shows "Saving...", "Saved", or "Save failed"
                 -->
-                <TextBlock Grid.Column="1"
+                <TextBlock Grid.Column="3"
                            Text="{Binding ChatViewModel.SaveStatus}"
                            VerticalAlignment="Center"
                            Foreground="{DynamicResource TextMuted}"
@@ -153,7 +183,7 @@
                     Token Statistics
                     Shows "Tokens: X (Y.Y tok/s)" during generation
                 -->
-                <TextBlock Grid.Column="2"
+                <TextBlock Grid.Column="4"
                            Text="{Binding TokenInfo}"
                            VerticalAlignment="Center"
                            Foreground="{DynamicResource TextMuted}"
@@ -163,7 +193,7 @@
                     Progress Indicator
                     Indeterminate progress bar shown during generation
                 -->
-                <ProgressBar Grid.Column="3"
+                <ProgressBar Grid.Column="5"
                              IsVisible="{Binding ChatViewModel.IsGenerating}"
                              IsIndeterminate="True"
                              Width="80"
