@@ -51,6 +51,15 @@ public sealed class InferencePresetConfiguration : IEntityTypeConfiguration<Infe
     /// </summary>
     public const int DescriptionMaxLength = 500;
 
+    /// <summary>
+    /// Maximum length for the Category column.
+    /// </summary>
+    /// <remarks>
+    /// Categories organize presets in the UI (e.g., "General", "Code", "Creative").
+    /// Added in v0.2.3a.
+    /// </remarks>
+    public const int CategoryMaxLength = 50;
+
     #endregion
 
     #region Default Values
@@ -109,6 +118,24 @@ public sealed class InferencePresetConfiguration : IEntityTypeConfiguration<Infe
     /// </remarks>
     public const int DefaultContextSize = 4096;
 
+    /// <summary>
+    /// Default value for Seed parameter.
+    /// </summary>
+    /// <remarks>
+    /// Random seed for reproducible generation. -1 means use a random seed each time.
+    /// Added in v0.2.3a.
+    /// </remarks>
+    public const int DefaultSeed = -1;
+
+    /// <summary>
+    /// Default value for UsageCount parameter.
+    /// </summary>
+    /// <remarks>
+    /// Tracks how many times a preset has been used. Starts at 0 for new presets.
+    /// Added in v0.2.3a.
+    /// </remarks>
+    public const int DefaultUsageCount = 0;
+
     #endregion
 
     #region Index Names
@@ -127,6 +154,15 @@ public sealed class InferencePresetConfiguration : IEntityTypeConfiguration<Infe
     /// Index name for the composite list query index.
     /// </summary>
     private const string IndexList = "IX_InferencePresets_List";
+
+    /// <summary>
+    /// Index name for Category column.
+    /// </summary>
+    /// <remarks>
+    /// Supports filtering presets by category in the UI.
+    /// Added in v0.2.3a.
+    /// </remarks>
+    private const string IndexCategory = "IX_InferencePresets_Category";
 
     #endregion
 
@@ -199,6 +235,11 @@ public sealed class InferencePresetConfiguration : IEntityTypeConfiguration<Infe
             .HasDefaultValue(DefaultContextSize)
             .HasComment("Context window size in tokens (512-131072).");
 
+        builder.Property(ip => ip.Seed)
+            .IsRequired()
+            .HasDefaultValue(DefaultSeed)
+            .HasComment("Random seed for reproducible generation. -1 = random each time, 0+ = reproducible.");
+
         // Status flags
         builder.Property(ip => ip.IsDefault)
             .IsRequired()
@@ -209,6 +250,16 @@ public sealed class InferencePresetConfiguration : IEntityTypeConfiguration<Infe
             .IsRequired()
             .HasDefaultValue(false)
             .HasComment("Whether this is a built-in preset that cannot be deleted.");
+
+        // Metadata columns (added in v0.2.3a)
+        builder.Property(ip => ip.Category)
+            .HasMaxLength(CategoryMaxLength)
+            .HasComment("Optional category for organizing presets (e.g., 'General', 'Code', 'Creative').");
+
+        builder.Property(ip => ip.UsageCount)
+            .IsRequired()
+            .HasDefaultValue(DefaultUsageCount)
+            .HasComment("Number of times this preset has been used for generation.");
 
         // Timestamp columns
         builder.Property(ip => ip.CreatedAt)
@@ -253,6 +304,11 @@ public sealed class InferencePresetConfiguration : IEntityTypeConfiguration<Infe
         builder.HasIndex(ip => new { ip.IsBuiltIn, ip.UpdatedAt })
             .HasDatabaseName(IndexList)
             .IsDescending(true, true);
+
+        // Index for category-based filtering (added in v0.2.3a).
+        // Supports GetByCategoryAsync repository method for filtering presets by category.
+        builder.HasIndex(ip => ip.Category)
+            .HasDatabaseName(IndexCategory);
     }
 
     #endregion

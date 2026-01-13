@@ -484,11 +484,17 @@ public sealed class DatabaseInitializer
     /// Default presets cover common use cases with varying parameter combinations:
     /// </para>
     /// <list type="bullet">
-    ///   <item><description><b>Balanced:</b> General conversation (DEFAULT)</description></item>
-    ///   <item><description><b>Precise:</b> Low temperature for factual responses</description></item>
-    ///   <item><description><b>Creative:</b> High temperature for brainstorming</description></item>
-    ///   <item><description><b>Long-form:</b> Extended context for detailed work</description></item>
+    ///   <item><description><b>Balanced:</b> General conversation (DEFAULT) - Category: General</description></item>
+    ///   <item><description><b>Precise:</b> Low temperature for factual responses - Category: Code</description></item>
+    ///   <item><description><b>Creative:</b> High temperature for brainstorming - Category: Creative</description></item>
+    ///   <item><description><b>Long-form:</b> Extended context for detailed work - Category: Technical</description></item>
+    ///   <item><description><b>Code Review:</b> Optimized for code analysis - Category: Code</description></item>
     /// </list>
+    /// <para>
+    /// All presets use well-known GUIDs for stable references. These match the
+    /// IDs defined in <c>InferencePreset.cs</c>.
+    /// </para>
+    /// <para>Updated in v0.2.3a to add Seed, Category, UsageCount, and Code Review preset.</para>
     /// </remarks>
     private static List<InferencePresetEntity> CreateDefaultInferencePresets()
     {
@@ -497,65 +503,96 @@ public sealed class DatabaseInitializer
             // Balanced - Default preset for general use
             new()
             {
-                Id = Guid.NewGuid(),
+                Id = new Guid("00000001-0000-0000-0000-000000000002"),
                 Name = "Balanced",
                 Description = "Good balance of creativity and consistency. Recommended for general conversation and most tasks.",
+                Category = "General",
                 Temperature = 0.7f,
                 TopP = 0.9f,
                 TopK = 40,
+                RepeatPenalty = 1.1f,
+                Seed = -1,
                 MaxTokens = 2048,
                 ContextSize = 4096,
-                RepeatPenalty = 1.1f,
                 IsDefault = true,
-                IsBuiltIn = true
+                IsBuiltIn = true,
+                UsageCount = 0
             },
 
             // Precise - Low temperature for factual responses
             new()
             {
-                Id = Guid.NewGuid(),
+                Id = new Guid("00000001-0000-0000-0000-000000000001"),
                 Name = "Precise",
                 Description = "Low temperature for factual, consistent, and deterministic responses. Best for code generation and technical questions.",
+                Category = "Code",
                 Temperature = 0.2f,
                 TopP = 0.8f,
                 TopK = 20,
+                RepeatPenalty = 1.1f,
+                Seed = -1,
                 MaxTokens = 1024,
                 ContextSize = 4096,
-                RepeatPenalty = 1.1f,
                 IsDefault = false,
-                IsBuiltIn = true
+                IsBuiltIn = true,
+                UsageCount = 0
             },
 
             // Creative - High temperature for brainstorming
             new()
             {
-                Id = Guid.NewGuid(),
+                Id = new Guid("00000001-0000-0000-0000-000000000003"),
                 Name = "Creative",
                 Description = "High temperature for brainstorming, creative writing, and exploring diverse ideas. May produce more varied outputs.",
+                Category = "Creative",
                 Temperature = 1.2f,
                 TopP = 0.95f,
                 TopK = 60,
+                RepeatPenalty = 1.05f,
+                Seed = -1,
                 MaxTokens = 4096,
                 ContextSize = 8192,
-                RepeatPenalty = 1.05f,
                 IsDefault = false,
-                IsBuiltIn = true
+                IsBuiltIn = true,
+                UsageCount = 0
             },
 
             // Long-form - Extended context for detailed work
             new()
             {
-                Id = Guid.NewGuid(),
+                Id = new Guid("00000001-0000-0000-0000-000000000004"),
                 Name = "Long-form",
                 Description = "Extended context window and output length for detailed explanations, long documents, and complex conversations.",
+                Category = "Technical",
                 Temperature = 0.7f,
                 TopP = 0.9f,
                 TopK = 40,
+                RepeatPenalty = 1.15f,
+                Seed = -1,
                 MaxTokens = 8192,
                 ContextSize = 16384,
-                RepeatPenalty = 1.15f,
                 IsDefault = false,
-                IsBuiltIn = true
+                IsBuiltIn = true,
+                UsageCount = 0
+            },
+
+            // Code Review - Optimized for code analysis (added in v0.2.3a)
+            new()
+            {
+                Id = new Guid("00000001-0000-0000-0000-000000000005"),
+                Name = "Code Review",
+                Description = "Optimized for code review and analysis. Low temperature for consistent feedback, extended context for reviewing larger files.",
+                Category = "Code",
+                Temperature = 0.3f,
+                TopP = 0.85f,
+                TopK = 30,
+                RepeatPenalty = 1.1f,
+                Seed = -1,
+                MaxTokens = 2048,
+                ContextSize = 8192,
+                IsDefault = false,
+                IsBuiltIn = true,
+                UsageCount = 0
             }
         ];
     }

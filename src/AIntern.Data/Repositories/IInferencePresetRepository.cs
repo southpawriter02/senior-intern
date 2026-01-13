@@ -106,6 +106,32 @@ public interface IInferencePresetRepository
     /// </returns>
     Task<bool> NameExistsAsync(string name, Guid? excludeId = null, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Retrieves all inference presets in a specific category.
+    /// </summary>
+    /// <param name="category">The category to filter by (e.g., "General", "Code", "Creative").</param>
+    /// <param name="cancellationToken">A token to cancel the operation.</param>
+    /// <returns>
+    /// A read-only list of inference presets in the specified category, ordered by name.
+    /// Returns an empty list if no presets match the category.
+    /// </returns>
+    /// <remarks>
+    /// <para>
+    /// Categories provide a way to organize presets in the UI. Built-in presets
+    /// are assigned to categories during database seeding:
+    /// </para>
+    /// <list type="bullet">
+    ///   <item><description><b>General:</b> Balanced preset</description></item>
+    ///   <item><description><b>Code:</b> Precise, Code Review presets</description></item>
+    ///   <item><description><b>Creative:</b> Creative preset</description></item>
+    ///   <item><description><b>Technical:</b> Long-form preset</description></item>
+    /// </list>
+    /// <para>Added in v0.2.3a.</para>
+    /// </remarks>
+    Task<IReadOnlyList<InferencePresetEntity>> GetByCategoryAsync(
+        string category,
+        CancellationToken cancellationToken = default);
+
     #endregion
 
     #region Write Operations
@@ -191,6 +217,57 @@ public interface IInferencePresetRepository
     /// </list>
     /// </remarks>
     Task<InferencePresetEntity?> DuplicateAsync(Guid id, string newName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Increments the usage count for a preset.
+    /// </summary>
+    /// <param name="id">The unique identifier of the preset whose usage count should be incremented.</param>
+    /// <param name="cancellationToken">A token to cancel the operation.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <remarks>
+    /// <para>
+    /// This method is called each time a preset is used for inference generation.
+    /// It provides analytics on which presets are most frequently used.
+    /// </para>
+    /// <para>
+    /// The implementation uses <c>ExecuteUpdateAsync</c> for efficiency, avoiding
+    /// the need to load the full entity into memory. This makes it safe to call
+    /// frequently without performance concerns.
+    /// </para>
+    /// <para>
+    /// If the preset is not found, the operation completes without error but
+    /// logs a warning for diagnostic purposes.
+    /// </para>
+    /// <para>Added in v0.2.3a.</para>
+    /// </remarks>
+    Task IncrementUsageAsync(Guid id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Seeds the built-in presets if none exist.
+    /// </summary>
+    /// <param name="cancellationToken">A token to cancel the operation.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    /// <remarks>
+    /// <para>
+    /// This method is idempotent - it only creates presets if no built-in presets
+    /// currently exist in the database. Safe to call during every application startup.
+    /// </para>
+    /// <para>
+    /// Creates 5 built-in presets with well-known GUIDs for stable references:
+    /// </para>
+    /// <list type="bullet">
+    ///   <item><description><b>Precise</b> (00000001-0000-0000-0000-000000000001): Low temperature for factual responses</description></item>
+    ///   <item><description><b>Balanced</b> (00000001-0000-0000-0000-000000000002): Default preset for general use</description></item>
+    ///   <item><description><b>Creative</b> (00000001-0000-0000-0000-000000000003): High temperature for brainstorming</description></item>
+    ///   <item><description><b>Long-form</b> (00000001-0000-0000-0000-000000000004): Extended context for detailed work</description></item>
+    ///   <item><description><b>Code Review</b> (00000001-0000-0000-0000-000000000005): Optimized for code analysis</description></item>
+    /// </list>
+    /// <para>
+    /// The "Balanced" preset is marked as the default preset for new conversations.
+    /// </para>
+    /// <para>Added in v0.2.3a.</para>
+    /// </remarks>
+    Task SeedBuiltInPresetsAsync(CancellationToken cancellationToken = default);
 
     #endregion
 }

@@ -132,6 +132,19 @@ public sealed class InferencePresetEntity
     /// </remarks>
     public float RepeatPenalty { get; set; } = 1.1f;
 
+    /// <summary>
+    /// Gets or sets the random seed for reproducible generation.
+    /// </summary>
+    /// <remarks>
+    /// <para>Valid values:</para>
+    /// <list type="bullet">
+    ///   <item><description>-1: Use a random seed each generation (non-reproducible)</description></item>
+    ///   <item><description>0+: Use the specified seed for reproducible output</description></item>
+    /// </list>
+    /// <para>Default: -1 (random)</para>
+    /// </remarks>
+    public int Seed { get; set; } = -1;
+
     #endregion
 
     #region Length Parameters
@@ -182,6 +195,31 @@ public sealed class InferencePresetEntity
     /// <para>Default: false</para>
     /// </remarks>
     public bool IsBuiltIn { get; set; }
+
+    #endregion
+
+    #region Metadata
+
+    /// <summary>
+    /// Gets or sets the category for grouping presets.
+    /// </summary>
+    /// <remarks>
+    /// <para>Categories help organize presets in the UI.</para>
+    /// <para>Common categories: "General", "Code", "Creative", "Technical"</para>
+    /// <para>Maximum length: 50 characters (enforced by EF Core config in v0.2.3a).</para>
+    /// <para>Null indicates no category assignment.</para>
+    /// </remarks>
+    public string? Category { get; set; }
+
+    /// <summary>
+    /// Gets or sets the number of times this preset has been used.
+    /// </summary>
+    /// <remarks>
+    /// <para>Incremented each time the preset is selected for a new message.</para>
+    /// <para>Used for analytics and "most used" sorting in the UI.</para>
+    /// <para>Default: 0</para>
+    /// </remarks>
+    public int UsageCount { get; set; }
 
     #endregion
 

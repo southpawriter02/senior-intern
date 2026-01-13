@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.2.3a] - 2026-01-13
+
+Inference parameter models and repository enhancements. See [detailed notes](docs/changelog/v0.2.3a.md).
+
+### Added
+
+- InferenceSettings: Value object with 7 parameters (Temperature, TopP, TopK, RepetitionPenalty, MaxTokens, ContextSize, Seed), Clone(), Validate()
+- InferencePreset: Domain model with well-known preset IDs, Options property, ToEntity()/FromEntity() mapping
+- ParameterConstants: Static Min/Max/Default/Step for all 7 parameters
+- ValidationResult: Record type for validation results with Success/Failure factory methods
+- GetByCategoryAsync: Repository method for filtering presets by category
+- IncrementUsageAsync: Repository method for usage tracking
+- SeedBuiltInPresetsAsync: Repository method for idempotent preset seeding
+- "Code Review" preset: 5th built-in preset optimized for code analysis
+
+### Changed
+
+- InferencePresetEntity: Added Seed, Category, UsageCount properties
+- InferencePresetConfiguration: Added EF Core configuration for new columns and Category index
+- DatabaseInitializer: All presets now use well-known GUIDs and include Category assignments
+- InferencePresetRepository.DuplicateAsync: Now copies Category and Seed, resets UsageCount to 0
+
 ## [0.2.2e] - 2026-01-13
 
 Polish & edge cases. See [detailed notes](docs/changelog/v0.2.2e.md).

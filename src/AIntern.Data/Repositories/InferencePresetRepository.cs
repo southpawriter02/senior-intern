@@ -179,6 +179,28 @@ public sealed class InferencePresetRepository : IInferencePresetRepository
         return exists;
     }
 
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<InferencePresetEntity>> GetByCategoryAsync(
+        string category,
+        CancellationToken cancellationToken = default)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        _logger.LogDebug("[ENTER] GetByCategoryAsync - Category: {Category}", category);
+
+        var presets = await _context.InferencePresets
+            .AsNoTracking()
+            .Where(p => p.Category == category)
+            .OrderBy(p => p.Name)
+            .ToListAsync(cancellationToken);
+
+        stopwatch.Stop();
+        _logger.LogDebug(
+            "[EXIT] GetByCategoryAsync - Category: {Category}, Count: {Count}, Duration: {DurationMs}ms",
+            category, presets.Count, stopwatch.ElapsedMilliseconds);
+
+        return presets;
+    }
+
     #endregion
 
     #region Write Operations
@@ -364,14 +386,17 @@ public sealed class InferencePresetRepository : IInferencePresetRepository
             Id = Guid.NewGuid(),
             Name = newName,
             Description = source.Description,
+            Category = source.Category,
             Temperature = source.Temperature,
             TopP = source.TopP,
             TopK = source.TopK,
             RepeatPenalty = source.RepeatPenalty,
+            Seed = source.Seed,
             MaxTokens = source.MaxTokens,
             ContextSize = source.ContextSize,
-            IsDefault = false,  // Duplicates are never default
-            IsBuiltIn = false   // Duplicates are always user-created
+            IsDefault = false,   // Duplicates are never default
+            IsBuiltIn = false,   // Duplicates are always user-created
+            UsageCount = 0       // Start fresh usage count for duplicates
         };
 
         _context.InferencePresets.Add(duplicate);
@@ -383,6 +408,176 @@ public sealed class InferencePresetRepository : IInferencePresetRepository
             id, duplicate.Id, newName, stopwatch.ElapsedMilliseconds);
 
         return duplicate;
+    }
+
+    /// <inheritdoc />
+    public async Task IncrementUsageAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        _logger.LogDebug("[ENTER] IncrementUsageAsync - PresetId: {PresetId}", id);
+
+        // Use ExecuteUpdateAsync for efficiency - no need to load the full entity.
+        // This is safe to call frequently without performance concerns.
+        var affected = await _context.InferencePresets
+            .Where(p => p.Id == id)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(p => p.UsageCount, p => p.UsageCount + 1)
+                .SetProperty(p => p.UpdatedAt, DateTime.UtcNow),
+                cancellationToken);
+
+        stopwatch.Stop();
+
+        if (affected == 0)
+        {
+            _logger.LogWarning(
+                "[EXIT] IncrementUsageAsync - Preset not found: {PresetId}, Duration: {DurationMs}ms",
+                id, stopwatch.ElapsedMilliseconds);
+        }
+        else
+        {
+            _logger.LogDebug(
+                "[EXIT] IncrementUsageAsync - PresetId: {PresetId}, Duration: {DurationMs}ms",
+                id, stopwatch.ElapsedMilliseconds);
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task SeedBuiltInPresetsAsync(CancellationToken cancellationToken = default)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        _logger.LogDebug("[ENTER] SeedBuiltInPresetsAsync");
+
+        // Idempotent check: Only seed if no built-in presets exist.
+        // This makes it safe to call during every application startup.
+        var hasBuiltIn = await _context.InferencePresets
+            .AnyAsync(p => p.IsBuiltIn, cancellationToken);
+
+        if (hasBuiltIn)
+        {
+            stopwatch.Stop();
+            _logger.LogDebug(
+                "[SKIP] SeedBuiltInPresetsAsync - Built-in presets already exist, Duration: {DurationMs}ms",
+                stopwatch.ElapsedMilliseconds);
+            return;
+        }
+
+        _logger.LogDebug("[INFO] SeedBuiltInPresetsAsync - No built-in presets found, creating 5 presets");
+
+        var now = DateTime.UtcNow;
+
+        // Create 5 built-in presets with well-known GUIDs for stable references.
+        // These IDs match InferencePreset.cs well-known preset IDs.
+        var builtInPresets = new List<InferencePresetEntity>
+        {
+            // Precise: Low temperature for factual, deterministic responses
+            new()
+            {
+                Id = new Guid("00000001-0000-0000-0000-000000000001"),
+                Name = "Precise",
+                Description = "Low temperature for factual and deterministic responses. Best for tasks requiring accuracy and consistency.",
+                Category = "Code",
+                Temperature = 0.2f,
+                TopP = 0.85f,
+                TopK = 30,
+                RepeatPenalty = 1.1f,
+                Seed = -1,
+                MaxTokens = 2048,
+                ContextSize = 4096,
+                IsDefault = false,
+                IsBuiltIn = true,
+                UsageCount = 0,
+                CreatedAt = now,
+                UpdatedAt = now
+            },
+            // Balanced: Default preset for general use
+            new()
+            {
+                Id = new Guid("00000001-0000-0000-0000-000000000002"),
+                Name = "Balanced",
+                Description = "Well-rounded settings for general conversations and tasks. The default preset for new conversations.",
+                Category = "General",
+                Temperature = 0.7f,
+                TopP = 0.9f,
+                TopK = 40,
+                RepeatPenalty = 1.1f,
+                Seed = -1,
+                MaxTokens = 2048,
+                ContextSize = 4096,
+                IsDefault = true,  // This is the default preset
+                IsBuiltIn = true,
+                UsageCount = 0,
+                CreatedAt = now,
+                UpdatedAt = now
+            },
+            // Creative: High temperature for brainstorming and creative writing
+            new()
+            {
+                Id = new Guid("00000001-0000-0000-0000-000000000003"),
+                Name = "Creative",
+                Description = "Higher temperature for brainstorming and creative writing. Produces more varied and imaginative responses.",
+                Category = "Creative",
+                Temperature = 1.2f,
+                TopP = 0.95f,
+                TopK = 50,
+                RepeatPenalty = 1.05f,
+                Seed = -1,
+                MaxTokens = 4096,
+                ContextSize = 4096,
+                IsDefault = false,
+                IsBuiltIn = true,
+                UsageCount = 0,
+                CreatedAt = now,
+                UpdatedAt = now
+            },
+            // Long-form: Extended context for detailed work
+            new()
+            {
+                Id = new Guid("00000001-0000-0000-0000-000000000004"),
+                Name = "Long-form",
+                Description = "Extended context window for working with longer documents and detailed conversations.",
+                Category = "Technical",
+                Temperature = 0.7f,
+                TopP = 0.9f,
+                TopK = 40,
+                RepeatPenalty = 1.1f,
+                Seed = -1,
+                MaxTokens = 4096,
+                ContextSize = 16384,
+                IsDefault = false,
+                IsBuiltIn = true,
+                UsageCount = 0,
+                CreatedAt = now,
+                UpdatedAt = now
+            },
+            // Code Review: Optimized for code analysis
+            new()
+            {
+                Id = new Guid("00000001-0000-0000-0000-000000000005"),
+                Name = "Code Review",
+                Description = "Optimized for code review and analysis. Low temperature for consistent feedback, extended context for reviewing larger files.",
+                Category = "Code",
+                Temperature = 0.3f,
+                TopP = 0.85f,
+                TopK = 30,
+                RepeatPenalty = 1.1f,
+                Seed = -1,
+                MaxTokens = 2048,
+                ContextSize = 8192,
+                IsDefault = false,
+                IsBuiltIn = true,
+                UsageCount = 0,
+                CreatedAt = now,
+                UpdatedAt = now
+            }
+        };
+
+        _context.InferencePresets.AddRange(builtInPresets);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        stopwatch.Stop();
+        _logger.LogInformation(
+            "[EXIT] SeedBuiltInPresetsAsync - Created {Count} built-in presets, Duration: {DurationMs}ms",
+            builtInPresets.Count, stopwatch.ElapsedMilliseconds);
     }
 
     #endregion
