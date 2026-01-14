@@ -13,6 +13,8 @@
                 <ResourceInclude Source="avares://AIntern.Desktop/Themes/Dark.axaml" />
                 <ResourceInclude Source="avares://AIntern.Desktop/Resources/Icons.axaml" />
                 <ResourceInclude Source="avares://AIntern.Desktop/Controls/ParameterSlider.axaml" />
+                <!-- v0.3.2g: File explorer icons -->
+                <ResourceInclude Source="avares://AIntern.Desktop/Assets/FileIcons.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

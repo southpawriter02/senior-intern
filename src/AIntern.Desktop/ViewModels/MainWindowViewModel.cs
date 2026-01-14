@@ -22,6 +22,7 @@ namespace AIntern.Desktop.ViewModels;
 /// <item><see cref="ModelSelectorViewModel"/> - Model file selection</item>
 /// <item><see cref="ConversationListViewModel"/> - Sidebar conversation list</item>
 /// <item><see cref="InferenceSettingsViewModel"/> - Inference parameter sliders (v0.2.3e)</item>
+/// <item><see cref="FileExplorerViewModel"/> - File explorer sidebar (v0.3.2g)</item>
 /// </list>
 /// </para>
 /// <para>
@@ -79,6 +80,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly ISearchService _searchService;
     private readonly IExportService _exportService;
     private readonly IConversationService _conversationService;
+    private readonly IWorkspaceService _workspaceService;
     private readonly IDispatcher _dispatcher;
     private readonly ILogger<MainWindowViewModel>? _logger;
 
@@ -116,6 +118,15 @@ public partial class MainWindowViewModel : ViewModelBase
     /// (Temperature, TopP, MaxTokens, etc.) with preset management.
     /// </remarks>
     public InferenceSettingsViewModel InferenceSettingsViewModel { get; }
+
+    /// <summary>
+    /// Gets the ViewModel for the file explorer sidebar.
+    /// Manages workspace files, navigation, and file operations.
+    /// </summary>
+    /// <remarks>
+    /// Added in v0.3.2g. Singleton instance persists across navigation.
+    /// </remarks>
+    public FileExplorerViewModel FileExplorer { get; }
 
     #endregion
 
@@ -188,6 +199,20 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isModelLoaded;
 
+    /// <summary>
+    /// Gets or sets whether a workspace is currently open.
+    /// Controls EditorPanel visibility in main content area.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Updated via <see cref="IWorkspaceService.WorkspaceChanged"/> event.
+    /// When true, the editor panel placeholder is visible.
+    /// </para>
+    /// <para>Added in v0.3.2g.</para>
+    /// </remarks>
+    [ObservableProperty]
+    private bool _hasOpenWorkspace;
+
     #endregion
 
     #region Constructor
@@ -250,6 +275,8 @@ public partial class MainWindowViewModel : ViewModelBase
         ISearchService searchService,
         IExportService exportService,
         IConversationService conversationService,
+        IWorkspaceService workspaceService,
+        FileExplorerViewModel fileExplorer,
         IDispatcher dispatcher,
         ILogger<MainWindowViewModel>? logger = null)
     {
@@ -270,6 +297,8 @@ public partial class MainWindowViewModel : ViewModelBase
         _searchService = searchService ?? throw new ArgumentNullException(nameof(searchService));
         _exportService = exportService ?? throw new ArgumentNullException(nameof(exportService));
         _conversationService = conversationService ?? throw new ArgumentNullException(nameof(conversationService));
+        _workspaceService = workspaceService ?? throw new ArgumentNullException(nameof(workspaceService));
+        FileExplorer = fileExplorer ?? throw new ArgumentNullException(nameof(fileExplorer));
         _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
         _logger?.LogDebug("[INFO] Child ViewModels and services assigned");
@@ -285,6 +314,12 @@ public partial class MainWindowViewModel : ViewModelBase
 
         // v0.2.5g: Initialize model loaded state
         IsModelLoaded = _llmService.IsModelLoaded;
+
+        // v0.3.2g: Subscribe to file explorer and workspace events
+        FileExplorer.FileOpenRequested += OnFileOpenRequested;
+        FileExplorer.FileAttachRequested += OnFileAttachRequested;
+        _workspaceService.WorkspaceChanged += OnWorkspaceChanged;
+        HasOpenWorkspace = _workspaceService.CurrentWorkspace != null;
 
         _logger?.LogDebug("[INFO] Subscribed to ILlmService and IConversationService events");
         _logger?.LogDebug("[INIT] MainWindowViewModel construction completed - {ElapsedMs}ms", sw.ElapsedMilliseconds);
@@ -815,6 +850,62 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             _logger?.LogDebug("[INFO] Inference progress: {TokenInfo}", TokenInfo);
         }
+    }
+
+    /// <summary>
+    /// Handles file open requests from the file explorer.
+    /// Forwards to editor panel (v0.3.3 when implemented).
+    /// </summary>
+    /// <param name="sender">The event source.</param>
+    /// <param name="e">Event arguments containing file path.</param>
+    /// <remarks>
+    /// <para>Added in v0.3.2g.</para>
+    /// </remarks>
+    private void OnFileOpenRequested(object? sender, FileOpenRequestedEventArgs e)
+    {
+        _logger?.LogDebug("[EVENT] OnFileOpenRequested - Path: {Path}", e.FilePath);
+
+        // TODO: Forward to editor panel (v0.3.3)
+        // EditorPanel?.OpenFileCommand.Execute(e.FilePath);
+
+        _logger?.LogInformation("[INFO] File open requested: {Path}", e.FilePath);
+    }
+
+    /// <summary>
+    /// Handles file attach requests from the file explorer.
+    /// Forwards to chat view model (v0.3.4 when implemented).
+    /// </summary>
+    /// <param name="sender">The event source.</param>
+    /// <param name="e">Event arguments containing file path.</param>
+    /// <remarks>
+    /// <para>Added in v0.3.2g.</para>
+    /// </remarks>
+    private void OnFileAttachRequested(object? sender, FileAttachRequestedEventArgs e)
+    {
+        _logger?.LogDebug("[EVENT] OnFileAttachRequested - Path: {Path}", e.FilePath);
+
+        // TODO: Forward to chat view model (v0.3.4)
+        // Chat?.AttachFileCommand.Execute(e.FilePath);
+
+        _logger?.LogInformation("[INFO] File attach requested: {Path}", e.FilePath);
+    }
+
+    /// <summary>
+    /// Handles workspace change events to update HasOpenWorkspace.
+    /// </summary>
+    /// <param name="sender">The event source.</param>
+    /// <param name="e">Event arguments containing workspace details.</param>
+    /// <remarks>
+    /// <para>Added in v0.3.2g.</para>
+    /// </remarks>
+    private void OnWorkspaceChanged(object? sender, WorkspaceChangedEventArgs e)
+    {
+        _logger?.LogDebug("[EVENT] OnWorkspaceChanged - CurrentWorkspace: {Workspace}",
+            e.CurrentWorkspace?.Name ?? "(null)");
+
+        HasOpenWorkspace = e.CurrentWorkspace != null;
+
+        _logger?.LogInformation("[INFO] Workspace state updated: HasOpenWorkspace={HasOpen}", HasOpenWorkspace);
     }
 
     #endregion

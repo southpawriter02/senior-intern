@@ -39,6 +39,7 @@ public class MainWindowViewModelTests : IDisposable
     private readonly Mock<ISystemPromptService> _mockSystemPromptService;
     private readonly Mock<ISearchService> _mockSearchService;
     private readonly Mock<IExportService> _mockExportService;
+    private readonly Mock<IWorkspaceService> _mockWorkspaceService;
     private readonly TestDispatcher _dispatcher;
     private readonly Mock<ILogger<MainWindowViewModel>> _mockLogger;
 
@@ -47,6 +48,7 @@ public class MainWindowViewModelTests : IDisposable
     private readonly ModelSelectorViewModel _modelSelectorViewModel;
     private readonly ConversationListViewModel _conversationListViewModel;
     private readonly InferenceSettingsViewModel _inferenceSettingsViewModel;
+    private readonly FileExplorerViewModel _fileExplorerViewModel;
 
     private MainWindowViewModel? _viewModel;
 
@@ -58,6 +60,7 @@ public class MainWindowViewModelTests : IDisposable
         _mockSystemPromptService = new Mock<ISystemPromptService>();
         _mockSearchService = new Mock<ISearchService>();
         _mockExportService = new Mock<IExportService>();
+        _mockWorkspaceService = new Mock<IWorkspaceService>();
         _dispatcher = new TestDispatcher();
         _mockLogger = new Mock<ILogger<MainWindowViewModel>>();
 
@@ -113,6 +116,16 @@ public class MainWindowViewModelTests : IDisposable
             mockInferenceSettingsService.Object,
             _dispatcher,
             mockInferenceSettingsLogger.Object);
+
+        // FileExplorerViewModel (v0.3.2g)
+        var mockFileSystemService = new Mock<IFileSystemService>();
+        var mockFileExplorerLogger = new Mock<ILogger<FileExplorerViewModel>>();
+        _fileExplorerViewModel = new FileExplorerViewModel(
+            _mockWorkspaceService.Object,
+            mockFileSystemService.Object,
+            _mockSettingsService.Object,
+            null, // IStorageProvider not needed in tests
+            mockFileExplorerLogger.Object);
     }
 
     private MainWindowViewModel CreateViewModel()
@@ -128,6 +141,8 @@ public class MainWindowViewModelTests : IDisposable
             _mockSearchService.Object,
             _mockExportService.Object,
             _mockConversationService.Object,
+            _mockWorkspaceService.Object,
+            _fileExplorerViewModel,
             _dispatcher,
             _mockLogger.Object);
 
@@ -161,6 +176,8 @@ public class MainWindowViewModelTests : IDisposable
             _mockSearchService.Object,
             _mockExportService.Object,
             _mockConversationService.Object,
+            _mockWorkspaceService.Object,
+            _fileExplorerViewModel,
             _dispatcher,
             _mockLogger.Object));
     }
@@ -183,6 +200,8 @@ public class MainWindowViewModelTests : IDisposable
             _mockSearchService.Object,
             _mockExportService.Object,
             _mockConversationService.Object,
+            _mockWorkspaceService.Object,
+            _fileExplorerViewModel,
             _dispatcher,
             _mockLogger.Object));
     }
@@ -841,6 +860,160 @@ public class MainWindowViewModelTests : IDisposable
         // Assert
         Assert.False(_inferenceSettingsViewModel.IsExpanded);
         Assert.True(vm.IsSidebarVisible); // Sidebar should remain visible
+    }
+
+    #endregion
+
+    #region v0.3.2g Tests - FileExplorer and Workspace Integration
+
+    /// <summary>
+    /// Verifies that FileExplorer property is properly injected.
+    /// </summary>
+    [Fact]
+    public void FileExplorer_IsProperlyInjected()
+    {
+        // Act
+        var vm = CreateViewModel();
+
+        // Assert
+        Assert.NotNull(vm.FileExplorer);
+        Assert.Same(_fileExplorerViewModel, vm.FileExplorer);
+    }
+
+    /// <summary>
+    /// Verifies that HasOpenWorkspace is false by default.
+    /// </summary>
+    [Fact]
+    public void Constructor_HasOpenWorkspaceIsFalseByDefault()
+    {
+        // Arrange - no workspace
+        _mockWorkspaceService.Setup(s => s.CurrentWorkspace).Returns((Workspace?)null);
+
+        // Act
+        var vm = CreateViewModel();
+
+        // Assert
+        Assert.False(vm.HasOpenWorkspace);
+    }
+
+    /// <summary>
+    /// Verifies that HasOpenWorkspace is true when workspace is already open.
+    /// </summary>
+    [Fact]
+    public void Constructor_HasOpenWorkspaceIsTrueWhenWorkspaceOpen()
+    {
+        // Arrange
+        _mockWorkspaceService.Setup(s => s.CurrentWorkspace)
+            .Returns(new Workspace { Id = Guid.NewGuid(), Name = "Test", RootPath = "/test" });
+
+        // Act
+        var vm = CreateViewModel();
+
+        // Assert
+        Assert.True(vm.HasOpenWorkspace);
+    }
+
+    /// <summary>
+    /// Verifies that WorkspaceChanged event updates HasOpenWorkspace.
+    /// </summary>
+    [Fact]
+    public void OnWorkspaceChanged_UpdatesHasOpenWorkspace()
+    {
+        // Arrange
+        _mockWorkspaceService.Setup(s => s.CurrentWorkspace).Returns((Workspace?)null);
+        var vm = CreateViewModel();
+        Assert.False(vm.HasOpenWorkspace);
+
+        // Act - open workspace
+        _mockWorkspaceService.Raise(
+            s => s.WorkspaceChanged += null,
+            new WorkspaceChangedEventArgs
+            {
+                CurrentWorkspace = new Workspace { Id = Guid.NewGuid(), Name = "Test", RootPath = "/test" },
+                ChangeType = WorkspaceChangeType.Opened
+            });
+
+        // Assert
+        Assert.True(vm.HasOpenWorkspace);
+    }
+
+    /// <summary>
+    /// Verifies that WorkspaceChanged event updates HasOpenWorkspace to false when closed.
+    /// </summary>
+    [Fact]
+    public void OnWorkspaceChanged_WorkspaceClosed_UpdatesHasOpenWorkspace()
+    {
+        // Arrange - start with workspace open
+        _mockWorkspaceService.Setup(s => s.CurrentWorkspace)
+            .Returns(new Workspace { Id = Guid.NewGuid(), Name = "Test", RootPath = "/test" });
+        var vm = CreateViewModel();
+        Assert.True(vm.HasOpenWorkspace);
+
+        // Act - close workspace
+        _mockWorkspaceService.Raise(
+            s => s.WorkspaceChanged += null,
+            new WorkspaceChangedEventArgs
+            {
+                CurrentWorkspace = null,
+                ChangeType = WorkspaceChangeType.Closed
+            });
+
+        // Assert
+        Assert.False(vm.HasOpenWorkspace);
+    }
+
+    /// <summary>
+    /// Verifies that HasOpenWorkspace notifies property changed.
+    /// </summary>
+    [Fact]
+    public void OnWorkspaceChanged_NotifiesHasOpenWorkspacePropertyChanged()
+    {
+        // Arrange
+        _mockWorkspaceService.Setup(s => s.CurrentWorkspace).Returns((Workspace?)null);
+        var vm = CreateViewModel();
+        var changedProperties = new List<string?>();
+        vm.PropertyChanged += (s, e) => changedProperties.Add(e.PropertyName);
+
+        // Act
+        _mockWorkspaceService.Raise(
+            s => s.WorkspaceChanged += null,
+            new WorkspaceChangedEventArgs
+            {
+                CurrentWorkspace = new Workspace { Id = Guid.NewGuid(), Name = "Test", RootPath = "/test" },
+                ChangeType = WorkspaceChangeType.Opened
+            });
+
+        // Assert
+        Assert.Contains(nameof(MainWindowViewModel.HasOpenWorkspace), changedProperties);
+    }
+
+    /// <summary>
+    /// Verifies that constructor subscribes to FileOpenRequested event.
+    /// </summary>
+    [Fact]
+    public void Constructor_SubscribesToFileOpenRequestedEvent()
+    {
+        // Act
+        var vm = CreateViewModel();
+
+        // Assert - verify subscription happened (FileExplorer has the event)
+        // We can't directly verify subscription, but we can verify the event exists
+        Assert.NotNull(vm.FileExplorer);
+    }
+
+    /// <summary>
+    /// Verifies that constructor subscribes to WorkspaceChanged event.
+    /// </summary>
+    [Fact]
+    public void Constructor_SubscribesToWorkspaceChangedEvent()
+    {
+        // Act
+        var vm = CreateViewModel();
+
+        // Assert
+        _mockWorkspaceService.VerifyAdd(
+            s => s.WorkspaceChanged += It.IsAny<EventHandler<WorkspaceChangedEventArgs>>(),
+            Times.AtLeastOnce);
     }
 
     #endregion

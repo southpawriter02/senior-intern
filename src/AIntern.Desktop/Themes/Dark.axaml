@@ -30,6 +30,15 @@
     <SolidColorBrush x:Key="SuccessBackground" Color="#1D3D1D" />
     <SolidColorBrush x:Key="SuccessForeground" Color="#89D185" />
 
+    <!-- ============================================================== -->
+    <!-- Sidebar & File Explorer Colors (v0.3.2g)                       -->
+    <!-- ============================================================== -->
+    <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="#1E1E2E" />
+    <SolidColorBrush x:Key="SplitterBrush" Color="#313244" />
+    <SolidColorBrush x:Key="EditorBackgroundBrush" Color="#181825" />
+    <SolidColorBrush x:Key="TreeViewItemSelectedBackground" Color="#45475A" />
+    <SolidColorBrush x:Key="TreeViewItemHoverBackground" Color="#313244" />
+
     <!-- Button Styles -->
     <ControlTheme x:Key="PrimaryButton" TargetType="Button">
         <Setter Property="Background" Value="{DynamicResource AccentBrush}" />

@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.2g] - 2026-01-14
+
+Main window integration. See [detailed notes](docs/changelog/v0.3.2g.md).
+
+### Added
+
+- FileExplorerViewModel integration with MainWindowViewModel
+- HasOpenWorkspace property for EditorPanel visibility
+- WorkspaceChanged event handling
+- FileOpenRequested and FileAttachRequested event wiring
+- Sidebar and TreeView theme colors in Dark.axaml
+- FileIcons.axaml resource inclusion in App.axaml
+- FileExplorerViewModel DI registration
+
+### Unit Tests
+
+- 8 new tests for workspace integration
+
+## [0.3.2f] - 2026-01-14
+
+Keyboard & interactions documentation. See [detailed notes](docs/changelog/v0.3.2f.md).
+
+### Documentation
+
+- Complete keyboard shortcut reference table
+- Inline rename flow with validation rules
+- Delete confirmation flow diagrams
+- Focus management patterns
+
+### Shortcuts
+
+| Key | Action |
+|-----|--------|
+| Enter | Open file / Toggle folder |
+| F2 | Start rename |
+| Delete | Delete with confirmation |
+| Ctrl+C | Copy absolute path |
+| Ctrl+Shift+C | Copy relative path |
+| Ctrl+N | New file |
+| Ctrl+Shift+N | New folder |
+| Ctrl+R | Refresh tree |
+
 ## [0.3.2e] - 2026-01-14
 
 Context menus & icon colors. See [detailed notes](docs/changelog/v0.3.2e.md).

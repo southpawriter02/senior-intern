@@ -248,8 +248,13 @@ public static class ServiceCollectionExtensions
         // System Prompt Selector: quick selector for the chat header dropdown.
         // Singleton to share selection state across the application.
         // Subscribes to ISystemPromptService events for automatic synchronization.
-        // Added in v0.2.4c.
-        services.AddSingleton<SystemPromptSelectorViewModel>();
+        // Added in v0.2.4c.\n        services.AddSingleton<SystemPromptSelectorViewModel>();
+
+        // File Explorer: workspace navigation and file operations sidebar.
+        // Singleton to persist expansion state and selection across application lifecycle.
+        // Subscribes to IWorkspaceService events for workspace state synchronization.
+        // Added in v0.3.2g.
+        services.AddSingleton<FileExplorerViewModel>();
 
         // Search: spotlight-style search dialog ViewModel with debounced search.
         // Transient so each dialog gets its own instance with fresh state.
