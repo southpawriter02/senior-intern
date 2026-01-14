@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.2d] - 2026-01-14
+
+Tree view UI. See [detailed notes](docs/changelog/v0.3.2d.md).
+
+### Added
+
+- **FileExplorerView.axaml** - Main file explorer UI with TreeView
+- **FileExplorerView.axaml.cs** - Code-behind with keyboard handlers
+
+### Features
+
+- Header with workspace name and action buttons
+- Filter box with search icon and clear button
+- TreeView with TreeDataTemplate for file/folder hierarchy
+- Inline rename mode (F2, Enter/Escape)
+- Keyboard navigation (Enter, Delete, Arrow keys, Ctrl+C/N/R)
+- Context menu with file operations
+- Empty state for no workspace
+- Error message display
+
 ## [0.3.2c] - 2026-01-14
 
 File icon system. See [detailed notes](docs/changelog/v0.3.2c.md).

@@ -1,0 +1,250 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AIntern.Desktop.ViewModels"
+             xmlns:converters="using:AIntern.Desktop.Converters"
+             x:Class="AIntern.Desktop.Views.FileExplorerView"
+             x:DataType="vm:FileExplorerViewModel">
+
+    <UserControl.Resources>
+        <converters:FileIconConverter x:Key="FileIconConverter" />
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <!-- Icon button style -->
+        <Style Selector="Button.icon-button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="Width" Value="28" />
+            <Setter Property="Height" Value="28" />
+        </Style>
+        <Style Selector="Button.icon-button:pointerover">
+            <Setter Property="Background" Value="{DynamicResource SystemControlHighlightListLowBrush}" />
+        </Style>
+
+        <!-- Highlighted item (filter match) -->
+        <Style Selector="TextBlock.highlighted">
+            <Setter Property="Background" Value="{DynamicResource SystemAccentColorLight2}" />
+        </Style>
+
+        <!-- Loading progress bar -->
+        <Style Selector="ProgressBar.tree-loading">
+            <Setter Property="IsIndeterminate" Value="True" />
+            <Setter Property="Height" Value="2" />
+            <Setter Property="Margin" Value="16,4" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*">
+
+        <!-- Row 0: Header -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                Padding="12,8">
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                <TextBlock Grid.Column="0"
+                           Text="{Binding WorkspaceName, FallbackValue='Explorer'}"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis"
+                           ToolTip.Tip="{Binding WorkspacePath}" />
+
+                <Button Grid.Column="1"
+                        Command="{Binding NewFileCommand}"
+                        CommandParameter="{Binding SelectedItem}"
+                        ToolTip.Tip="New File (Ctrl+N)"
+                        Classes="icon-button"
+                        IsVisible="{Binding HasWorkspace}">
+                    <PathIcon Data="{StaticResource NewFileIcon}" Width="16" Height="16" />
+                </Button>
+
+                <Button Grid.Column="2"
+                        Command="{Binding NewFolderCommand}"
+                        CommandParameter="{Binding SelectedItem}"
+                        ToolTip.Tip="New Folder (Ctrl+Shift+N)"
+                        Classes="icon-button"
+                        IsVisible="{Binding HasWorkspace}">
+                    <PathIcon Data="{StaticResource NewFolderIcon}" Width="16" Height="16" />
+                </Button>
+
+                <Button Grid.Column="3"
+                        Command="{Binding RefreshCommand}"
+                        ToolTip.Tip="Refresh (Ctrl+R)"
+                        Classes="icon-button"
+                        IsVisible="{Binding HasWorkspace}">
+                    <PathIcon Data="{StaticResource RefreshIcon}" Width="16" Height="16" />
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- Row 1: Filter Box -->
+        <Border Grid.Row="1" Padding="8,4" IsVisible="{Binding HasWorkspace}">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBox Grid.Column="0"
+                         Text="{Binding SearchFilter, Mode=TwoWay}"
+                         Watermark="Filter files..."
+                         x:Name="FilterTextBox">
+                    <TextBox.InnerLeftContent>
+                        <PathIcon Data="{StaticResource SearchIcon}"
+                                  Width="14" Height="14" Margin="8,0,4,0"
+                                  Foreground="{DynamicResource SystemBaseMediumColor}" />
+                    </TextBox.InnerLeftContent>
+                </TextBox>
+                <Button Grid.Column="1"
+                        Command="{Binding ClearFilterCommand}"
+                        IsVisible="{Binding SearchFilter.Length}"
+                        Classes="icon-button" Margin="4,0,0,0">
+                    <PathIcon Data="{StaticResource ClearIcon}" Width="12" Height="12" />
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- Row 2: Loading -->
+        <ProgressBar Grid.Row="2" Classes="tree-loading" IsVisible="{Binding IsLoading}" />
+
+        <!-- Row 3: TreeView -->
+        <TreeView Grid.Row="3" x:Name="FileTree"
+                  ItemsSource="{Binding RootItems}"
+                  SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                  IsVisible="{Binding HasWorkspace}"
+                  SelectionMode="Single"
+                  DoubleTapped="OnTreeViewDoubleTapped"
+                  KeyDown="OnTreeViewKeyDown">
+
+            <TreeView.ItemTemplate>
+                <TreeDataTemplate ItemsSource="{Binding Children}">
+                    <Grid ColumnDefinitions="Auto,*,Auto" Background="Transparent"
+                          ToolTip.Tip="{Binding Path}">
+
+                        <!-- Chevron (directories with children) -->
+                        <Panel Grid.Column="0" Width="16" IsVisible="{Binding ShowExpander}">
+                            <PathIcon Data="{StaticResource ChevronRightIcon}"
+                                      Width="12" Height="12"
+                                      IsVisible="{Binding !IsExpanded}" />
+                            <PathIcon Data="{StaticResource ChevronDownIcon}"
+                                      Width="12" Height="12"
+                                      IsVisible="{Binding IsExpanded}" />
+                        </Panel>
+
+                        <!-- File Icon (non-expandable items) -->
+                        <PathIcon Grid.Column="0"
+                                  Data="{Binding IconKey, Converter={StaticResource FileIconConverter}}"
+                                  Width="16" Height="16" Margin="0,0,6,0"
+                                  IsVisible="{Binding !ShowExpander}" />
+
+                        <!-- Loading spinner for children load -->
+                        <ProgressBar Grid.Column="0" IsIndeterminate="True"
+                                     Width="16" Height="16"
+                                     IsVisible="{Binding IsLoading}" Classes="circular" />
+
+                        <!-- Name (normal mode) -->
+                        <TextBlock Grid.Column="1" Text="{Binding Name}"
+                                   Classes="item-name"
+                                   Classes.highlighted="{Binding IsHighlighted}"
+                                   IsVisible="{Binding !IsRenaming}"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis" />
+
+                        <!-- Name (rename mode) -->
+                        <TextBox Grid.Column="1" Text="{Binding EditingName, Mode=TwoWay}"
+                                 IsVisible="{Binding IsRenaming}"
+                                 x:Name="RenameTextBox"
+                                 KeyDown="OnRenameKeyDown"
+                                 LostFocus="OnRenameLostFocus"
+                                 Padding="2" MinWidth="100" />
+
+                        <!-- Modified indicator (unsaved changes) -->
+                        <Ellipse Grid.Column="2" Width="8" Height="8"
+                                 Fill="{DynamicResource SystemAccentColor}"
+                                 IsVisible="{Binding IsModified}"
+                                 Margin="6,0,0,0" ToolTip.Tip="Unsaved changes" />
+                    </Grid>
+                </TreeDataTemplate>
+            </TreeView.ItemTemplate>
+
+            <!-- Context Menu -->
+            <TreeView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Open" Command="{Binding OpenFileCommand}"
+                              CommandParameter="{Binding SelectedItem}"
+                              IsVisible="{Binding SelectedItem.IsFile}" InputGesture="Enter">
+                        <MenuItem.Icon>
+                            <PathIcon Data="{StaticResource FileIcon}" Width="16" Height="16" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Attach to Chat" Command="{Binding AttachToContextCommand}"
+                              CommandParameter="{Binding SelectedItem}"
+                              IsVisible="{Binding SelectedItem.IsFile}">
+                        <MenuItem.Icon>
+                            <PathIcon Data="{StaticResource AttachIcon}" Width="16" Height="16" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator IsVisible="{Binding SelectedItem.IsFile}" />
+
+                    <MenuItem Header="New File" Command="{Binding NewFileCommand}"
+                              CommandParameter="{Binding SelectedItem}" InputGesture="Ctrl+N">
+                        <MenuItem.Icon>
+                            <PathIcon Data="{StaticResource NewFileIcon}" Width="16" Height="16" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="New Folder" Command="{Binding NewFolderCommand}"
+                              CommandParameter="{Binding SelectedItem}" InputGesture="Ctrl+Shift+N">
+                        <MenuItem.Icon>
+                            <PathIcon Data="{StaticResource NewFolderIcon}" Width="16" Height="16" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator />
+
+                    <MenuItem Header="Rename" Command="{Binding RenameCommand}"
+                              CommandParameter="{Binding SelectedItem}" InputGesture="F2">
+                        <MenuItem.Icon>
+                            <PathIcon Data="{StaticResource RenameIcon}" Width="16" Height="16" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Delete" Command="{Binding DeleteCommand}"
+                              CommandParameter="{Binding SelectedItem}" InputGesture="Delete">
+                        <MenuItem.Icon>
+                            <PathIcon Data="{StaticResource DeleteIcon}" Width="16" Height="16" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator />
+
+                    <MenuItem Header="Copy Path" Command="{Binding CopyPathCommand}"
+                              CommandParameter="{Binding SelectedItem}" InputGesture="Ctrl+C">
+                        <MenuItem.Icon>
+                            <PathIcon Data="{StaticResource CopyIcon}" Width="16" Height="16" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Copy Relative Path" Command="{Binding CopyRelativePathCommand}"
+                              CommandParameter="{Binding SelectedItem}" InputGesture="Ctrl+Shift+C" />
+                    <MenuItem Header="Reveal in File Manager" Command="{Binding RevealInFinderCommand}"
+                              CommandParameter="{Binding SelectedItem}" />
+                </ContextMenu>
+            </TreeView.ContextMenu>
+        </TreeView>
+
+        <!-- Empty state (no workspace) -->
+        <StackPanel Grid.Row="3" IsVisible="{Binding !HasWorkspace}"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
+            <PathIcon Data="{StaticResource FolderIcon}" Width="48" Height="48"
+                      Foreground="{DynamicResource SystemBaseMediumColor}" />
+            <TextBlock Text="No folder opened" HorizontalAlignment="Center"
+                       Foreground="{DynamicResource SystemBaseMediumColor}" />
+            <Button Command="{Binding OpenWorkspaceCommand}"
+                    Content="Open Folder" HorizontalAlignment="Center" Classes="accent" />
+        </StackPanel>
+
+        <!-- Error message (dismissible) -->
+        <Border Grid.Row="3"
+                IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                Background="{DynamicResource SystemErrorBackgroundBrush}"
+                Padding="12" Margin="8" CornerRadius="4" VerticalAlignment="Bottom">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="{Binding ErrorMessage}" TextWrapping="Wrap"
+                           Foreground="{DynamicResource SystemErrorTextBrush}" />
+                <Button Grid.Column="1" Content="Dismiss"
+                        Classes="link-button" Margin="8,0,0,0" />
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
