@@ -338,6 +338,29 @@ public class AInternDbContext : DbContext
     /// </remarks>
     public DbSet<AppVersionEntity> AppVersions => Set<AppVersionEntity>();
 
+    /// <summary>
+    /// Gets the set of recent workspaces in the database.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Workspaces store project folder state including open files and UI expansion.
+    /// </para>
+    /// <para>Added in v0.3.1b.</para>
+    /// </remarks>
+    public DbSet<RecentWorkspaceEntity> RecentWorkspaces => Set<RecentWorkspaceEntity>();
+
+    /// <summary>
+    /// Gets the set of file context history in the database.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// File contexts track files attached to chat messages.
+    /// Cascade deletes with conversation/message.
+    /// </para>
+    /// <para>Added in v0.3.1b.</para>
+    /// </remarks>
+    public DbSet<FileContextEntity> FileContextHistory => Set<FileContextEntity>();
+
     #endregion
 
     #region DbContext Overrides
@@ -378,7 +401,9 @@ public class AInternDbContext : DbContext
                 MessageConfiguration.TableName,
                 SystemPromptConfiguration.TableName,
                 InferencePresetConfiguration.TableName,
-                AppVersionConfiguration.TableName
+                AppVersionConfiguration.TableName,
+                RecentWorkspaceConfiguration.TableName,
+                FileContextConfiguration.TableName
             }));
     }
 

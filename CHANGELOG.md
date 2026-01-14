@@ -7,9 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.1b] - 2026-01-14
+
+Database entities for workspace persistence. See [detailed notes](docs/changelog/v0.3.1b.md).
+
+### Added
+
+- **RecentWorkspaceEntity** - Workspace state persistence
+  - JSON serialization for OpenFiles, ExpandedFolders
+  - ToWorkspace/FromWorkspace mapping
+  - UpdateFrom for preserving Id
+
+- **FileContextEntity** - File context history
+  - FK to Conversations and Messages (CASCADE delete)
+  - FromFileContext/ToFileContextStub mapping
+  - FileContextStub for lightweight queries
+
+- **EF Core Configurations** - Table schemas
+  - RecentWorkspaces: Unique RootPath, DESC LastAccessedAt index
+  - FileContextHistory: FK indexes, AttachedAt index
+
+- **DbContext Updates** - New DbSets
+  - RecentWorkspaces, FileContextHistory
+
+### Technical Details
+
+- 16 new unit tests for entity mapping and JSON handling
+- Configurations auto-discovered via ApplyConfigurationsFromAssembly
+
 ## [0.3.1a] - 2026-01-14
 
 Core models for workspace awareness. See [detailed notes](docs/changelog/v0.3.1a.md).
+
 
 ### Added
 
