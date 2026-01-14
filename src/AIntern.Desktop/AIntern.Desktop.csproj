@@ -22,6 +22,9 @@
     <PackageReference Include="Avalonia.Fonts.Inter" />
     <PackageReference Include="Avalonia.Diagnostics" Condition="'$(Configuration)' == 'Debug'" />
 
+    <!-- Code Editor (v0.3.3) -->
+    <PackageReference Include="Avalonia.AvaloniaEdit" />
+
     <!-- MVVM -->
     <PackageReference Include="CommunityToolkit.Mvvm" />
 

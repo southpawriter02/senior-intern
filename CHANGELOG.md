@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.3a] - 2026-01-14
+
+Editor Tab ViewModel. See [detailed notes](docs/changelog/v0.3.3a.md).
+
+### Added
+
+- EditorTabViewModel with factory methods (FromFile, CreateNew)
+- Hash-based dirty state detection
+- Caret position and selection tracking
+- Line ending detection (LF, CRLF, CR)
+- Avalonia.AvaloniaEdit v11.3.0 package
+
+### Unit Tests
+
+- 31 new tests for EditorTabViewModel
+
 ## [0.3.2g] - 2026-01-14
 
 Main window integration. See [detailed notes](docs/changelog/v0.3.2g.md).
