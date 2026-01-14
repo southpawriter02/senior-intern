@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.2b] - 2026-01-14
+
+File explorer ViewModel. See [detailed notes](docs/changelog/v0.3.2b.md).
+
+### Added
+
+- **FileExplorerViewModel** - Workspace management, file operations, debounced filter
+- **FileOpenRequestedEventArgs** - Event args for file open requests
+- **FileAttachRequestedEventArgs** - Event args for context attachment
+- **DeleteConfirmationEventArgs** - Event args for delete confirmation
+
+### Features
+
+- Open workspace via folder picker, close, refresh commands
+- New file/folder with inline rename
+- Copy path, copy relative path, reveal in finder
+- 200ms debounced filter with auto-expand
+- Attach file to chat context
+
 ## [0.3.2a] - 2026-01-14
 
 File tree item ViewModel. See [detailed notes](docs/changelog/v0.3.2a.md).
