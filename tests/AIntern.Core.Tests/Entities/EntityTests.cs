@@ -133,6 +133,58 @@ public class EntityTests
         Assert.False(conversation.IsPinned);
     }
 
+    /// <summary>
+    /// Verifies that a new ConversationEntity has null ModelPath.
+    /// </summary>
+    [Fact]
+    public void ConversationEntity_Constructor_HasNullModelPath()
+    {
+        // Arrange & Act
+        var conversation = new ConversationEntity();
+
+        // Assert
+        Assert.Null(conversation.ModelPath);
+    }
+
+    /// <summary>
+    /// Verifies that a new ConversationEntity has null ModelName.
+    /// </summary>
+    [Fact]
+    public void ConversationEntity_Constructor_HasNullModelName()
+    {
+        // Arrange & Act
+        var conversation = new ConversationEntity();
+
+        // Assert
+        Assert.Null(conversation.ModelName);
+    }
+
+    /// <summary>
+    /// Verifies that a new ConversationEntity has null SystemPromptId.
+    /// </summary>
+    [Fact]
+    public void ConversationEntity_Constructor_HasNullSystemPromptId()
+    {
+        // Arrange & Act
+        var conversation = new ConversationEntity();
+
+        // Assert
+        Assert.Null(conversation.SystemPromptId);
+    }
+
+    /// <summary>
+    /// Verifies that a new ConversationEntity has null SystemPrompt navigation property.
+    /// </summary>
+    [Fact]
+    public void ConversationEntity_Constructor_HasNullSystemPrompt()
+    {
+        // Arrange & Act
+        var conversation = new ConversationEntity();
+
+        // Assert
+        Assert.Null(conversation.SystemPrompt);
+    }
+
     #endregion
 
     #region MessageEntity Tests
@@ -285,6 +337,71 @@ public class EntityTests
         Assert.Empty(prompt.Conversations);
     }
 
+    /// <summary>
+    /// Verifies that a new SystemPromptEntity is not marked as default.
+    /// </summary>
+    [Fact]
+    public void SystemPromptEntity_Constructor_IsNotDefault()
+    {
+        // Arrange & Act
+        var prompt = new SystemPromptEntity();
+
+        // Assert
+        Assert.False(prompt.IsDefault);
+    }
+
+    /// <summary>
+    /// Verifies that a new SystemPromptEntity is not marked as built-in.
+    /// </summary>
+    [Fact]
+    public void SystemPromptEntity_Constructor_IsNotBuiltIn()
+    {
+        // Arrange & Act
+        var prompt = new SystemPromptEntity();
+
+        // Assert
+        Assert.False(prompt.IsBuiltIn);
+    }
+
+    /// <summary>
+    /// Verifies that a new SystemPromptEntity has UsageCount defaulted to 0.
+    /// </summary>
+    [Fact]
+    public void SystemPromptEntity_Constructor_SetsZeroUsageCount()
+    {
+        // Arrange & Act
+        var prompt = new SystemPromptEntity();
+
+        // Assert
+        Assert.Equal(0, prompt.UsageCount);
+    }
+
+    /// <summary>
+    /// Verifies that a new SystemPromptEntity has null Description.
+    /// </summary>
+    [Fact]
+    public void SystemPromptEntity_Constructor_HasNullDescription()
+    {
+        // Arrange & Act
+        var prompt = new SystemPromptEntity();
+
+        // Assert
+        Assert.Null(prompt.Description);
+    }
+
+    /// <summary>
+    /// Verifies that a new SystemPromptEntity has null TagsJson.
+    /// </summary>
+    [Fact]
+    public void SystemPromptEntity_Constructor_HasNullTagsJson()
+    {
+        // Arrange & Act
+        var prompt = new SystemPromptEntity();
+
+        // Assert
+        Assert.Null(prompt.TagsJson);
+    }
+
     #endregion
 
     #region InferencePresetEntity Tests
@@ -365,6 +482,97 @@ public class EntityTests
 
         // Assert
         Assert.Equal(4096, preset.ContextSize);
+    }
+
+    /// <summary>
+    /// Verifies that a new InferencePresetEntity has Seed defaulted to -1 (random).
+    /// </summary>
+    [Fact]
+    public void InferencePresetEntity_Constructor_SetsDefaultSeed()
+    {
+        // Arrange & Act
+        var preset = new InferencePresetEntity();
+
+        // Assert
+        Assert.Equal(-1, preset.Seed);
+    }
+
+    /// <summary>
+    /// Verifies that a new InferencePresetEntity has UsageCount defaulted to 0.
+    /// </summary>
+    [Fact]
+    public void InferencePresetEntity_Constructor_SetsZeroUsageCount()
+    {
+        // Arrange & Act
+        var preset = new InferencePresetEntity();
+
+        // Assert
+        Assert.Equal(0, preset.UsageCount);
+    }
+
+    /// <summary>
+    /// Verifies that a new InferencePresetEntity is not marked as default.
+    /// </summary>
+    [Fact]
+    public void InferencePresetEntity_Constructor_IsNotDefault()
+    {
+        // Arrange & Act
+        var preset = new InferencePresetEntity();
+
+        // Assert
+        Assert.False(preset.IsDefault);
+    }
+
+    /// <summary>
+    /// Verifies that a new InferencePresetEntity is not marked as built-in.
+    /// </summary>
+    [Fact]
+    public void InferencePresetEntity_Constructor_IsNotBuiltIn()
+    {
+        // Arrange & Act
+        var preset = new InferencePresetEntity();
+
+        // Assert
+        Assert.False(preset.IsBuiltIn);
+    }
+
+    /// <summary>
+    /// Verifies that a new InferencePresetEntity has Name initialized to empty string.
+    /// </summary>
+    [Fact]
+    public void InferencePresetEntity_Constructor_SetsEmptyName()
+    {
+        // Arrange & Act
+        var preset = new InferencePresetEntity();
+
+        // Assert
+        Assert.Equal(string.Empty, preset.Name);
+    }
+
+    /// <summary>
+    /// Verifies that a new InferencePresetEntity has null Category.
+    /// </summary>
+    [Fact]
+    public void InferencePresetEntity_Constructor_HasNullCategory()
+    {
+        // Arrange & Act
+        var preset = new InferencePresetEntity();
+
+        // Assert
+        Assert.Null(preset.Category);
+    }
+
+    /// <summary>
+    /// Verifies that a new InferencePresetEntity has null Description.
+    /// </summary>
+    [Fact]
+    public void InferencePresetEntity_Constructor_HasNullDescription()
+    {
+        // Arrange & Act
+        var preset = new InferencePresetEntity();
+
+        // Assert
+        Assert.Null(preset.Description);
     }
 
     #endregion

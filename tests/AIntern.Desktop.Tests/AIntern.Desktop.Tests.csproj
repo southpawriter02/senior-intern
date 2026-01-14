@@ -1,15 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>AIntern.Services.Tests</RootNamespace>
+    <RootNamespace>AIntern.Desktop.Tests</RootNamespace>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\AIntern.Core\AIntern.Core.csproj" />
-    <ProjectReference Include="..\..\src\AIntern.Data\AIntern.Data.csproj" />
-    <ProjectReference Include="..\..\src\AIntern.Services\AIntern.Services.csproj" />
+    <ProjectReference Include="..\..\src\AIntern.Desktop\AIntern.Desktop.csproj" />
   </ItemGroup>
 
   <ItemGroup>

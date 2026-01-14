@@ -1,0 +1,563 @@
+using AIntern.Core.Events;
+using AIntern.Core.Interfaces;
+using AIntern.Core.Models;
+using AIntern.Desktop.Tests.TestHelpers;
+using AIntern.Desktop.ViewModels;
+using Microsoft.Extensions.Logging;
+using Moq;
+using Xunit;
+
+namespace AIntern.Desktop.Tests.ViewModels;
+
+/// <summary>
+/// Unit tests for the <see cref="MainWindowViewModel"/> class (v0.2.2d).
+/// Tests initialization, child ViewModel composition, and sidebar commands.
+/// </summary>
+/// <remarks>
+/// <para>
+/// These tests verify the v0.2.2d functionality:
+/// </para>
+/// <list type="bullet">
+///   <item><description>Child ViewModels are properly injected and accessible</description></item>
+///   <item><description>InitializeAsync loads conversation list and settings</description></item>
+///   <item><description>ToggleSidebar toggles visibility state</description></item>
+///   <item><description>NewConversation delegates to ConversationListViewModel</description></item>
+///   <item><description>ModelStateChanged updates StatusMessage</description></item>
+///   <item><description>InferenceProgress updates TokenInfo</description></item>
+/// </list>
+/// </remarks>
+public class MainWindowViewModelTests : IDisposable
+{
+    #region Test Infrastructure
+
+    private readonly Mock<ILlmService> _mockLlmService;
+    private readonly Mock<IConversationService> _mockConversationService;
+    private readonly Mock<ISettingsService> _mockSettingsService;
+    private readonly Mock<ISystemPromptService> _mockSystemPromptService;
+    private readonly TestDispatcher _dispatcher;
+    private readonly Mock<ILogger<MainWindowViewModel>> _mockLogger;
+
+    // Child ViewModels (created with minimal mocking)
+    private readonly ChatViewModel _chatViewModel;
+    private readonly ModelSelectorViewModel _modelSelectorViewModel;
+    private readonly ConversationListViewModel _conversationListViewModel;
+    private readonly InferenceSettingsViewModel _inferenceSettingsViewModel;
+
+    private MainWindowViewModel? _viewModel;
+
+    public MainWindowViewModelTests()
+    {
+        _mockLlmService = new Mock<ILlmService>();
+        _mockConversationService = new Mock<IConversationService>();
+        _mockSettingsService = new Mock<ISettingsService>();
+        _mockSystemPromptService = new Mock<ISystemPromptService>();
+        _dispatcher = new TestDispatcher();
+        _mockLogger = new Mock<ILogger<MainWindowViewModel>>();
+
+        // Setup default behavior
+        _mockLlmService.Setup(s => s.IsModelLoaded).Returns(false);
+        _mockConversationService.Setup(s => s.CurrentConversation)
+            .Returns(new Conversation { Id = Guid.NewGuid(), Title = "Test" });
+        _mockConversationService.Setup(s => s.GetMessages())
+            .Returns(Array.Empty<ChatMessage>());
+        _mockConversationService.Setup(s => s.GetRecentConversationsAsync(It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<ConversationSummary>());
+        _mockSettingsService.Setup(s => s.CurrentSettings)
+            .Returns(new AppSettings());
+        _mockSettingsService.Setup(s => s.LoadSettingsAsync())
+            .ReturnsAsync(new AppSettings());
+
+        // Create child ViewModels with their own mocks
+        var mockChatLogger = new Mock<ILogger<ChatViewModel>>();
+        var mockSelectorVmLogger = new Mock<ILogger<SystemPromptSelectorViewModel>>();
+        var selectorViewModel = new SystemPromptSelectorViewModel(
+            _mockSystemPromptService.Object,
+            _dispatcher,
+            mockSelectorVmLogger.Object);
+
+        _chatViewModel = new ChatViewModel(
+            _mockLlmService.Object,
+            _mockConversationService.Object,
+            _mockSettingsService.Object,
+            _mockSystemPromptService.Object,
+            selectorViewModel,
+            _dispatcher,
+            mockChatLogger.Object);
+
+        // ModelSelectorViewModel takes 2 parameters: ILlmService and ISettingsService
+        _modelSelectorViewModel = new ModelSelectorViewModel(
+            _mockLlmService.Object,
+            _mockSettingsService.Object);
+
+        var mockConversationListLogger = new Mock<ILogger<ConversationListViewModel>>();
+        _conversationListViewModel = new ConversationListViewModel(
+            _mockConversationService.Object,
+            _dispatcher,
+            mockConversationListLogger.Object);
+
+        // InferenceSettingsViewModel takes IInferenceSettingsService, IDispatcher, and optional logger
+        var mockInferenceSettingsService = new Mock<IInferenceSettingsService>();
+        mockInferenceSettingsService.Setup(s => s.CurrentSettings)
+            .Returns(new InferenceSettings());
+        mockInferenceSettingsService.Setup(s => s.GetPresetsAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<InferencePreset>());
+        var mockInferenceSettingsLogger = new Mock<ILogger<InferenceSettingsViewModel>>();
+        _inferenceSettingsViewModel = new InferenceSettingsViewModel(
+            mockInferenceSettingsService.Object,
+            _dispatcher,
+            mockInferenceSettingsLogger.Object);
+    }
+
+    private MainWindowViewModel CreateViewModel()
+    {
+        _viewModel = new MainWindowViewModel(
+            _chatViewModel,
+            _modelSelectorViewModel,
+            _conversationListViewModel,
+            _inferenceSettingsViewModel,
+            _mockLlmService.Object,
+            _mockSettingsService.Object,
+            _mockSystemPromptService.Object,
+            _dispatcher,
+            _mockLogger.Object);
+
+        return _viewModel;
+    }
+
+    public void Dispose()
+    {
+        _chatViewModel.Dispose();
+    }
+
+    #endregion
+
+    #region Constructor Tests
+
+    /// <summary>
+    /// Verifies that the constructor throws ArgumentNullException for null chatViewModel.
+    /// </summary>
+    [Fact]
+    public void Constructor_NullChatViewModel_ThrowsArgumentNullException()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => new MainWindowViewModel(
+            null!,
+            _modelSelectorViewModel,
+            _conversationListViewModel,
+            _inferenceSettingsViewModel,
+            _mockLlmService.Object,
+            _mockSettingsService.Object,
+            _mockSystemPromptService.Object,
+            _dispatcher,
+            _mockLogger.Object));
+    }
+
+    /// <summary>
+    /// Verifies that the constructor throws ArgumentNullException for null conversationListViewModel.
+    /// </summary>
+    [Fact]
+    public void Constructor_NullConversationListViewModel_ThrowsArgumentNullException()
+    {
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => new MainWindowViewModel(
+            _chatViewModel,
+            _modelSelectorViewModel,
+            null!,
+            _inferenceSettingsViewModel,
+            _mockLlmService.Object,
+            _mockSettingsService.Object,
+            _mockSystemPromptService.Object,
+            _dispatcher,
+            _mockLogger.Object));
+    }
+
+    /// <summary>
+    /// Verifies that the constructor subscribes to ModelStateChanged event.
+    /// </summary>
+    [Fact]
+    public void Constructor_SubscribesToModelStateChangedEvent()
+    {
+        // Act
+        var vm = CreateViewModel();
+
+        // Assert
+        _mockLlmService.VerifyAdd(
+            s => s.ModelStateChanged += It.IsAny<EventHandler<ModelStateChangedEventArgs>>(),
+            Times.AtLeastOnce); // Multiple subscriptions expected (MainWindowViewModel + ModelSelectorViewModel)
+    }
+
+    /// <summary>
+    /// Verifies that the constructor subscribes to InferenceProgress event.
+    /// </summary>
+    [Fact]
+    public void Constructor_SubscribesToInferenceProgressEvent()
+    {
+        // Act
+        var vm = CreateViewModel();
+
+        // Assert
+        _mockLlmService.VerifyAdd(
+            s => s.InferenceProgress += It.IsAny<EventHandler<InferenceProgressEventArgs>>(),
+            Times.Once);
+    }
+
+    #endregion
+
+    #region Child ViewModel Property Tests
+
+    /// <summary>
+    /// Verifies that ChatViewModel property is properly set.
+    /// </summary>
+    [Fact]
+    public void ChatViewModel_IsProperlyInjected()
+    {
+        // Act
+        var vm = CreateViewModel();
+
+        // Assert
+        Assert.NotNull(vm.ChatViewModel);
+        Assert.Same(_chatViewModel, vm.ChatViewModel);
+    }
+
+    /// <summary>
+    /// Verifies that ModelSelectorViewModel property is properly set.
+    /// </summary>
+    [Fact]
+    public void ModelSelectorViewModel_IsProperlyInjected()
+    {
+        // Act
+        var vm = CreateViewModel();
+
+        // Assert
+        Assert.NotNull(vm.ModelSelectorViewModel);
+        Assert.Same(_modelSelectorViewModel, vm.ModelSelectorViewModel);
+    }
+
+    /// <summary>
+    /// Verifies that ConversationListViewModel property is properly set.
+    /// </summary>
+    [Fact]
+    public void ConversationListViewModel_IsProperlyInjected()
+    {
+        // Act
+        var vm = CreateViewModel();
+
+        // Assert
+        Assert.NotNull(vm.ConversationListViewModel);
+        Assert.Same(_conversationListViewModel, vm.ConversationListViewModel);
+    }
+
+    /// <summary>
+    /// Verifies that InferenceSettingsViewModel property is properly set.
+    /// </summary>
+    [Fact]
+    public void InferenceSettingsViewModel_IsProperlyInjected()
+    {
+        // Act
+        var vm = CreateViewModel();
+
+        // Assert
+        Assert.NotNull(vm.InferenceSettingsViewModel);
+        Assert.Same(_inferenceSettingsViewModel, vm.InferenceSettingsViewModel);
+    }
+
+    #endregion
+
+    #region Default Value Tests
+
+    /// <summary>
+    /// Verifies that MainWindowViewModel has correct default values.
+    /// </summary>
+    [Fact]
+    public void Constructor_SetsDefaultValues()
+    {
+        // Act
+        var vm = CreateViewModel();
+
+        // Assert
+        Assert.Equal("No model loaded", vm.StatusMessage);
+        Assert.Equal(string.Empty, vm.TokenInfo);
+        Assert.True(vm.IsSidebarVisible);
+        Assert.Equal(280, vm.SidebarWidth);
+    }
+
+    #endregion
+
+    #region InitializeAsync Tests
+
+    /// <summary>
+    /// Verifies that InitializeAsync loads settings.
+    /// </summary>
+    [Fact]
+    public async Task InitializeAsync_LoadsSettings()
+    {
+        // Arrange
+        var vm = CreateViewModel();
+
+        // Act
+        await vm.InitializeAsync();
+
+        // Assert
+        _mockSettingsService.Verify(s => s.LoadSettingsAsync(), Times.Once);
+    }
+
+    /// <summary>
+    /// Verifies that InitializeAsync initializes ConversationListViewModel.
+    /// </summary>
+    [Fact]
+    public async Task InitializeAsync_InitializesConversationListViewModel()
+    {
+        // Arrange
+        var vm = CreateViewModel();
+
+        // Act
+        await vm.InitializeAsync();
+
+        // Assert - ConversationListViewModel.InitializeAsync should be called
+        // We verify this indirectly by checking that GetRecentConversationsAsync was called
+        _mockConversationService.Verify(
+            s => s.GetRecentConversationsAsync(It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()),
+            Times.AtLeastOnce);
+    }
+
+    /// <summary>
+    /// Verifies that InitializeAsync updates StatusMessage on success.
+    /// </summary>
+    [Fact]
+    public async Task InitializeAsync_UpdatesStatusMessageOnSuccess()
+    {
+        // Arrange
+        _mockLlmService.Setup(s => s.IsModelLoaded).Returns(false);
+        var vm = CreateViewModel();
+
+        // Act
+        await vm.InitializeAsync();
+
+        // Assert
+        Assert.Equal("No model loaded", vm.StatusMessage);
+    }
+
+    /// <summary>
+    /// Verifies that InitializeAsync shows loading status initially.
+    /// </summary>
+    [Fact]
+    public async Task InitializeAsync_ShowsLoadingStatus()
+    {
+        // Arrange
+        var statusMessages = new List<string?>();
+        var vm = CreateViewModel();
+        vm.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(MainWindowViewModel.StatusMessage))
+                statusMessages.Add(vm.StatusMessage);
+        };
+
+        // Act
+        await vm.InitializeAsync();
+
+        // Assert - "Loading..." should have been set at some point
+        Assert.Contains("Loading...", statusMessages);
+    }
+
+    /// <summary>
+    /// Verifies that InitializeAsync handles errors gracefully.
+    /// </summary>
+    [Fact]
+    public async Task InitializeAsync_HandlesErrors()
+    {
+        // Arrange
+        _mockSettingsService.Setup(s => s.LoadSettingsAsync())
+            .ThrowsAsync(new Exception("Test error"));
+        var vm = CreateViewModel();
+
+        // Act
+        await vm.InitializeAsync();
+
+        // Assert - should not throw, should show error in status
+        Assert.StartsWith("Error:", vm.StatusMessage);
+    }
+
+    #endregion
+
+    #region ToggleSidebar Command Tests
+
+    /// <summary>
+    /// Verifies that ToggleSidebarCommand toggles sidebar visibility.
+    /// </summary>
+    [Fact]
+    public void ToggleSidebarCommand_TogglesSidebarVisibility()
+    {
+        // Arrange
+        var vm = CreateViewModel();
+        Assert.True(vm.IsSidebarVisible);
+
+        // Act
+        vm.ToggleSidebarCommand.Execute(null);
+
+        // Assert
+        Assert.False(vm.IsSidebarVisible);
+
+        // Toggle back
+        vm.ToggleSidebarCommand.Execute(null);
+        Assert.True(vm.IsSidebarVisible);
+    }
+
+    /// <summary>
+    /// Verifies that ToggleSidebar notifies property changed.
+    /// </summary>
+    [Fact]
+    public void ToggleSidebar_NotifiesPropertyChanged()
+    {
+        // Arrange
+        var vm = CreateViewModel();
+        var changedProperties = new List<string?>();
+        vm.PropertyChanged += (s, e) => changedProperties.Add(e.PropertyName);
+
+        // Act
+        vm.ToggleSidebarCommand.Execute(null);
+
+        // Assert
+        Assert.Contains(nameof(MainWindowViewModel.IsSidebarVisible), changedProperties);
+    }
+
+    #endregion
+
+    #region NewConversation Command Tests
+
+    /// <summary>
+    /// Verifies that NewConversationCommand delegates to ConversationListViewModel.
+    /// </summary>
+    [Fact]
+    public async Task NewConversationCommand_CreatesNewConversation()
+    {
+        // Arrange
+        _mockConversationService.Setup(s => s.CreateNewConversationAsync(
+            It.IsAny<string?>(),
+            It.IsAny<Guid?>(),
+            It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Conversation { Id = Guid.NewGuid(), Title = "New" });
+        var vm = CreateViewModel();
+
+        // Act
+        await vm.NewConversationCommand.ExecuteAsync(null);
+
+        // Assert - Verify the conversation service was called to create a new conversation
+        _mockConversationService.Verify(
+            s => s.CreateNewConversationAsync(It.IsAny<string?>(), It.IsAny<Guid?>(), It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    #endregion
+
+    #region FocusSearch Command Tests
+
+    /// <summary>
+    /// Verifies that FocusSearchCommand executes without throwing.
+    /// </summary>
+    [Fact]
+    public void FocusSearchCommand_ExecutesWithoutError()
+    {
+        // Arrange
+        var vm = CreateViewModel();
+
+        // Act & Assert - should not throw
+        vm.FocusSearchCommand.Execute(null);
+    }
+
+    #endregion
+
+    #region OnModelStateChanged Event Handler Tests
+
+    /// <summary>
+    /// Verifies that the event handler is subscribed and responds to model unloaded state.
+    /// </summary>
+    /// <remarks>
+    /// Note: Testing model loaded state requires a valid file path because ModelSelectorViewModel
+    /// tries to read file info. This test only verifies the unloaded state where no file access occurs.
+    /// </remarks>
+    [Fact]
+    public void OnModelStateChanged_ModelUnloaded_UpdatesStatusMessage()
+    {
+        // Arrange
+        var vm = CreateViewModel();
+
+        // Act - unload (no file path, so no FileInfo access)
+        _mockLlmService.Raise(
+            s => s.ModelStateChanged += null,
+            new ModelStateChangedEventArgs(isLoaded: false, modelPath: null));
+
+        // Assert
+        Assert.Equal("No model loaded", vm.StatusMessage);
+    }
+
+    /// <summary>
+    /// Verifies that InferenceProgress updates TokenInfo (which can then be cleared).
+    /// </summary>
+    [Fact]
+    public void OnInferenceProgress_SetsTokenInfo_ThenModelUnloaded_ClearsTokenInfo()
+    {
+        // Arrange
+        var vm = CreateViewModel();
+
+        // First simulate some token info
+        _mockLlmService.Raise(
+            s => s.InferenceProgress += null,
+            new InferenceProgressEventArgs { TokensGenerated = 10, Elapsed = TimeSpan.FromSeconds(2) });
+        Assert.NotEqual(string.Empty, vm.TokenInfo);
+
+        // Act - unload model (no file path, so no FileInfo access)
+        _mockLlmService.Raise(
+            s => s.ModelStateChanged += null,
+            new ModelStateChangedEventArgs(isLoaded: false, modelPath: null));
+
+        // Assert
+        Assert.Equal(string.Empty, vm.TokenInfo);
+    }
+
+    #endregion
+
+    #region OnInferenceProgress Event Handler Tests
+
+    /// <summary>
+    /// Verifies that OnInferenceProgress updates TokenInfo.
+    /// </summary>
+    [Fact]
+    public void OnInferenceProgress_UpdatesTokenInfo()
+    {
+        // Arrange
+        var vm = CreateViewModel();
+
+        // Act - TokensPerSecond is calculated from TokensGenerated / Elapsed.TotalSeconds
+        // 42 tokens in ~2.745 seconds = ~15.3 tok/s
+        _mockLlmService.Raise(
+            s => s.InferenceProgress += null,
+            new InferenceProgressEventArgs
+            {
+                TokensGenerated = 42,
+                Elapsed = TimeSpan.FromSeconds(42.0 / 15.3)
+            });
+
+        // Assert - The format may vary slightly due to floating point
+        Assert.Contains("Tokens: 42", vm.TokenInfo);
+        Assert.Contains("tok/s", vm.TokenInfo);
+    }
+
+    #endregion
+
+    #region SetMainWindow Tests
+
+    /// <summary>
+    /// Verifies that SetMainWindow throws ArgumentNullException for null window.
+    /// </summary>
+    [Fact]
+    public void SetMainWindow_NullWindow_ThrowsArgumentNullException()
+    {
+        // Arrange
+        var vm = CreateViewModel();
+
+        // Act & Assert
+        Assert.Throws<ArgumentNullException>(() => vm.SetMainWindow(null!));
+    }
+
+    #endregion
+}

@@ -136,4 +136,24 @@ public class ConversationTests
         Assert.Equal("Second", conversation.Messages[1].Content);
         Assert.Equal("Third", conversation.Messages[2].Content);
     }
+
+    /// <summary>
+    /// Verifies ClearMessages removes all messages and marks as unsaved.
+    /// </summary>
+    [Fact]
+    public void ClearMessages_RemovesAllMessagesAndMarksUnsaved()
+    {
+        // Arrange
+        var conversation = new Conversation();
+        conversation.AddMessage(new ChatMessage { Content = "Test 1" });
+        conversation.AddMessage(new ChatMessage { Content = "Test 2" });
+        conversation.MarkAsSaved(); // Reset unsaved flag
+
+        // Act
+        conversation.ClearMessages();
+
+        // Assert
+        Assert.Empty(conversation.Messages);
+        Assert.True(conversation.HasUnsavedChanges);
+    }
 }

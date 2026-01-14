@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.2.5a] - 2026-01-13
+
+FTS5 search infrastructure for full-text search. See [detailed notes](docs/changelog/v0.2.5a.md).
+
+### Added
+
+- **FTS5 Search Infrastructure** - Full-text search for conversations and messages
+  - SearchResultType enum (Conversation, Message) for categorizing search results
+  - SearchResult record with Id, ResultType, Title, Preview, Rank, Timestamp, ConversationId, MessageId
+  - SearchQuery record with QueryText, MaxResults, IncludeConversations, IncludeMessages, MinRank
+  - SearchResults record with Results, TotalCount, Query, SearchDuration
+  - AInternDbContext.EnsureFts5TablesAsync() - Creates FTS5 virtual tables and triggers
+  - AInternDbContext.RebuildFts5IndexesAsync() - Rebuilds FTS indexes from source data
+  - AInternDbContext.SearchAsync(SearchQuery) - Executes full-text search with BM25 ranking
+  - ConversationsFts virtual table indexing conversation titles
+  - MessagesFts virtual table indexing message content
+  - 6 synchronization triggers for automatic FTS index maintenance
+
+### Technical Details
+
+- Uses SQLite FTS5 with external content pattern (no data duplication)
+- BM25 ranking algorithm for relevance scoring (lower = better match)
+- snippet() function for highlighted search previews
+- Trigger-based synchronization for INSERT/UPDATE/DELETE operations
+
 ## [0.2.4e] - 2026-01-13
 
 Chat integration for system prompt feature. See [detailed notes](docs/changelog/v0.2.4e.md).
