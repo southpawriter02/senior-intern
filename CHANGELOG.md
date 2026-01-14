@@ -7,7 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.1a] - 2026-01-14
+
+Core models for workspace awareness. See [detailed notes](docs/changelog/v0.3.1a.md).
+
+### Added
+
+- **Workspace Model** - Project folder representation
+  - Properties: Id, Name, RootPath, OpenedAt, LastAccessedAt, OpenFiles, ActiveFilePath
+  - UI state: ExpandedFolders, IsPinned, GitIgnorePatterns
+  - Path utilities: GetAbsolutePath, GetRelativePath, ContainsPath, Touch
+  - Computed: DisplayName (custom name or folder), Exists
+
+- **FileSystemItem Model** - File/directory representation
+  - Core: Path, Name, Type, Size, ModifiedAt, AccessedAt, CreatedAt
+  - Metadata: IsHidden, IsReadOnly, HasChildren, IsExpanded, Children
+  - Factory methods: FromFileInfo, FromDirectoryInfo
+  - Computed: Extension, Language, FormattedSize, ParentPath
+
+- **FileContext Model** - Attached file content for chat
+  - Content: FilePath, Content, Language, LineCount, EstimatedTokens
+  - Partial support: StartLine, EndLine, IsPartialContent
+  - Factory methods: FromFile, FromSelection, FormatForLlmContext
+  - Change detection: ContentHash (SHA256 prefix)
+
+- **TokenEstimator Utility** - LLM context budget estimation
+  - Estimate(content) - ~3.5 chars/token baseline
+  - Estimate(content, language) - language-specific multipliers
+  - MaxContentLength, ExceedsBudget helpers
+
+- **LanguageDetector Utility** - File extension to language mapping
+  - 50+ extensions mapped (csharp, python, typescript, etc.)
+  - Special files: Dockerfile, Makefile, Gemfile, etc.
+  - GetAllSupportedExtensions, IsSupported helpers
+
+### Technical Details
+
+- New Utilities/ folder in AIntern.Core
+- 40 new unit tests (Workspace: 10, FileSystemItem: 12, FileContext: 14, TokenEstimator: 15)
+- Full XML documentation with remarks and examples
+
 ## [0.2.5g] - 2026-01-14
+
 
 Status bar enhancements with interactive elements and keyboard shortcuts. See [detailed notes](docs/changelog/v0.2.5g.md).
 
