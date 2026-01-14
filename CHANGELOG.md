@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.3b] - 2026-01-14
+
+Editor Panel ViewModel. See [detailed notes](docs/changelog/v0.3.3b.md).
+
+### Added
+
+- EditorPanelViewModel with tab management and file operations
+- IDialogService interface for platform-independent dialogs
+- Tab navigation (next/prev with wrap-around)
+- Editor commands (undo, redo, find, replace, go-to-line)
+- Unsaved changes prompt flow (Save/Don't Save/Cancel)
+
+### Unit Tests
+
+- 31 new tests for EditorPanelViewModel
+
 ## [0.3.3a] - 2026-01-14
 
 Editor Tab ViewModel. See [detailed notes](docs/changelog/v0.3.3a.md).
