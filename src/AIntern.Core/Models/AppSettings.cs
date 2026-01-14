@@ -109,6 +109,12 @@ public sealed class AppSettings
     /// </summary>
     public double SidebarWidth { get; set; } = 280;
 
+    /// <summary>
+    /// Gets or sets whether to restore the last workspace on startup.
+    /// </summary>
+    /// <remarks>Added in v0.3.1e.</remarks>
+    public bool RestoreLastWorkspace { get; set; } = true;
+
     #endregion
 
     #region Window State

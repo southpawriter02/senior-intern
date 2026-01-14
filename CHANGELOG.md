@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.1e] - 2026-01-14
+
+Workspace lifecycle management service. See [detailed notes](docs/changelog/v0.3.1e.md).
+
+### Added
+
+- **IWorkspaceService Interface** - Workspace lifecycle management
+  - Open/close workspace operations with event notifications
+  - Recent workspaces management (pin, rename, remove)
+  - State persistence (open files, expanded folders)
+  - 30-second auto-save timer
+  - Workspace restoration on startup
+- **WorkspaceEvents** - Event args and enums for workspace changes
+- **IWorkspaceRepository + WorkspaceRepository** - EF Core persistence
+- **RestoreLastWorkspace** setting in AppSettings
+
+### Technical Details
+
+- 18 unit tests in WorkspaceServiceTests
+- Thread-safe operations with SemaphoreSlim
+- Integrates with IFileSystemService for file watching and .gitignore
+
 ## [0.3.1d] - 2026-01-14
 
 File system service for workspace operations. See [detailed notes](docs/changelog/v0.3.1d.md).
