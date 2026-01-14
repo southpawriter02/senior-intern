@@ -7,9 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.1d] - 2026-01-14
+
+File system service for workspace operations. See [detailed notes](docs/changelog/v0.3.1d.md).
+
+### Added
+
+- **IFileSystemService Interface** - Workspace-aware file operations
+  - Directory operations: list, create, delete (recursive)
+  - File operations: read, write, create, delete, rename, copy, move
+  - Debounced file watching (200ms window)
+  - Binary file detection via signatures (PNG, JPEG, PDF, etc.)
+  - .gitignore pattern matching with negation support
+- **FileSystemChangeEvent** - Change notification data
+- **FileSystemChangeType** - Created, Modified, Deleted, Renamed enum
+
+### Technical Details
+
+- 27 unit tests (FileSystemServiceTests + GitIgnorePatternTests)
+- Last-match-wins semantics for gitignore patterns
+
 ## [0.3.1c] - 2026-01-14
 
 Enhanced language detection utility. See [detailed notes](docs/changelog/v0.3.1c.md).
+
 
 ### Added
 
