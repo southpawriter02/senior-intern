@@ -252,15 +252,15 @@ public class FileTreeItemViewModelTests
     [InlineData(".py", "file-python")]
     [InlineData(".md", "file-markdown")]
     [InlineData(".json", "file-json")]
-    [InlineData(".unknown", "file")]
+    [InlineData(".unknown", "file-code")]
     public void FileIconProvider_ReturnsCorrectKeys(string extension, string expected)
     {
         Assert.Equal(expected, FileIconProvider.GetIconKeyForExtension(extension));
     }
 
     [Theory]
-    [InlineData("README.md", "file-readme")]
-    [InlineData("package.json", "file-npm")]
+    [InlineData("README.md", "file-markdown")]
+    [InlineData("package.json", "file-json")]
     [InlineData(".gitignore", "file-git")]
     [InlineData("random.txt", null)]
     public void FileIconProvider_IdentifiesSpecialFiles(string fileName, string? expected)

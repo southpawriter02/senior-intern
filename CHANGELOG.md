@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.2c] - 2026-01-14
+
+File icon system. See [detailed notes](docs/changelog/v0.3.2c.md).
+
+### Added
+
+- **SVG IconPaths** - 25+ file type icons with 24x24 SVG path data
+- **FileIconConverter** - IValueConverter for XAML PathIcon binding
+- **FileIcons.axaml** - Resource dictionary with colors and UI icons
+
+### Features
+
+- GetIconPath() returns SVG data for icon keys
+- GetAllIconKeys() lists all available icons
+- 11 language-specific color brushes
+- 14 static UI geometry icons
+
 ## [0.3.2b] - 2026-01-14
 
 File explorer ViewModel. See [detailed notes](docs/changelog/v0.3.2b.md).
