@@ -188,6 +188,29 @@ public static class ServiceCollectionExtensions
         });
 
         // ┌─────────────────────────────────────────────────────────────────┐
+        // │ WORKSPACE SERVICES (v0.3.1e-f)                                  │
+        // └─────────────────────────────────────────────────────────────────┘
+
+        // File System: workspace-aware file operations with watching and .gitignore.
+        // Singleton for shared file watcher state.
+        // Added in v0.3.1d.
+        services.AddSingleton<IFileSystemService, FileSystemService>();
+
+        // Workspace: manages workspace lifecycle, state, and recent history.
+        // Uses a factory to resolve scoped repository dependency.
+        // Added in v0.3.1e, enhanced in v0.3.1f.
+        services.AddSingleton<IWorkspaceService>(sp =>
+        {
+            // Create a scope to resolve scoped services (repositories).
+            var scope = sp.CreateScope();
+            return new WorkspaceService(
+                scope.ServiceProvider.GetRequiredService<IWorkspaceRepository>(),
+                sp.GetRequiredService<IFileSystemService>(),
+                sp.GetRequiredService<ISettingsService>(),
+                sp.GetRequiredService<ILogger<WorkspaceService>>());
+        });
+
+        // ┌─────────────────────────────────────────────────────────────────┐
         // │ UI INFRASTRUCTURE                                                │
         // └─────────────────────────────────────────────────────────────────┘
         

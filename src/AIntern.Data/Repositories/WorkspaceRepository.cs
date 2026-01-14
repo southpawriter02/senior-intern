@@ -9,9 +9,17 @@ using System.Diagnostics;
 /// <summary>
 /// EF Core implementation of workspace repository.
 /// </summary>
-/// <remarks>Added in v0.3.1e.</remarks>
+/// <remarks>
+/// <para>Added in v0.3.1e.</para>
+/// <para>Enhanced in v0.3.1f with max recent enforcement.</para>
+/// </remarks>
 public sealed class WorkspaceRepository : IWorkspaceRepository
 {
+    /// <summary>
+    /// Maximum number of recent workspaces to keep in database.
+    /// Oldest non-pinned workspaces are removed when limit is exceeded.
+    /// </summary>
+    private const int MaxRecentWorkspaces = 20;
     private readonly AInternDbContext _context;
     private readonly ILogger<WorkspaceRepository> _logger;
 
@@ -117,6 +125,10 @@ public sealed class WorkspaceRepository : IWorkspaceRepository
         }
 
         await _context.SaveChangesAsync(cancellationToken);
+
+        // Enforce max recent workspaces limit (v0.3.1f)
+        await EnforceMaxRecentAsync(cancellationToken);
+
         _logger.LogDebug("[EXIT] AddOrUpdateAsync - Elapsed: {Elapsed}ms", sw.ElapsedMilliseconds);
     }
 
@@ -177,4 +189,40 @@ public sealed class WorkspaceRepository : IWorkspaceRepository
             _logger.LogInformation("Renamed workspace {Id} to: {Name}", workspaceId, newName);
         }
     }
+
+    #region Private Methods
+
+    /// <summary>
+    /// Enforces the maximum number of recent workspaces.
+    /// Removes oldest non-pinned workspaces if over limit.
+    /// </summary>
+    /// <remarks>Added in v0.3.1f.</remarks>
+    private async Task EnforceMaxRecentAsync(CancellationToken cancellationToken)
+    {
+        var count = await _context.RecentWorkspaces.CountAsync(cancellationToken);
+
+        if (count <= MaxRecentWorkspaces)
+            return;
+
+        _logger.LogDebug("Enforcing max recent limit: {Count}/{Max}", count, MaxRecentWorkspaces);
+
+        // Get IDs of oldest non-pinned workspaces to remove
+        var idsToRemove = await _context.RecentWorkspaces
+            .Where(w => !w.IsPinned)
+            .OrderBy(w => w.LastAccessedAt)
+            .Take(count - MaxRecentWorkspaces)
+            .Select(w => w.Id)
+            .ToListAsync(cancellationToken);
+
+        if (idsToRemove.Count > 0)
+        {
+            await _context.RecentWorkspaces
+                .Where(w => idsToRemove.Contains(w.Id))
+                .ExecuteDeleteAsync(cancellationToken);
+
+            _logger.LogInformation("Removed {Count} old workspaces to enforce limit", idsToRemove.Count);
+        }
+    }
+
+    #endregion
 }

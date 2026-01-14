@@ -21,6 +21,7 @@ namespace AIntern.Data;
 ///   <item><description><see cref="IConversationRepository"/> - Scoped</description></item>
 ///   <item><description><see cref="ISystemPromptRepository"/> - Scoped</description></item>
 ///   <item><description><see cref="IInferencePresetRepository"/> - Scoped</description></item>
+///   <item><description><see cref="IWorkspaceRepository"/> - Scoped (v0.3.1e-f)</description></item>
 ///   <item><description><see cref="DatabaseInitializer"/> - Scoped</description></item>
 /// </list>
 /// <para>
@@ -93,6 +94,7 @@ public static class DataServiceCollectionExtensions
         services.AddScoped<IConversationRepository, ConversationRepository>();
         services.AddScoped<ISystemPromptRepository, SystemPromptRepository>();
         services.AddScoped<IInferencePresetRepository, InferencePresetRepository>();
+        services.AddScoped<IWorkspaceRepository, WorkspaceRepository>(); // v0.3.1e-f
 
         // Register the database initializer.
         // This is called during application startup to apply migrations and seed data.
@@ -134,6 +136,7 @@ public static class DataServiceCollectionExtensions
         services.AddScoped<IConversationRepository, ConversationRepository>();
         services.AddScoped<ISystemPromptRepository, SystemPromptRepository>();
         services.AddScoped<IInferencePresetRepository, InferencePresetRepository>();
+        services.AddScoped<IWorkspaceRepository, WorkspaceRepository>(); // v0.3.1e-f
 
         // Register the database initializer.
         services.AddScoped<DatabaseInitializer>();

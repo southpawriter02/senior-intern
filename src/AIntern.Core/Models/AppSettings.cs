@@ -115,6 +115,70 @@ public sealed class AppSettings
     /// <remarks>Added in v0.3.1e.</remarks>
     public bool RestoreLastWorkspace { get; set; } = true;
 
+    /// <summary>
+    /// Gets or sets whether to show hidden files in the file explorer.
+    /// </summary>
+    /// <remarks>Added in v0.3.1f.</remarks>
+    public bool ShowHiddenFiles { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets whether to respect .gitignore patterns when displaying files.
+    /// </summary>
+    /// <remarks>Added in v0.3.1f.</remarks>
+    public bool UseGitIgnore { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the maximum number of recent workspaces to display.
+    /// </summary>
+    /// <remarks>Added in v0.3.1f.</remarks>
+    public int MaxRecentWorkspaces { get; set; } = 10;
+
+    /// <summary>
+    /// Gets or sets custom ignore patterns (in addition to .gitignore).
+    /// </summary>
+    /// <remarks>Added in v0.3.1f.</remarks>
+    public IReadOnlyList<string> CustomIgnorePatterns { get; set; } = [];
+
+    #endregion
+
+    #region Editor Settings (v0.3.1f)
+
+    /// <summary>
+    /// Gets or sets whether to enable word wrap in the code editor.
+    /// </summary>
+    /// <remarks>Added in v0.3.1f.</remarks>
+    public bool WordWrap { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets the tab size in spaces.
+    /// </summary>
+    /// <remarks>Added in v0.3.1f.</remarks>
+    public int TabSize { get; set; } = 4;
+
+    /// <summary>
+    /// Gets or sets whether to show line numbers in the code editor.
+    /// </summary>
+    /// <remarks>Added in v0.3.1f.</remarks>
+    public bool ShowLineNumbers { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets whether to highlight the current line.
+    /// </summary>
+    /// <remarks>Added in v0.3.1f.</remarks>
+    public bool HighlightCurrentLine { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the font family for the code editor.
+    /// </summary>
+    /// <remarks>Added in v0.3.1f.</remarks>
+    public string EditorFontFamily { get; set; } = "Cascadia Code, Consolas, monospace";
+
+    /// <summary>
+    /// Gets or sets the font size for the code editor.
+    /// </summary>
+    /// <remarks>Added in v0.3.1f.</remarks>
+    public int EditorFontSize { get; set; } = 14;
+
     #endregion
 
     #region Window State

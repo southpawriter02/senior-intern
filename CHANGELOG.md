@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.1f] - 2026-01-14
+
+Repository layer enhancements. See [detailed notes](docs/changelog/v0.3.1f.md).
+
+### Added
+
+- **Max Recent Enforcement** - Limit of 20 workspaces, oldest non-pinned auto-removed
+- **EnforceMaxRecentAsync** - Private method in WorkspaceRepository
+- **AppSettings Extensions**:
+  - Workspace: ShowHiddenFiles, UseGitIgnore, MaxRecentWorkspaces, CustomIgnorePatterns
+  - Editor: WordWrap, TabSize, ShowLineNumbers, HighlightCurrentLine, FontFamily, FontSize
+- **DI Registration** - IFileSystemService, IWorkspaceService, IWorkspaceRepository
+
+### Technical Details
+
+- 10 new repository unit tests (43 total Workspace tests)
+- Pinned workspaces preserved during max enforcement
+
 ## [0.3.1e] - 2026-01-14
 
 Workspace lifecycle management service. See [detailed notes](docs/changelog/v0.3.1e.md).
