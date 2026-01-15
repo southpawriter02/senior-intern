@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.4e] - 2026-01-15
+
+Context Preview. See [detailed notes](docs/changelog/v0.3.4e.md).
+
+### Added
+
+- ContextPreviewPopup user control with header, content, footer
+- ContextPreviewViewModel for preview state management
+- Popup theme resources (background, border, header, footer)
+- Commands: ShowPreview, HidePreview, OpenInEditor, Remove, Copy
+- Escape key and backdrop click to close
+
+### Unit Tests
+
+- 10 tests for ContextPreviewViewModel
+
 ## [0.3.4d] - 2026-01-15
 
 Chat Context Bar UI. See [detailed notes](docs/changelog/v0.3.4d.md).
