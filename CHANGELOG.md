@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.4c] - 2026-01-15
+
+File Context ViewModel. See [detailed notes](docs/changelog/v0.3.4c.md).
+
+### Added
+
+- ContextAttachmentType enum (File, Selection, Clipboard)
+- FileContextViewModel with observable and computed properties
+- Factory methods (FromFile, FromSelection, FromClipboard)
+- Display properties (DisplayLabel, ShortLabel, PreviewContent, Badge, IconKey)
+- ToFileContext and FromFileContext conversions
+
+### Unit Tests
+
+- 33 tests for FileContextViewModel
+
 ## [0.3.4b] - 2026-01-15
 
 Context Formatter. See [detailed notes](docs/changelog/v0.3.4b.md).
