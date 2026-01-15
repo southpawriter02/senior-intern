@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.4b] - 2026-01-15
+
+Context Formatter. See [detailed notes](docs/changelog/v0.3.4b.md).
+
+### Added
+
+- IContextFormatter interface for context formatting
+- ContextFormatter with prompt, display, and storage formatting
+- ContextPromptTemplates for standardized templates
+- Support for code block syntax highlighting hints
+- Truncated preview for collapsed display mode
+
+### Unit Tests
+
+- 21 tests for context formatting
+
 ## [0.3.4a] - 2026-01-15
 
 Token Estimation Service. See [detailed notes](docs/changelog/v0.3.4a.md).
