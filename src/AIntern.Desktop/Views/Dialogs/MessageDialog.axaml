@@ -1,0 +1,49 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="AIntern.Desktop.Views.Dialogs.MessageDialog"
+        Width="400"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False"
+        ExtendClientAreaToDecorationsHint="False"
+        Background="{DynamicResource PanelBackground}">
+    <!--
+        MessageDialog - Configurable message dialog with icons and buttons.
+        
+        Features:
+        - Icon support (Info, Warning, Error, Question)
+        - Configurable button labels
+        - Returns clicked button text
+        
+        Added in v0.3.3g.
+    -->
+
+    <Grid Margin="16" RowDefinitions="Auto, Auto">
+        <!-- Icon and Message -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto, *" Margin="0,0,0,16">
+            <PathIcon Grid.Column="0"
+                      x:Name="DialogIcon"
+                      Width="32" Height="32"
+                      Margin="0,0,16,0"
+                      VerticalAlignment="Top"
+                      Foreground="{DynamicResource TextSecondary}" />
+            <TextBlock Grid.Column="1"
+                       x:Name="MessageText"
+                       TextWrapping="Wrap"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource TextPrimary}" />
+        </Grid>
+
+        <!-- Buttons -->
+        <ItemsControl Grid.Row="1"
+                      x:Name="ButtonsPanel"
+                      HorizontalAlignment="Right">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" Spacing="8" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+    </Grid>
+</Window>

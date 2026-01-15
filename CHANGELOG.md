@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.4a] - 2026-01-15
+
+Token Estimation Service. See [detailed notes](docs/changelog/v0.3.4a.md).
+
+### Added
+
+- ITokenEstimationService interface for token estimation
+- TokenEstimationService with three algorithms (CharacterBased, WordBased, BpeApproximate)
+- TokenEstimationMethod enum
+- TokenUsageBreakdown model with usage tracking
+- ContextLimitsConfig for configurable limits
+- Content truncation with word-boundary awareness
+
+### Unit Tests
+
+- 36 tests for token estimation and usage breakdown
+
+## [0.3.3g] - 2026-01-14
+
+Dialogs & Integration. See [detailed notes](docs/changelog/v0.3.3g.md).
+
+### Added
+
+- IDialogService interface for platform dialogs
+- DialogService implementation using Avalonia storage providers
+- GoToLineDialog with input validation
+- MessageDialog with configurable buttons and icons
+- Dialog icons (InfoIcon, WarningIcon, ErrorIcon, QuestionIcon)
+- Semantic color brushes (DangerBrush, WarningBrush, SuccessBrush)
+
+### Unit Tests
+
+- 12 new tests for DialogService and MessageDialogIcon
+
 ## [0.3.3f] - 2026-01-14
 
 Find & Replace. See [detailed notes](docs/changelog/v0.3.3f.md).

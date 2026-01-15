@@ -189,4 +189,36 @@
     -->
     <StreamGeometry x:Key="TerminalIcon">M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8h16v10zm-2-1h-6v-2h6v2zM7.5 17l-1.41-1.41L8.67 13l-2.59-2.59L7.5 9l4 4-4 4z</StreamGeometry>
 
+    <!-- ================================================================== -->
+    <!-- Dialog Icons (v0.3.3g)                                             -->
+    <!-- ================================================================== -->
+
+    <!--
+        InfoIcon - Used for information message dialogs
+        Circle with "i" representing informational content
+        ViewBox: 0 0 24 24
+    -->
+    <StreamGeometry x:Key="InfoIcon">M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z</StreamGeometry>
+
+    <!--
+        WarningIcon - Used for warning message dialogs
+        Triangle with exclamation mark representing caution
+        ViewBox: 0 0 24 24
+    -->
+    <StreamGeometry x:Key="WarningIcon">M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z</StreamGeometry>
+
+    <!--
+        ErrorIcon - Used for error message dialogs
+        Circle with X representing error/failure
+        ViewBox: 0 0 24 24
+    -->
+    <StreamGeometry x:Key="ErrorIcon">M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z</StreamGeometry>
+
+    <!--
+        QuestionIcon - Used for question/confirmation dialogs
+        Circle with question mark for prompting decisions
+        ViewBox: 0 0 24 24
+    -->
+    <StreamGeometry x:Key="QuestionIcon">M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z</StreamGeometry>
+
 </ResourceDictionary>

@@ -216,4 +216,14 @@ public sealed class AppSettings
     public double? WindowY { get; set; }
 
     #endregion
+
+    #region Context Attachment Settings (v0.3.4a)
+
+    /// <summary>
+    /// Gets or sets the context attachment limits configuration.
+    /// </summary>
+    /// <remarks>Added in v0.3.4a.</remarks>
+    public ContextLimitsConfig ContextLimits { get; set; } = new();
+
+    #endregion
 }

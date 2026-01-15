@@ -30,6 +30,11 @@
     <SolidColorBrush x:Key="SuccessBackground" Color="#1D3D1D" />
     <SolidColorBrush x:Key="SuccessForeground" Color="#89D185" />
 
+    <!-- Semantic Icon Colors (v0.3.3g) -->
+    <SolidColorBrush x:Key="DangerBrush" Color="#F48771" />
+    <SolidColorBrush x:Key="WarningBrush" Color="#F0C674" />
+    <SolidColorBrush x:Key="SuccessBrush" Color="#89D185" />
+
     <!-- ============================================================== -->
     <!-- Sidebar & File Explorer Colors (v0.3.2g)                       -->
     <!-- ============================================================== -->

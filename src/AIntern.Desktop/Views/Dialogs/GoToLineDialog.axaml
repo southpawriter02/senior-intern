@@ -1,0 +1,54 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="AIntern.Desktop.Views.Dialogs.GoToLineDialog"
+        Title="Go to Line"
+        Width="300"
+        Height="140"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False"
+        ExtendClientAreaToDecorationsHint="False"
+        Background="{DynamicResource PanelBackground}">
+    <!--
+        GoToLineDialog - Input dialog for navigating to a specific line.
+        
+        Features:
+        - Validates line number range (1 to MaxLine)
+        - Pre-fills current line number
+        - Enter key submits
+        - Auto-focus on open
+        
+        Added in v0.3.3g.
+    -->
+
+    <Grid Margin="16" RowDefinitions="Auto, Auto, Auto">
+        <!-- Label -->
+        <TextBlock Grid.Row="0"
+                   x:Name="PromptText"
+                   Text="Go to line (1 - 100):"
+                   Foreground="{DynamicResource TextPrimary}"
+                   Margin="0,0,0,8" />
+
+        <!-- Input -->
+        <TextBox Grid.Row="1"
+                 x:Name="LineNumberInput"
+                 Watermark="Line number"
+                 Margin="0,0,0,16" />
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="8">
+            <Button Content="Cancel"
+                    Click="OnCancelClick"
+                    IsCancel="True"
+                    MinWidth="75" />
+            <Button Content="Go"
+                    Theme="{DynamicResource PrimaryButton}"
+                    Click="OnGoClick"
+                    IsDefault="True"
+                    MinWidth="75" />
+        </StackPanel>
+    </Grid>
+</Window>
