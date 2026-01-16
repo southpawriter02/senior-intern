@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.4.1c] - 2026-01-15
+
+Language Detection Service. See [detailed notes](docs/changelog/v0.4.1c.md).
+
+### Added
+
+- `ILanguageDetectionService` interface
+- `LanguageDetectionService` with 50+ language definitions
+- Alias normalization (cs → csharp, js → javascript, etc.)
+- File extension mapping
+- Content-based detection heuristics
+- Shell/config language classification
+- Comprehensive unit tests (30+)
+
 ## [0.4.1b] - 2026-01-15
 
 Parser Service for Code Block Extraction. See [detailed notes](docs/changelog/v0.4.1b.md).
