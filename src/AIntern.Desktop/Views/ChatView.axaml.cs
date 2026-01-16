@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -26,6 +28,7 @@ namespace AIntern.Desktop.Views;
 /// <list type="bullet">
 ///   <item>Enter key: Submits the current message</item>
 ///   <item>Edit button click: Opens the SystemPromptEditorWindow</item>
+///   <item>Drag-drop: Attaches files to chat context (v0.3.4g)</item>
 /// </list>
 /// </para>
 /// </remarks>
@@ -89,9 +92,109 @@ public partial class ChatView : UserControl
             _logger?.LogWarning("[INIT] PromptSelector not found in template");
         }
 
+        // Initialize drag-drop handlers (v0.3.4g)
+        InitializeDragDrop();
+
         sw.Stop();
         _logger?.LogDebug("[INIT] ChatView construction completed - {ElapsedMs}ms",
             sw.ElapsedMilliseconds);
+    }
+
+    #endregion
+
+    #region Drag-Drop (v0.3.4g)
+
+    /// <summary>
+    /// Initializes drag-drop event handlers.
+    /// </summary>
+    private void InitializeDragDrop()
+    {
+        AddHandler(DragDrop.DragEnterEvent, OnDragEnter);
+        AddHandler(DragDrop.DragOverEvent, OnDragOver);
+        AddHandler(DragDrop.DragLeaveEvent, OnDragLeave);
+        AddHandler(DragDrop.DropEvent, OnDrop);
+
+        _logger?.LogDebug("[INIT] Drag-drop handlers attached");
+    }
+
+    /// <summary>
+    /// Handles drag enter - shows the drop zone indicator.
+    /// </summary>
+    private void OnDragEnter(object? sender, DragEventArgs e)
+    {
+        if (e.Data.Contains(DataFormats.Files))
+        {
+            DropZoneIndicator.IsVisible = true;
+            _logger?.LogDebug("[DRAG] Drag enter with files");
+        }
+    }
+
+    /// <summary>
+    /// Handles drag over - sets the drag effect.
+    /// </summary>
+    private void OnDragOver(object? sender, DragEventArgs e)
+    {
+        if (e.Data.Contains(DataFormats.Files))
+        {
+            e.DragEffects = DragDropEffects.Link;
+            e.Handled = true;
+        }
+        else
+        {
+            e.DragEffects = DragDropEffects.None;
+        }
+    }
+
+    /// <summary>
+    /// Handles drag leave - hides the drop zone indicator.
+    /// </summary>
+    private void OnDragLeave(object? sender, DragEventArgs e)
+    {
+        DropZoneIndicator.IsVisible = false;
+        _logger?.LogDebug("[DRAG] Drag leave");
+    }
+
+    /// <summary>
+    /// Handles file drop - attaches files to chat context.
+    /// </summary>
+    private async void OnDrop(object? sender, DragEventArgs e)
+    {
+        DropZoneIndicator.IsVisible = false;
+
+        if (!e.Data.Contains(DataFormats.Files))
+            return;
+
+        // Access MainWindowViewModel through the visual tree
+        var window = TopLevel.GetTopLevel(this) as Window;
+        var mainViewModel = window?.DataContext as MainWindowViewModel;
+        if (mainViewModel == null)
+        {
+            _logger?.LogWarning("[DROP] Could not find MainWindowViewModel");
+            return;
+        }
+
+        var files = e.Data.GetFiles()?.ToList();
+        if (files == null || files.Count == 0)
+            return;
+
+        _logger?.LogDebug("[DROP] Processing {Count} dropped items", files.Count);
+
+        foreach (var file in files)
+        {
+            var path = file.Path.LocalPath;
+            // Only attach files, not directories
+            if (File.Exists(path))
+            {
+                _logger?.LogDebug("[DROP] Attaching file: {Path}", path);
+                await mainViewModel.AttachFileAsync(path);
+            }
+            else
+            {
+                _logger?.LogDebug("[DROP] Skipping directory: {Path}", path);
+            }
+        }
+
+        e.Handled = true;
     }
 
     #endregion

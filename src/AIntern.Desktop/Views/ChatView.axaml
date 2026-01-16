@@ -4,6 +4,7 @@
              xmlns:views="using:AIntern.Desktop.Views"
              x:Class="AIntern.Desktop.Views.ChatView"
              x:DataType="vm:ChatViewModel"
+             DragDrop.AllowDrop="True"
              Background="{DynamicResource WindowBackground}">
 
     <!--
@@ -15,6 +16,32 @@
         Row 3: Input Area (existing)
     -->
     <Grid RowDefinitions="Auto, Auto, *, Auto">
+
+        <!-- ================================================================== -->
+        <!-- Drop Zone Indicator (v0.3.4g)                                       -->
+        <!-- Appears when files are dragged over the chat area                   -->
+        <!-- ================================================================== -->
+        <Border x:Name="DropZoneIndicator"
+                Grid.RowSpan="4"
+                Background="#402196F3"
+                BorderBrush="#2196F3"
+                BorderThickness="2"
+                CornerRadius="8"
+                IsVisible="False"
+                IsHitTestVisible="False"
+                ZIndex="50">
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="8">
+                <PathIcon Data="{StaticResource AttachmentIcon}"
+                          Width="32" Height="32"
+                          Foreground="#2196F3" />
+                <TextBlock Text="Drop files to attach"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           Foreground="#2196F3" />
+            </StackPanel>
+        </Border>
 
         <!-- ================================================================== -->
         <!-- Row 0: System Prompt Selector Header (v0.2.4e)                     -->

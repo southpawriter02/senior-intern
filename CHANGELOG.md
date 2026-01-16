@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.4g] - 2026-01-15
+
+File Explorer Integration. See [detailed notes](docs/changelog/v0.3.4g.md).
+
+### Added
+
+- Drop zone visual indicator in ChatView for drag-drop feedback
+- Drag-drop handlers (DragEnter, DragOver, DragLeave, Drop) in ChatView
+- AttachFileAsync method in MainWindowViewModel for file attachment
+- Updated OnFileAttachRequested to use AttachFileAsync
+
 ## [0.3.4f] - 2026-01-15
 
 Editor Integration. See [detailed notes](docs/changelog/v0.3.4f.md).

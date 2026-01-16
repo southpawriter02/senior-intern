@@ -873,21 +873,72 @@ public partial class MainWindowViewModel : ViewModelBase
 
     /// <summary>
     /// Handles file attach requests from the file explorer.
-    /// Forwards to chat view model (v0.3.4 when implemented).
+    /// Forwards to AttachFileAsync for processing.
     /// </summary>
     /// <param name="sender">The event source.</param>
     /// <param name="e">Event arguments containing file path.</param>
     /// <remarks>
-    /// <para>Added in v0.3.2g.</para>
+    /// <para>Added in v0.3.2g, updated in v0.3.4g.</para>
     /// </remarks>
-    private void OnFileAttachRequested(object? sender, FileAttachRequestedEventArgs e)
+    private async void OnFileAttachRequested(object? sender, FileAttachRequestedEventArgs e)
     {
         _logger?.LogDebug("[EVENT] OnFileAttachRequested - Path: {Path}", e.FilePath);
+        await AttachFileAsync(e.FilePath);
+    }
 
-        // TODO: Forward to chat view model (v0.3.4)
-        // Chat?.AttachFileCommand.Execute(e.FilePath);
+    /// <summary>
+    /// Attaches a file to the chat context.
+    /// Reads the file content, estimates tokens, and logs the attachment.
+    /// </summary>
+    /// <param name="filePath">Absolute path to the file to attach.</param>
+    /// <remarks>
+    /// <para>Added in v0.3.4g for File Explorer Integration.</para>
+    /// <para>
+    /// Currently logs the attachment. Full integration with ChatContextBarViewModel
+    /// will be implemented when the context bar is wired into the main layout.
+    /// </para>
+    /// </remarks>
+    public async Task AttachFileAsync(string filePath)
+    {
+        var sw = Stopwatch.StartNew();
+        _logger?.LogDebug("[ENTER] AttachFileAsync - Path: {Path}", filePath);
 
-        _logger?.LogInformation("[INFO] File attach requested: {Path}", e.FilePath);
+        try
+        {
+            // Validate file exists
+            if (!System.IO.File.Exists(filePath))
+            {
+                _logger?.LogWarning("[WARN] AttachFileAsync - File not found: {Path}", filePath);
+                return;
+            }
+
+            // Read file content
+            var content = await System.IO.File.ReadAllTextAsync(filePath);
+            var fileName = System.IO.Path.GetFileName(filePath);
+            var lineCount = content.Count(c => c == '\n') + 1;
+
+            // Simple token estimation (approximately 4 chars per token)
+            var estimatedTokens = content.Length / 4;
+
+            _logger?.LogInformation(
+                "[INFO] File attached: {FileName} ({LineCount} lines, ~{Tokens} tokens)",
+                fileName, lineCount, estimatedTokens);
+
+            // TODO: Create FileContextViewModel and add to ChatContextBarViewModel
+            // when the context bar is integrated into the main layout.
+            // var context = FileContextViewModel.FromFile(filePath, content, estimatedTokens);
+            // ChatContextBar?.AddContext(context);
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "[ERROR] AttachFileAsync failed for {Path}: {Message}",
+                filePath, ex.Message);
+        }
+        finally
+        {
+            sw.Stop();
+            _logger?.LogDebug("[EXIT] AttachFileAsync - {ElapsedMs}ms", sw.ElapsedMilliseconds);
+        }
     }
 
     /// <summary>
