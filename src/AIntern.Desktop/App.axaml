@@ -35,6 +35,18 @@
             <Setter Property="Background" Value="{DynamicResource ControlBackground}" />
             <Setter Property="Opacity" Value="1" />
         </Style>
+        
+        <!-- Primary Button Style (v0.3.5b) -->
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="Button.primary:pointerover">
+            <Setter Property="Background" Value="{DynamicResource AccentHoverBrush}" />
+        </Style>
+        <Style Selector="Button.primary:pressed">
+            <Setter Property="Background" Value="{DynamicResource AccentPressedBrush}" />
+        </Style>
     </Application.Styles>
 
     <Application.Resources>

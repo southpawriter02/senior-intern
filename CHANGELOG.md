@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.5b] - 2026-01-15
+
+Workspace Settings Panel UI. See [detailed notes](docs/changelog/v0.3.5b.md).
+
+### Added
+
+- WorkspaceSettingsPanel.axaml with 3 organized sections
+- File Explorer section (6 controls)
+- Editor section (9 controls)
+- Context Attachment section (6 controls)
+- Footer with Reset/Cancel/Save buttons
+- Primary button style and theme resources
+
 ## [0.3.5a] - 2026-01-15
 
 Workspace Settings ViewModel. See [detailed notes](docs/changelog/v0.3.5a.md).

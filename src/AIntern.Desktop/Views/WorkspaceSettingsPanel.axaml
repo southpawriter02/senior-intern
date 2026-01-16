@@ -1,0 +1,314 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:AIntern.Desktop.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="700"
+        x:Class="AIntern.Desktop.Views.WorkspaceSettingsPanel"
+        x:DataType="vm:WorkspaceSettingsViewModel"
+        Title="Settings"
+        Width="600"
+        Height="700"
+        MinWidth="500"
+        MinHeight="500"
+        WindowStartupLocation="CenterOwner"
+        CanResize="True">
+
+    <Window.Styles>
+        <Style Selector="TextBlock.section-header">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Margin" Value="0,16,0,8" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+        </Style>
+
+        <Style Selector="TextBlock.setting-label">
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="TextBlock.setting-description">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Foreground" Value="{DynamicResource TextMutedBrush}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Margin" Value="0,2,0,0" />
+        </Style>
+
+        <Style Selector="Border.section-divider">
+            <Setter Property="Height" Value="1" />
+            <Setter Property="Background" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="Margin" Value="0,16,0,0" />
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="*, Auto">
+        <!-- Scrollable Content -->
+        <ScrollViewer Grid.Row="0"
+                      HorizontalScrollBarVisibility="Disabled"
+                      Padding="24,16">
+            <StackPanel Spacing="4">
+
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!-- FILE EXPLORER SECTION -->
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <TextBlock Text="File Explorer" Classes="section-header" />
+
+                <!-- Restore Last Workspace -->
+                <CheckBox IsChecked="{Binding RestoreLastWorkspace}">
+                    <StackPanel>
+                        <TextBlock Text="Restore last workspace on startup" Classes="setting-label" />
+                        <TextBlock Text="Automatically open the last used folder when starting the application"
+                                   Classes="setting-description" />
+                    </StackPanel>
+                </CheckBox>
+
+                <!-- Show Hidden Files -->
+                <CheckBox IsChecked="{Binding ShowHiddenFiles}" Margin="0,8,0,0">
+                    <StackPanel>
+                        <TextBlock Text="Show hidden files and folders" Classes="setting-label" />
+                        <TextBlock Text="Display files starting with a dot (e.g., .gitignore)"
+                                   Classes="setting-description" />
+                    </StackPanel>
+                </CheckBox>
+
+                <!-- Use GitIgnore -->
+                <CheckBox IsChecked="{Binding UseGitIgnore}" Margin="0,8,0,0">
+                    <StackPanel>
+                        <TextBlock Text="Respect .gitignore patterns" Classes="setting-label" />
+                        <TextBlock Text="Hide files and folders matching patterns in .gitignore"
+                                   Classes="setting-description" />
+                    </StackPanel>
+                </CheckBox>
+
+                <!-- Auto Refresh -->
+                <CheckBox IsChecked="{Binding AutoRefreshOnExternalChanges}" Margin="0,8,0,0">
+                    <StackPanel>
+                        <TextBlock Text="Auto-refresh on external changes" Classes="setting-label" />
+                        <TextBlock Text="Automatically update the file tree when files change outside the app"
+                                   Classes="setting-description" />
+                    </StackPanel>
+                </CheckBox>
+
+                <!-- Max Recent Workspaces -->
+                <Grid ColumnDefinitions="*, Auto" Margin="0,12,0,0">
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Recent workspaces to remember" Classes="setting-label" />
+                        <TextBlock Text="Maximum number of recent folders shown in the menu"
+                                   Classes="setting-description" />
+                    </StackPanel>
+                    <NumericUpDown Grid.Column="1"
+                                   Value="{Binding MaxRecentWorkspaces}"
+                                   Minimum="1"
+                                   Maximum="50"
+                                   Width="80"
+                                   VerticalAlignment="Center" />
+                </Grid>
+
+                <!-- Custom Ignore Patterns -->
+                <StackPanel Margin="0,12,0,0">
+                    <TextBlock Text="Custom ignore patterns (one per line)" Classes="setting-label" />
+                    <TextBlock Text="Files and folders matching these patterns will be hidden"
+                               Classes="setting-description" />
+                    <TextBox Text="{Binding CustomIgnorePatterns}"
+                             AcceptsReturn="True"
+                             Height="100"
+                             Margin="0,8,0,0"
+                             FontFamily="Cascadia Code, Consolas, monospace"
+                             FontSize="12" />
+                </StackPanel>
+
+                <Border Classes="section-divider" />
+
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!-- EDITOR SECTION -->
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <TextBlock Text="Editor" Classes="section-header" />
+
+                <!-- Font Family -->
+                <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,0">
+                    <TextBlock Grid.Column="0" Text="Font family" Classes="setting-label" />
+                    <ComboBox Grid.Column="1"
+                              ItemsSource="{Binding AvailableFonts}"
+                              SelectedItem="{Binding EditorFontFamily}"
+                              Width="200" />
+                </Grid>
+
+                <!-- Font Size -->
+                <Grid ColumnDefinitions="*, Auto" Margin="0,8,0,0">
+                    <TextBlock Grid.Column="0" Text="Font size" Classes="setting-label" />
+                    <ComboBox Grid.Column="1"
+                              ItemsSource="{Binding FontSizeOptions}"
+                              SelectedItem="{Binding EditorFontSize}"
+                              Width="80" />
+                </Grid>
+
+                <!-- Tab Size -->
+                <Grid ColumnDefinitions="*, Auto" Margin="0,8,0,0">
+                    <TextBlock Grid.Column="0" Text="Tab size" Classes="setting-label" />
+                    <ComboBox Grid.Column="1"
+                              ItemsSource="{Binding TabSizeOptions}"
+                              SelectedItem="{Binding TabSize}"
+                              Width="80" />
+                </Grid>
+
+                <!-- Convert Tabs to Spaces -->
+                <CheckBox IsChecked="{Binding ConvertTabsToSpaces}" Margin="0,8,0,0">
+                    <TextBlock Text="Convert tabs to spaces" Classes="setting-label" />
+                </CheckBox>
+
+                <!-- Show Line Numbers -->
+                <CheckBox IsChecked="{Binding ShowLineNumbers}" Margin="0,8,0,0">
+                    <TextBlock Text="Show line numbers" Classes="setting-label" />
+                </CheckBox>
+
+                <!-- Highlight Current Line -->
+                <CheckBox IsChecked="{Binding HighlightCurrentLine}" Margin="0,8,0,0">
+                    <TextBlock Text="Highlight current line" Classes="setting-label" />
+                </CheckBox>
+
+                <!-- Word Wrap -->
+                <CheckBox IsChecked="{Binding WordWrap}" Margin="0,8,0,0">
+                    <TextBlock Text="Word wrap" Classes="setting-label" />
+                </CheckBox>
+
+                <!-- Ruler Column -->
+                <Grid ColumnDefinitions="*, Auto" Margin="0,8,0,0">
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Column ruler" Classes="setting-label" />
+                        <TextBlock Text="Show a vertical line at this column (0 = disabled)"
+                                   Classes="setting-description" />
+                    </StackPanel>
+                    <ComboBox Grid.Column="1"
+                              ItemsSource="{Binding RulerColumnOptions}"
+                              SelectedItem="{Binding RulerColumn}"
+                              Width="80" />
+                </Grid>
+
+                <!-- Editor Theme -->
+                <Grid ColumnDefinitions="*, Auto" Margin="0,8,0,0">
+                    <TextBlock Grid.Column="0" Text="Syntax theme" Classes="setting-label" />
+                    <ComboBox Grid.Column="1"
+                              ItemsSource="{Binding AvailableThemes}"
+                              SelectedItem="{Binding EditorTheme}"
+                              Width="150" />
+                </Grid>
+
+                <Border Classes="section-divider" />
+
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!-- CONTEXT ATTACHMENT SECTION -->
+                <!-- ═══════════════════════════════════════════════════════════ -->
+                <TextBlock Text="Context Attachment" Classes="section-header" />
+
+                <!-- Max Files Attached -->
+                <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,0">
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Maximum files" Classes="setting-label" />
+                        <TextBlock Text="Maximum number of files that can be attached at once"
+                                   Classes="setting-description" />
+                    </StackPanel>
+                    <NumericUpDown Grid.Column="1"
+                                   Value="{Binding MaxFilesAttached}"
+                                   Minimum="1"
+                                   Maximum="50"
+                                   Width="80" />
+                </Grid>
+
+                <!-- Max Tokens Per File -->
+                <Grid ColumnDefinitions="*, Auto" Margin="0,8,0,0">
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Maximum tokens per file" Classes="setting-label" />
+                        <TextBlock Text="Files exceeding this limit will be truncated"
+                                   Classes="setting-description" />
+                    </StackPanel>
+                    <NumericUpDown Grid.Column="1"
+                                   Value="{Binding MaxTokensPerFile}"
+                                   Minimum="100"
+                                   Maximum="32000"
+                                   Increment="500"
+                                   Width="100" />
+                </Grid>
+
+                <!-- Max Total Tokens -->
+                <Grid ColumnDefinitions="*, Auto" Margin="0,8,0,0">
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Maximum total tokens" Classes="setting-label" />
+                        <TextBlock Text="Combined token limit for all attached files"
+                                   Classes="setting-description" />
+                    </StackPanel>
+                    <NumericUpDown Grid.Column="1"
+                                   Value="{Binding MaxTotalContextTokens}"
+                                   Minimum="100"
+                                   Maximum="64000"
+                                   Increment="1000"
+                                   Width="100" />
+                </Grid>
+
+                <!-- Max File Size -->
+                <Grid ColumnDefinitions="*, Auto" Margin="0,8,0,0">
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Maximum file size (KB)" Classes="setting-label" />
+                        <TextBlock Text="Files larger than this cannot be attached"
+                                   Classes="setting-description" />
+                    </StackPanel>
+                    <NumericUpDown Grid.Column="1"
+                                   Value="{Binding MaxFileSizeKb}"
+                                   Minimum="1"
+                                   Maximum="10000"
+                                   Increment="100"
+                                   Width="100" />
+                </Grid>
+
+                <!-- Show Token Count -->
+                <CheckBox IsChecked="{Binding ShowTokenCount}" Margin="0,8,0,0">
+                    <TextBlock Text="Show token count in context bar" Classes="setting-label" />
+                </CheckBox>
+
+                <!-- Warn on Token Limit -->
+                <CheckBox IsChecked="{Binding WarnOnTokenLimit}" Margin="0,8,0,0">
+                    <TextBlock Text="Warn when approaching token limit" Classes="setting-label" />
+                </CheckBox>
+
+                <!-- Spacer -->
+                <Border Height="24" />
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Footer with Buttons -->
+        <Border Grid.Row="1"
+                Background="{DynamicResource FooterBackgroundBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="24,16">
+            <Grid ColumnDefinitions="Auto, *, Auto, Auto, Auto">
+                <!-- Reset to Defaults -->
+                <Button Grid.Column="0"
+                        Content="Reset to Defaults"
+                        Command="{Binding ResetToDefaultsCommand}" />
+
+                <!-- Validation Error -->
+                <TextBlock Grid.Column="2"
+                           Text="{Binding ValidationError}"
+                           Foreground="{DynamicResource ErrorBrush}"
+                           VerticalAlignment="Center"
+                           Margin="0,0,16,0"
+                           IsVisible="{Binding ValidationError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+                <!-- Cancel -->
+                <Button Grid.Column="3"
+                        Content="Cancel"
+                        Command="{Binding CancelCommand}"
+                        Margin="0,0,8,0"
+                        IsCancel="True" />
+
+                <!-- Save -->
+                <Button Grid.Column="4"
+                        Content="Save"
+                        Command="{Binding SaveCommand}"
+                        Classes="primary"
+                        IsDefault="True" />
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
