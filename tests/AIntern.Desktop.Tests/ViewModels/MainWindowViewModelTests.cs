@@ -144,6 +144,7 @@ public class MainWindowViewModelTests : IDisposable
             _mockWorkspaceService.Object,
             _fileExplorerViewModel,
             _dispatcher,
+            keyboardShortcutService: null,
             _mockLogger.Object);
 
         return _viewModel;
@@ -179,7 +180,8 @@ public class MainWindowViewModelTests : IDisposable
             _mockWorkspaceService.Object,
             _fileExplorerViewModel,
             _dispatcher,
-            _mockLogger.Object));
+            keyboardShortcutService: null,
+            logger: _mockLogger.Object));
     }
 
     /// <summary>
@@ -203,7 +205,8 @@ public class MainWindowViewModelTests : IDisposable
             _mockWorkspaceService.Object,
             _fileExplorerViewModel,
             _dispatcher,
-            _mockLogger.Object));
+            keyboardShortcutService: null,
+            logger: _mockLogger.Object));
     }
 
     /// <summary>

@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Microsoft.Extensions.Logging;
 using AIntern.Desktop.Dialogs;
+using AIntern.Desktop.Services;
 using AIntern.Desktop.ViewModels;
 
 namespace AIntern.Desktop.Views;
@@ -50,6 +51,11 @@ public partial class MainWindow : Window
     /// Injected via constructor when using DI container.
     /// </summary>
     private readonly ILogger<MainWindow>? _logger;
+
+    /// <summary>
+    /// Keyboard shortcut service for centralized key handling (v0.3.5g).
+    /// </summary>
+    private IKeyboardShortcutService? _shortcutService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MainWindow"/> class.
@@ -119,6 +125,14 @@ public partial class MainWindow : Window
                 viewModel.ConversationListViewModel.SetOwnerWindowProvider(() => this);
                 _logger?.LogDebug("[INFO] Owner window provider set for ConversationListViewModel");
 
+                // Set up keyboard shortcut service (v0.3.5g)
+                _shortcutService = viewModel.KeyboardShortcutService;
+                if (_shortcutService != null)
+                {
+                    _shortcutService.CommandRequested += OnShortcutCommandRequested;
+                    _logger?.LogDebug("[INFO] Keyboard shortcut service connected");
+                }
+
                 // Perform async initialization (loads settings and conversations)
                 await viewModel.InitializeAsync();
 
@@ -140,6 +154,18 @@ public partial class MainWindow : Window
         finally
         {
             _logger?.LogDebug("[EXIT] MainWindow.OnOpened - {ElapsedMs}ms", sw.ElapsedMilliseconds);
+        }
+    }
+
+    /// <summary>
+    /// Handles keyboard shortcut command requests (v0.3.5g).
+    /// </summary>
+    private void OnShortcutCommandRequested(object? sender, string commandId)
+    {
+        _logger?.LogDebug("[INFO] Shortcut command requested: {CommandId}", commandId);
+        if (DataContext is MainWindowViewModel viewModel)
+        {
+            _ = viewModel.ExecuteCommandAsync(commandId);
         }
     }
 
@@ -251,11 +277,18 @@ public partial class MainWindow : Window
     /// </remarks>
     protected override void OnKeyDown(KeyEventArgs e)
     {
-        _logger?.LogDebug("[INFO] MainWindow.OnKeyDown - Key: {Key}", e.Key);
+        _logger?.LogDebug("[INFO] MainWindow.OnKeyDown - Key: {Key}, Mods: {Mods}", e.Key, e.KeyModifiers);
 
         try
         {
-            // F2: Begin rename of selected conversation
+            // Try centralized shortcut service first (v0.3.5g)
+            if (_shortcutService?.HandleKeyPress(e) == true)
+            {
+                e.Handled = true;
+                return;
+            }
+
+            // F2: Begin rename of selected conversation (legacy fallback)
             if (e.Key == Key.F2)
             {
                 _logger?.LogDebug("[INFO] F2 pressed, attempting to begin rename");

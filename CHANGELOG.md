@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.5g] - 2026-01-15
+
+Keyboard Shortcuts Manager. See [detailed notes](docs/changelog/v0.3.5g.md).
+
+### Added
+
+- `IKeyboardShortcutService` interface and `KeyboardShortcutService` implementation
+- `ShortcutInfo` model with display formatting
+- 18 default shortcuts across 7 categories
+- `ExecuteCommandAsync` in MainWindowViewModel for command routing
+- Comprehensive unit tests
+
 ## [0.3.5f] - 2026-01-15
 
 Global Drag-Drop. See [detailed notes](docs/changelog/v0.3.5f.md).

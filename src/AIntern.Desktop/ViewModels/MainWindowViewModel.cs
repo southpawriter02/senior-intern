@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using AIntern.Core.Events;
 using AIntern.Core.Interfaces;
 using AIntern.Core.Models;
+using AIntern.Desktop.Services;
 using AIntern.Desktop.Views;
 
 namespace AIntern.Desktop.ViewModels;
@@ -127,6 +128,11 @@ public partial class MainWindowViewModel : ViewModelBase
     /// Added in v0.3.2g. Singleton instance persists across navigation.
     /// </remarks>
     public FileExplorerViewModel FileExplorer { get; }
+
+    /// <summary>
+    /// Gets the keyboard shortcut service for centralized key handling (v0.3.5g).
+    /// </summary>
+    public IKeyboardShortcutService? KeyboardShortcutService { get; }
 
     #endregion
 
@@ -278,6 +284,7 @@ public partial class MainWindowViewModel : ViewModelBase
         IWorkspaceService workspaceService,
         FileExplorerViewModel fileExplorer,
         IDispatcher dispatcher,
+        IKeyboardShortcutService? keyboardShortcutService = null,
         ILogger<MainWindowViewModel>? logger = null)
     {
         var sw = Stopwatch.StartNew();
@@ -300,6 +307,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _workspaceService = workspaceService ?? throw new ArgumentNullException(nameof(workspaceService));
         FileExplorer = fileExplorer ?? throw new ArgumentNullException(nameof(fileExplorer));
         _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+        KeyboardShortcutService = keyboardShortcutService;
 
         _logger?.LogDebug("[INFO] Child ViewModels and services assigned");
 
@@ -957,6 +965,66 @@ public partial class MainWindowViewModel : ViewModelBase
         HasOpenWorkspace = e.CurrentWorkspace != null;
 
         _logger?.LogInformation("[INFO] Workspace state updated: HasOpenWorkspace={HasOpen}", HasOpenWorkspace);
+    }
+
+    #endregion
+
+    #region Keyboard Shortcut Commands (v0.3.5g)
+
+    /// <summary>
+    /// Executes a keyboard shortcut command by ID.
+    /// </summary>
+    /// <param name="commandId">The command identifier to execute.</param>
+    public async Task ExecuteCommandAsync(string commandId)
+    {
+        _logger?.LogDebug("[ENTER] ExecuteCommandAsync - {CommandId}", commandId);
+
+        try
+        {
+            switch (commandId)
+            {
+                // === Workspace ===
+                case "workspace.open":
+                    FileExplorer.OpenWorkspaceCommand.Execute(null);
+                    break;
+
+                // === File ===
+                case "file.open":
+                case "quickOpen":
+                    // Note: Quick Open dialog implementation pending
+                    _logger?.LogDebug("[INFO] quickOpen: Feature pending implementation");
+                    break;
+                case "file.save":
+                    _logger?.LogDebug("[INFO] file.save: Feature pending implementation");
+                    break;
+
+                // === Chat ===
+                case "chat.send":
+                    await ChatViewModel.SendMessageCommand.ExecuteAsync(null);
+                    break;
+                case "chat.clear":
+                    ChatViewModel.ClearChatCommand.Execute(null);
+                    break;
+
+                // === View ===
+                case "sidebar.toggle":
+                    IsSidebarVisible = !IsSidebarVisible;
+                    break;
+
+                // === Settings ===
+                case "settings.open":
+                    _logger?.LogDebug("[INFO] settings.open: Feature pending implementation");
+                    break;
+
+                default:
+                    _logger?.LogDebug("[SKIP] Unhandled command: {CommandId}", commandId);
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "[ERROR] ExecuteCommandAsync failed: {CommandId}", commandId);
+        }
     }
 
     #endregion

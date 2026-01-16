@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using AIntern.Core.Interfaces;
 using AIntern.Data;
 using AIntern.Data.Repositories;
+using AIntern.Desktop.Services;
 using AIntern.Desktop.ViewModels;
 using AIntern.Services;
 using Serilog;
@@ -213,6 +214,9 @@ public static class ServiceCollectionExtensions
         // File Index: workspace file indexing with fuzzy search.
         // Added in v0.3.5c.
         services.AddSingleton<IFileIndexService, FileIndexService>();
+
+        // Keyboard Shortcuts: centralized shortcut management (v0.3.5g).
+        services.AddSingleton<IKeyboardShortcutService, KeyboardShortcutService>();
 
         // ┌─────────────────────────────────────────────────────────────────┐
         // │ UI INFRASTRUCTURE                                                │
