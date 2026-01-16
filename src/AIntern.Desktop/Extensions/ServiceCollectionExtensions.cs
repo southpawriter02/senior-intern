@@ -310,6 +310,11 @@ public static class ServiceCollectionExtensions
         // Added in v0.3.5h.
         services.AddTransient<WelcomeViewModel>();
 
+        // Diff Viewer: ViewModel for side-by-side diff display with navigation.
+        // Transient so each diff view gets its own independent state.
+        // Added in v0.4.2d.
+        services.AddTransient<DiffViewerViewModel>();
+
         return services;
     }
 }
