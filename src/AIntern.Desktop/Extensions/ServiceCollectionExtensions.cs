@@ -210,6 +210,10 @@ public static class ServiceCollectionExtensions
                 sp.GetRequiredService<ILogger<WorkspaceService>>());
         });
 
+        // File Index: workspace file indexing with fuzzy search.
+        // Added in v0.3.5c.
+        services.AddSingleton<IFileIndexService, FileIndexService>();
+
         // ┌─────────────────────────────────────────────────────────────────┐
         // │ UI INFRASTRUCTURE                                                │
         // └─────────────────────────────────────────────────────────────────┘

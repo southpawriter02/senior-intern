@@ -1,0 +1,115 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:AIntern.Desktop.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
+        x:Class="AIntern.Desktop.Views.QuickOpenDialog"
+        x:DataType="vm:QuickOpenViewModel"
+        Title="Quick Open"
+        Width="600"
+        Height="400"
+        MinWidth="400"
+        MinHeight="200"
+        WindowStartupLocation="CenterOwner"
+        CanResize="True"
+        ShowInTaskbar="False"
+        Background="Transparent">
+
+    <Border Background="{DynamicResource QuickOpenBackgroundBrush}"
+            BorderBrush="{DynamicResource QuickOpenBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="8"
+            Margin="8"
+            ClipToBounds="True">
+
+        <Grid RowDefinitions="Auto, *, Auto">
+            <!-- Search Input -->
+            <Border Grid.Row="0"
+                    Background="{DynamicResource InputBackground}"
+                    Padding="12">
+                <Grid ColumnDefinitions="Auto, *">
+                    <PathIcon Grid.Column="0"
+                              Data="{StaticResource SearchIcon}"
+                              Width="16" Height="16"
+                              Margin="0,0,8,0"
+                              Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBox Grid.Column="1"
+                             x:Name="SearchInput"
+                             Text="{Binding SearchQuery, Mode=TwoWay}"
+                             Watermark="Type to search files..."
+                             BorderThickness="0"
+                             Background="Transparent"
+                             FontSize="14" />
+                </Grid>
+            </Border>
+
+            <!-- Results List -->
+            <ListBox Grid.Row="1"
+                     ItemsSource="{Binding Results}"
+                     SelectedIndex="{Binding SelectedIndex}"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:QuickOpenItemViewModel">
+                        <Grid ColumnDefinitions="Auto, *, Auto" Margin="8,6">
+                            <!-- Icon -->
+                            <PathIcon Grid.Column="0"
+                                      Data="{StaticResource FileCodeIcon}"
+                                      Width="16" Height="16"
+                                      Margin="0,0,10,0"
+                                      Foreground="{DynamicResource TextMutedBrush}" />
+
+                            <!-- File Info -->
+                            <StackPanel Grid.Column="1" Spacing="2">
+                                <TextBlock Text="{Binding FileName}"
+                                           FontWeight="SemiBold"
+                                           FontSize="13" />
+                                <TextBlock Text="{Binding RelativePath}"
+                                           FontSize="11"
+                                           Foreground="{DynamicResource TextMutedBrush}"
+                                           TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+
+                            <!-- Recent Badge -->
+                            <Border Grid.Column="2"
+                                    Background="{DynamicResource BadgeBackgroundBrush}"
+                                    CornerRadius="4"
+                                    Padding="6,2"
+                                    VerticalAlignment="Center"
+                                    IsVisible="{Binding IsRecent}">
+                                <TextBlock Text="recent"
+                                           FontSize="10"
+                                           Foreground="{DynamicResource TextMutedBrush}" />
+                            </Border>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <!-- Status Bar -->
+            <Border Grid.Row="2"
+                    Background="{DynamicResource FooterBackgroundBrush}"
+                    Padding="12,8">
+                <Grid ColumnDefinitions="*, Auto">
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding StatusText}"
+                               FontSize="11"
+                               Foreground="{DynamicResource TextMutedBrush}" />
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16">
+                        <TextBlock FontSize="11" Foreground="{DynamicResource TextMutedBrush}">
+                            <Run Text="↑↓" /> navigate
+                        </TextBlock>
+                        <TextBlock FontSize="11" Foreground="{DynamicResource TextMutedBrush}">
+                            <Run Text="↵" /> open
+                        </TextBlock>
+                        <TextBlock FontSize="11" Foreground="{DynamicResource TextMutedBrush}">
+                            <Run Text="esc" /> close
+                        </TextBlock>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.5c] - 2026-01-15
+
+Quick Open Dialog. See [detailed notes](docs/changelog/v0.3.5c.md).
+
+### Added
+
+- IFileIndexService interface and FileIndexService with fuzzy search
+- QuickOpenViewModel with debounced search
+- QuickOpenDialog with keyboard navigation (↑↓ Enter Esc)
+- Recent files tracking
+- FileSearchResult model
+
 ## [0.3.5b] - 2026-01-15
 
 Workspace Settings Panel UI. See [detailed notes](docs/changelog/v0.3.5b.md).
