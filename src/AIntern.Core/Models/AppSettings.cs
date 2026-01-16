@@ -254,4 +254,177 @@ public sealed class AppSettings
     public string EditorTheme { get; set; } = "DarkPlus";
 
     #endregion
+
+    // ═══════════════════════════════════════════════════════════════
+    // Code Generation Settings (v0.4.5a)
+    // ═══════════════════════════════════════════════════════════════
+
+    #region Code Generation Settings (v0.4.5a)
+
+    /// <summary>
+    /// Automatically detect and parse code blocks from LLM responses.
+    /// When enabled, code fences (```) are parsed into CodeBlock models.
+    /// </summary>
+    /// <remarks>Added in v0.4.5a.</remarks>
+    public bool AutoDetectCodeBlocks { get; set; } = true;
+
+    /// <summary>
+    /// Show diff preview while LLM is still streaming response.
+    /// Enables real-time diff computation during generation.
+    /// </summary>
+    /// <remarks>Added in v0.4.5a.</remarks>
+    public bool ShowDiffPreviewDuringStreaming { get; set; } = true;
+
+    /// <summary>
+    /// Auto-expand code blocks in chat messages.
+    /// When false, code blocks show collapsed by default.
+    /// </summary>
+    /// <remarks>Added in v0.4.5a.</remarks>
+    public bool AutoExpandCodeBlocks { get; set; } = true;
+
+    /// <summary>
+    /// Show quick action buttons (Copy, Apply, Preview) on code blocks.
+    /// </summary>
+    /// <remarks>Added in v0.4.5a.</remarks>
+    public bool ShowCodeBlockQuickActions { get; set; } = true;
+
+    #endregion
+
+    // ═══════════════════════════════════════════════════════════════
+    // Diff Viewer Settings (v0.4.5a)
+    // ═══════════════════════════════════════════════════════════════
+
+    #region Diff Viewer Settings (v0.4.5a)
+
+    /// <summary>
+    /// Default view mode for diff viewer.
+    /// </summary>
+    /// <remarks>Added in v0.4.5a.</remarks>
+    public DiffViewMode DefaultDiffViewMode { get; set; } = DiffViewMode.SideBySide;
+
+    /// <summary>
+    /// Show line numbers in diff viewer.
+    /// </summary>
+    /// <remarks>Added in v0.4.5a.</remarks>
+    public bool ShowLineNumbersInDiff { get; set; } = true;
+
+    /// <summary>
+    /// Highlight whitespace changes (spaces, tabs, line endings) in diff viewer.
+    /// </summary>
+    /// <remarks>Added in v0.4.5a.</remarks>
+    public bool HighlightWhitespaceChanges { get; set; } = false;
+
+    /// <summary>
+    /// Number of context lines to show around changes in diff viewer.
+    /// Valid range: 0-10.
+    /// </summary>
+    /// <remarks>Added in v0.4.5a.</remarks>
+    public int DiffContextLines { get; set; } = 3;
+
+    /// <summary>
+    /// Enable syntax highlighting in diff viewer.
+    /// </summary>
+    /// <remarks>Added in v0.4.5a.</remarks>
+    public bool SyntaxHighlightingInDiff { get; set; } = true;
+
+    #endregion
+
+    // ═══════════════════════════════════════════════════════════════
+    // Backup & Undo Settings (v0.4.5a)
+    // ═══════════════════════════════════════════════════════════════
+
+    #region Backup & Undo Settings (v0.4.5a)
+
+    /// <summary>
+    /// Create backup file before applying changes.
+    /// Enables undo functionality for applied changes.
+    /// </summary>
+    /// <remarks>Added in v0.4.5a.</remarks>
+    public bool CreateBackupBeforeApply { get; set; } = true;
+
+    /// <summary>
+    /// Time window in minutes during which undo is available.
+    /// Valid range: 5-1440 (5 minutes to 24 hours).
+    /// </summary>
+    /// <remarks>Added in v0.4.5a.</remarks>
+    public int UndoWindowMinutes { get; set; } = 30;
+
+    /// <summary>
+    /// Maximum age in days for backup files before automatic cleanup.
+    /// Valid range: 1-90 days.
+    /// </summary>
+    /// <remarks>Added in v0.4.5a.</remarks>
+    public int MaxBackupAgeDays { get; set; } = 7;
+
+    /// <summary>
+    /// Custom directory for storing backup files.
+    /// Null uses default: ".aintern/backups" in workspace root.
+    /// </summary>
+    /// <remarks>Added in v0.4.5a.</remarks>
+    public string? BackupDirectory { get; set; }
+
+    #endregion
+
+    // ═══════════════════════════════════════════════════════════════
+    // Apply Behavior Settings (v0.4.5a)
+    // ═══════════════════════════════════════════════════════════════
+
+    #region Apply Behavior Settings (v0.4.5a)
+
+    /// <summary>
+    /// Automatically refresh/reload file in editor after applying changes.
+    /// </summary>
+    /// <remarks>Added in v0.4.5a.</remarks>
+    public bool AutoRefreshEditorAfterApply { get; set; } = true;
+
+    /// <summary>
+    /// Show confirmation dialog before applying changes.
+    /// When false, changes apply immediately on click.
+    /// </summary>
+    /// <remarks>Added in v0.4.5a.</remarks>
+    public bool ConfirmBeforeApply { get; set; } = true;
+
+    /// <summary>
+    /// Show modal progress overlay during batch apply operations.
+    /// </summary>
+    /// <remarks>Added in v0.4.5a.</remarks>
+    public bool ShowApplyProgressOverlay { get; set; } = true;
+
+    /// <summary>
+    /// Automatically close progress overlay when operation succeeds.
+    /// When false, overlay stays open until user dismisses it.
+    /// </summary>
+    /// <remarks>Added in v0.4.5a.</remarks>
+    public bool AutoCloseProgressOnSuccess { get; set; } = true;
+
+    #endregion
+
+    // ═══════════════════════════════════════════════════════════════
+    // History Settings (v0.4.5a)
+    // ═══════════════════════════════════════════════════════════════
+
+    #region History Settings (v0.4.5a)
+
+    /// <summary>
+    /// Maximum number of recent changes to track in history panel.
+    /// Valid range: 10-500.
+    /// </summary>
+    /// <remarks>Added in v0.4.5a.</remarks>
+    public int MaxChangeHistoryItems { get; set; } = 50;
+
+    /// <summary>
+    /// Enable change history tracking.
+    /// When disabled, no history is recorded.
+    /// </summary>
+    /// <remarks>Added in v0.4.5a.</remarks>
+    public bool TrackChangeHistory { get; set; } = true;
+
+    /// <summary>
+    /// Persist change history across application sessions.
+    /// When false, history is cleared on restart.
+    /// </summary>
+    /// <remarks>Added in v0.4.5a.</remarks>
+    public bool PersistHistoryAcrossSessions { get; set; } = true;
+
+    #endregion
 }

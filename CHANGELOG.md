@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.4.5a] - 2026-01-16
+
+Settings Models. See [detailed notes](docs/changelog/v0.4.5a.md).
+
+### Added
+
+- `DiffViewMode` enum for diff viewer display options
+- `AppSettingsValidator` and `SettingsValidationResult` for settings validation
+- `SettingChangedEventArgs` for change notifications
+- `SettingsDefaults` for centralized defaults and constraints
+- 20 new settings properties in `AppSettings` (Code Gen, Diff, Backup, Apply, History)
+- 11 new unit tests
+
 ## [0.4.4h] - 2026-01-16
 
 Chat Integration. See [detailed notes](docs/changelog/v0.4.4h.md).
