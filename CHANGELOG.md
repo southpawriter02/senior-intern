@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.4.2e] - 2026-01-16
+
+Side-by-Side Diff View. See [detailed notes](docs/changelog/v0.4.2e.md).
+
+### Added
+
+- `DiffViewerPanel` with side-by-side synchronized scrolling
+- Header with file info, stats, navigation controls, and toolbar
+- Footer with Apply/Reject action buttons
+- Loading and error overlay states
+- `IncrementConverter` for 1-based hunk position display
+- 6 new icons (ChevronUp/Down, Highlight, WrapText, Link, FileCode)
+- 14 new diff color resources in dark theme
+
 ## [0.4.2d] - 2026-01-16
 
 Diff ViewModels for Diff Engine. See [detailed notes](docs/changelog/v0.4.2d.md).

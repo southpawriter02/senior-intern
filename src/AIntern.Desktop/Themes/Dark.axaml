@@ -402,4 +402,32 @@
     <SolidColorBrush x:Key="CodeForeground" Color="#D4D4D4" />
     <SolidColorBrush x:Key="SurfaceBackground" Color="#2D2D30" />
 
+    <!-- ============================================================== -->
+    <!-- Diff Viewer Colors (v0.4.2e)                                   -->
+    <!-- ============================================================== -->
+
+    <!-- Diff Panel Colors -->
+    <SolidColorBrush x:Key="DiffHeaderBackground" Color="#252526" />
+    <SolidColorBrush x:Key="DiffFooterBackground" Color="#252526" />
+    <SolidColorBrush x:Key="DiffPanelBackground" Color="#1E1E1E" />
+    <SolidColorBrush x:Key="DiffPanelHeaderBackground" Color="#2D2D30" />
+    <SolidColorBrush x:Key="DiffSplitterBackground" Color="#3E3E3E" />
+
+    <!-- Diff Line Colors -->
+    <SolidColorBrush x:Key="DiffAddedBackground" Color="#1D3D1D" />
+    <SolidColorBrush x:Key="DiffAddedForeground" Color="#89D185" />
+    <SolidColorBrush x:Key="DiffRemovedBackground" Color="#5A1D1D" />
+    <SolidColorBrush x:Key="DiffRemovedForeground" Color="#F48771" />
+    <SolidColorBrush x:Key="DiffModifiedBackground" Color="#352A00" />
+    <SolidColorBrush x:Key="DiffModifiedForeground" Color="#DDB700" />
+    <SolidColorBrush x:Key="DiffPlaceholderBackground" Color="#252526" />
+
+    <!-- Inline Change Highlight Colors -->
+    <SolidColorBrush x:Key="DiffInlineAddedBackground" Color="#2D5D2D" />
+    <SolidColorBrush x:Key="DiffInlineRemovedBackground" Color="#7A2D2D" />
+
+    <!-- Badge Colors -->
+    <SolidColorBrush x:Key="NewFileBadgeBackground" Color="#2D5D2D" />
+    <SolidColorBrush x:Key="NewFileBadgeForeground" Color="#89D185" />
+
 </ResourceDictionary>

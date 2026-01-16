@@ -1,0 +1,352 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:AIntern.Desktop.ViewModels"
+             xmlns:converters="using:AIntern.Desktop.Converters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="AIntern.Desktop.Views.DiffViewerPanel"
+             x:DataType="vm:DiffViewerViewModel">
+    <!--
+        DiffViewerPanel - Side-by-Side Diff Display (v0.4.2e)
+
+        Layout:
+        ┌────────────────────────────────────────────────────────────────┐
+        │ Header: File info, stats, navigation, toolbar                  │
+        ├───────────────────────────┬─┬──────────────────────────────────┤
+        │ Original Panel            │█│ Proposed Panel                   │
+        │                           │ │                                  │
+        │ ScrollViewer (synced) ◄───┼─┼───► ScrollViewer (synced)       │
+        │                           │ │                                  │
+        ├───────────────────────────┴─┴──────────────────────────────────┤
+        │ Footer: Open in Editor | Reject | Apply Changes               │
+        └────────────────────────────────────────────────────────────────┘
+    -->
+
+    <UserControl.Resources>
+        <converters:IncrementConverter x:Key="IncrementConverter" />
+    </UserControl.Resources>
+
+    <Grid RowDefinitions="Auto, *, Auto">
+        <!-- ============================================================ -->
+        <!-- Header Section                                                -->
+        <!-- ============================================================ -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource DiffHeaderBackground}"
+                Padding="0"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,0,0,1">
+            <Grid ColumnDefinitions="Auto, *, Auto, Auto">
+                <!-- File Info -->
+                <StackPanel Orientation="Horizontal" Spacing="8" Margin="12,8">
+                    <PathIcon Data="{StaticResource FileCodeIcon}"
+                              Width="16" Height="16"
+                              Foreground="{DynamicResource TextMuted}" />
+                    <TextBlock Text="{Binding FileName}"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center" />
+                    <Border Background="{DynamicResource LanguageBadgeBackground}"
+                            CornerRadius="3"
+                            Padding="6,2"
+                            IsVisible="{Binding Language, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                        <TextBlock Text="{Binding Language}"
+                                   FontSize="11"
+                                   Foreground="{DynamicResource LanguageBadgeForeground}" />
+                    </Border>
+                    <Border Background="{DynamicResource NewFileBadgeBackground}"
+                            CornerRadius="3"
+                            Padding="6,2"
+                            IsVisible="{Binding IsNewFile}">
+                        <TextBlock Text="NEW FILE"
+                                   FontSize="10"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource NewFileBadgeForeground}" />
+                    </Border>
+                </StackPanel>
+
+                <!-- Statistics -->
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Spacing="16"
+                            Margin="0,8">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="+"
+                                   Foreground="{DynamicResource DiffAddedForeground}"
+                                   FontWeight="Bold" />
+                        <TextBlock Text="{Binding DiffResult.Stats.AddedLines}"
+                                   Foreground="{DynamicResource DiffAddedForeground}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="-"
+                                   Foreground="{DynamicResource DiffRemovedForeground}"
+                                   FontWeight="Bold" />
+                        <TextBlock Text="{Binding DiffResult.Stats.RemovedLines}"
+                                   Foreground="{DynamicResource DiffRemovedForeground}" />
+                    </StackPanel>
+                    <TextBlock Foreground="{DynamicResource TextMuted}"
+                               FontSize="12">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0} hunks">
+                                <Binding Path="TotalHunks" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </StackPanel>
+
+                <!-- Navigation -->
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            Spacing="4"
+                            Margin="8">
+                    <TextBlock VerticalAlignment="Center"
+                               Margin="0,0,8,0"
+                               Foreground="{DynamicResource TextMuted}">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0}/{1}">
+                                <Binding Path="CurrentHunkIndex"
+                                         Converter="{StaticResource IncrementConverter}" />
+                                <Binding Path="TotalHunks" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <Button Command="{Binding PreviousHunkCommand}"
+                            IsEnabled="{Binding CanNavigatePrevious}"
+                            ToolTip.Tip="Previous change (Ctrl+↑)"
+                            Padding="4"
+                            Background="Transparent">
+                        <PathIcon Data="{StaticResource ChevronUpIcon}"
+                                  Width="14" Height="14" />
+                    </Button>
+                    <Button Command="{Binding NextHunkCommand}"
+                            IsEnabled="{Binding CanNavigateNext}"
+                            ToolTip.Tip="Next change (Ctrl+↓)"
+                            Padding="4"
+                            Background="Transparent">
+                        <PathIcon Data="{StaticResource ChevronDownIcon}"
+                                  Width="14" Height="14" />
+                    </Button>
+                </StackPanel>
+
+                <!-- Toolbar -->
+                <StackPanel Grid.Column="3"
+                            Orientation="Horizontal"
+                            Spacing="4"
+                            Margin="8">
+                    <ToggleButton IsChecked="{Binding ShowInlineChanges}"
+                                  ToolTip.Tip="Show character-level changes"
+                                  Padding="4"
+                                  Background="Transparent">
+                        <PathIcon Data="{StaticResource HighlightIcon}"
+                                  Width="14" Height="14" />
+                    </ToggleButton>
+                    <ToggleButton IsChecked="{Binding WordWrap}"
+                                  ToolTip.Tip="Word wrap"
+                                  Padding="4"
+                                  Background="Transparent">
+                        <PathIcon Data="{StaticResource WrapTextIcon}"
+                                  Width="14" Height="14" />
+                    </ToggleButton>
+                    <ToggleButton IsChecked="{Binding SynchronizedScroll}"
+                                  ToolTip.Tip="Synchronized scrolling"
+                                  Padding="4"
+                                  Background="Transparent">
+                        <PathIcon Data="{StaticResource LinkIcon}"
+                                  Width="14" Height="14" />
+                    </ToggleButton>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ============================================================ -->
+        <!-- Side-by-Side Content                                          -->
+        <!-- ============================================================ -->
+        <Grid Grid.Row="1" ColumnDefinitions="*, 1, *">
+            <!-- Original Panel -->
+            <Border Grid.Column="0"
+                    Background="{DynamicResource DiffPanelBackground}">
+                <Grid RowDefinitions="Auto, *">
+                    <Border Background="{DynamicResource DiffPanelHeaderBackground}"
+                            Padding="12,6"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="0,0,0,1">
+                        <TextBlock Text="Original"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextMuted}" />
+                    </Border>
+                    <ScrollViewer Grid.Row="1"
+                                  x:Name="OriginalScrollViewer"
+                                  HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding Hunks}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <!-- Placeholder: DiffHunkControl will be created in v0.4.2f -->
+                                    <Border Margin="0,4"
+                                            Padding="8"
+                                            Background="{DynamicResource ControlBackground}"
+                                            CornerRadius="4">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Header}"
+                                                       FontFamily="Cascadia Code, Consolas, monospace"
+                                                       FontSize="11"
+                                                       Foreground="{DynamicResource TextMuted}" />
+                                            <ItemsControl ItemsSource="{Binding OriginalLines}" Margin="0,4,0,0">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Grid ColumnDefinitions="40, *">
+                                                            <TextBlock Grid.Column="0"
+                                                                       Text="{Binding LineNumberDisplay}"
+                                                                       FontFamily="Cascadia Code, Consolas, monospace"
+                                                                       FontSize="11"
+                                                                       Foreground="{DynamicResource TextMuted}"
+                                                                       HorizontalAlignment="Right"
+                                                                       Margin="0,0,8,0" />
+                                                            <TextBlock Grid.Column="1"
+                                                                       Text="{Binding Content}"
+                                                                       FontFamily="Cascadia Code, Consolas, monospace"
+                                                                       FontSize="12" />
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+
+            <!-- Splitter -->
+            <GridSplitter Grid.Column="1"
+                          Width="1"
+                          Background="{DynamicResource DiffSplitterBackground}"
+                          ResizeDirection="Columns" />
+
+            <!-- Proposed Panel -->
+            <Border Grid.Column="2"
+                    Background="{DynamicResource DiffPanelBackground}">
+                <Grid RowDefinitions="Auto, *">
+                    <Border Background="{DynamicResource DiffPanelHeaderBackground}"
+                            Padding="12,6"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="0,0,0,1">
+                        <TextBlock Text="Proposed"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextMuted}" />
+                    </Border>
+                    <ScrollViewer Grid.Row="1"
+                                  x:Name="ProposedScrollViewer"
+                                  HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding Hunks}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <!-- Placeholder: DiffHunkControl will be created in v0.4.2f -->
+                                    <Border Margin="0,4"
+                                            Padding="8"
+                                            Background="{DynamicResource ControlBackground}"
+                                            CornerRadius="4">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Header}"
+                                                       FontFamily="Cascadia Code, Consolas, monospace"
+                                                       FontSize="11"
+                                                       Foreground="{DynamicResource TextMuted}" />
+                                            <ItemsControl ItemsSource="{Binding ProposedLines}" Margin="0,4,0,0">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Grid ColumnDefinitions="40, *">
+                                                            <TextBlock Grid.Column="0"
+                                                                       Text="{Binding LineNumberDisplay}"
+                                                                       FontFamily="Cascadia Code, Consolas, monospace"
+                                                                       FontSize="11"
+                                                                       Foreground="{DynamicResource TextMuted}"
+                                                                       HorizontalAlignment="Right"
+                                                                       Margin="0,0,8,0" />
+                                                            <TextBlock Grid.Column="1"
+                                                                       Text="{Binding Content}"
+                                                                       FontFamily="Cascadia Code, Consolas, monospace"
+                                                                       FontSize="12" />
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ============================================================ -->
+        <!-- Footer Actions                                                -->
+        <!-- ============================================================ -->
+        <Border Grid.Row="2"
+                Background="{DynamicResource DiffFooterBackground}"
+                Padding="12,8"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,1,0,0">
+            <Grid ColumnDefinitions="Auto, *, Auto">
+                <Button Content="Open in Editor"
+                        Padding="12,6"
+                        Background="{DynamicResource ControlBackground}" />
+
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            Spacing="8">
+                    <Button Content="Reject"
+                            Command="{Binding RequestRejectCommand}"
+                            Padding="12,6"
+                            Background="{DynamicResource ControlBackground}" />
+                    <Button Content="Apply Changes"
+                            Command="{Binding RequestApplyCommand}"
+                            Padding="12,6"
+                            Background="{DynamicResource AccentBrush}"
+                            Foreground="White" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ============================================================ -->
+        <!-- Loading Overlay                                               -->
+        <!-- ============================================================ -->
+        <Border Grid.RowSpan="3"
+                Background="#80000000"
+                IsVisible="{Binding IsLoading}">
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="12">
+                <ProgressBar IsIndeterminate="True" Width="120" />
+                <TextBlock Text="Computing diff..."
+                           Foreground="White"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+        </Border>
+
+        <!-- ============================================================ -->
+        <!-- Error Overlay                                                 -->
+        <!-- ============================================================ -->
+        <Border Grid.RowSpan="3"
+                Background="{DynamicResource ErrorBackground}"
+                IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                Padding="24">
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="12">
+                <PathIcon Data="{StaticResource CloseIcon}"
+                          Width="32" Height="32"
+                          Foreground="{DynamicResource ErrorForeground}" />
+                <TextBlock Text="{Binding ErrorMessage}"
+                           TextWrapping="Wrap"
+                           MaxWidth="400"
+                           TextAlignment="Center"
+                           Foreground="{DynamicResource ErrorForeground}" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
