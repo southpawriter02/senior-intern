@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.4.2h] - 2026-01-16
+
+Theming & Polish. See [detailed notes](docs/changelog/v0.4.2h.md).
+
+### Added
+
+- `DiffColors.axaml` with 30+ color/brush resources for diff viewer
+- `DiffStyles.axaml` with 25+ reusable styles for diff components
+- Complete dark theme palette (panel, line states, inline, hunk, gutter, buttons, stats)
+
 ## [0.4.2g] - 2026-01-16
 
 Diff Navigation. See [detailed notes](docs/changelog/v0.4.2g.md).

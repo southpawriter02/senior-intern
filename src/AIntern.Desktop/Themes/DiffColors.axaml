@@ -1,0 +1,162 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--
+        DiffColors.axaml - v0.4.2h Theming & Polish
+        Comprehensive color palette for the diff viewer (Dark Theme)
+    -->
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         PANEL COLORS
+         Structural colors for the diff viewer container
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <Color x:Key="DiffHeaderBackground">#1F1F1F</Color>
+    <Color x:Key="DiffFooterBackground">#1F1F1F</Color>
+    <Color x:Key="DiffPanelBackground">#1A1A1A</Color>
+    <Color x:Key="DiffPanelHeaderBackground">#252526</Color>
+    <Color x:Key="DiffSplitterBackground">#333333</Color>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         LINE STATE COLORS
+         Visual indicators for line change types
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <!-- ADDED LINES -->
+    <Color x:Key="DiffAddedBackground">#1E3A21</Color>
+    <Color x:Key="DiffAddedForeground">#4ADE80</Color>
+    <Color x:Key="DiffAddedGutter">#2D5A31</Color>
+
+    <!-- REMOVED LINES -->
+    <Color x:Key="DiffRemovedBackground">#3A1E1E</Color>
+    <Color x:Key="DiffRemovedForeground">#F87171</Color>
+    <Color x:Key="DiffRemovedGutter">#5A2D2D</Color>
+
+    <!-- MODIFIED LINES -->
+    <Color x:Key="DiffModifiedBackground">#3A3A1E</Color>
+    <Color x:Key="DiffModifiedForeground">#FBBF24</Color>
+
+    <!-- UNCHANGED LINES -->
+    <Color x:Key="DiffUnchangedBackground">Transparent</Color>
+    <Color x:Key="DiffUnchangedForeground">#D4D4D4</Color>
+
+    <!-- PLACEHOLDER LINES -->
+    <Color x:Key="DiffPlaceholderBackground">#0A0A0A</Color>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         INLINE CHANGE COLORS
+         Character-level change highlighting within lines
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <Color x:Key="DiffInlineAddedBackground">#2D5A31</Color>
+    <Color x:Key="DiffInlineRemovedBackground">#5A2D2D</Color>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         HUNK COLORS
+         Visual grouping for change blocks
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <Color x:Key="DiffHunkHeaderBackground">#252526</Color>
+    <Color x:Key="DiffHunkHeaderForeground">#858585</Color>
+    <Color x:Key="DiffHunkBorder">#333333</Color>
+    <Color x:Key="DiffHunkCurrentBorder">#0078D4</Color>
+    <Color x:Key="DiffHunkCurrentBackground">#0078D410</Color>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         GUTTER COLORS
+         Line number column styling
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <Color x:Key="DiffGutterBackground">#1A1A1A</Color>
+    <Color x:Key="DiffGutterForeground">#6E7681</Color>
+    <Color x:Key="DiffGutterBorder">#2D2D2D</Color>
+    <Color x:Key="DiffGutterAddedIndicator">#4ADE80</Color>
+    <Color x:Key="DiffGutterRemovedIndicator">#F87171</Color>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         ACTION BUTTON COLORS
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <Color x:Key="DiffApplyButtonBackground">#238636</Color>
+    <Color x:Key="DiffApplyButtonHover">#2EA043</Color>
+    <Color x:Key="DiffApplyButtonForeground">#FFFFFF</Color>
+
+    <Color x:Key="DiffCancelButtonBackground">#21262D</Color>
+    <Color x:Key="DiffCancelButtonHover">#30363D</Color>
+    <Color x:Key="DiffCancelButtonBorder">#363B42</Color>
+
+    <Color x:Key="DiffNavigationButtonBackground">#2D2D2D</Color>
+    <Color x:Key="DiffNavigationButtonHover">#3D3D3D</Color>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         STATS COLORS
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <Color x:Key="DiffStatsAddedColor">#4ADE80</Color>
+    <Color x:Key="DiffStatsRemovedColor">#F87171</Color>
+    <Color x:Key="DiffStatsModifiedColor">#FBBF24</Color>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         SOLIDCOLORBRUSH RESOURCES
+         Bindable brush resources for XAML
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <!-- Panel Brushes -->
+    <SolidColorBrush x:Key="DiffHeaderBackgroundBrush" Color="{StaticResource DiffHeaderBackground}"/>
+    <SolidColorBrush x:Key="DiffFooterBackgroundBrush" Color="{StaticResource DiffFooterBackground}"/>
+    <SolidColorBrush x:Key="DiffPanelBackgroundBrush" Color="{StaticResource DiffPanelBackground}"/>
+    <SolidColorBrush x:Key="DiffPanelHeaderBackgroundBrush" Color="{StaticResource DiffPanelHeaderBackground}"/>
+    <SolidColorBrush x:Key="DiffSplitterBackgroundBrush" Color="{StaticResource DiffSplitterBackground}"/>
+
+    <!-- Line State Brushes -->
+    <SolidColorBrush x:Key="DiffAddedBackgroundBrush" Color="{StaticResource DiffAddedBackground}"/>
+    <SolidColorBrush x:Key="DiffAddedForegroundBrush" Color="{StaticResource DiffAddedForeground}"/>
+    <SolidColorBrush x:Key="DiffAddedGutterBrush" Color="{StaticResource DiffAddedGutter}"/>
+
+    <SolidColorBrush x:Key="DiffRemovedBackgroundBrush" Color="{StaticResource DiffRemovedBackground}"/>
+    <SolidColorBrush x:Key="DiffRemovedForegroundBrush" Color="{StaticResource DiffRemovedForeground}"/>
+    <SolidColorBrush x:Key="DiffRemovedGutterBrush" Color="{StaticResource DiffRemovedGutter}"/>
+
+    <SolidColorBrush x:Key="DiffModifiedBackgroundBrush" Color="{StaticResource DiffModifiedBackground}"/>
+    <SolidColorBrush x:Key="DiffModifiedForegroundBrush" Color="{StaticResource DiffModifiedForeground}"/>
+
+    <SolidColorBrush x:Key="DiffUnchangedBackgroundBrush" Color="{StaticResource DiffUnchangedBackground}"/>
+    <SolidColorBrush x:Key="DiffUnchangedForegroundBrush" Color="{StaticResource DiffUnchangedForeground}"/>
+
+    <SolidColorBrush x:Key="DiffPlaceholderBackgroundBrush" Color="{StaticResource DiffPlaceholderBackground}" Opacity="0.5"/>
+
+    <!-- Inline Brushes -->
+    <SolidColorBrush x:Key="DiffInlineAddedBackgroundBrush" Color="{StaticResource DiffInlineAddedBackground}"/>
+    <SolidColorBrush x:Key="DiffInlineRemovedBackgroundBrush" Color="{StaticResource DiffInlineRemovedBackground}"/>
+
+    <!-- Hunk Brushes -->
+    <SolidColorBrush x:Key="DiffHunkHeaderBackgroundBrush" Color="{StaticResource DiffHunkHeaderBackground}"/>
+    <SolidColorBrush x:Key="DiffHunkHeaderForegroundBrush" Color="{StaticResource DiffHunkHeaderForeground}"/>
+    <SolidColorBrush x:Key="DiffHunkBorderBrush" Color="{StaticResource DiffHunkBorder}"/>
+    <SolidColorBrush x:Key="DiffHunkCurrentBorderBrush" Color="{StaticResource DiffHunkCurrentBorder}"/>
+    <SolidColorBrush x:Key="DiffHunkCurrentBackgroundBrush" Color="{StaticResource DiffHunkCurrentBackground}"/>
+
+    <!-- Gutter Brushes -->
+    <SolidColorBrush x:Key="DiffGutterBackgroundBrush" Color="{StaticResource DiffGutterBackground}"/>
+    <SolidColorBrush x:Key="DiffGutterForegroundBrush" Color="{StaticResource DiffGutterForeground}"/>
+    <SolidColorBrush x:Key="DiffGutterBorderBrush" Color="{StaticResource DiffGutterBorder}"/>
+    <SolidColorBrush x:Key="DiffGutterAddedIndicatorBrush" Color="{StaticResource DiffGutterAddedIndicator}"/>
+    <SolidColorBrush x:Key="DiffGutterRemovedIndicatorBrush" Color="{StaticResource DiffGutterRemovedIndicator}"/>
+
+    <!-- Button Brushes -->
+    <SolidColorBrush x:Key="DiffApplyButtonBackgroundBrush" Color="{StaticResource DiffApplyButtonBackground}"/>
+    <SolidColorBrush x:Key="DiffApplyButtonHoverBrush" Color="{StaticResource DiffApplyButtonHover}"/>
+    <SolidColorBrush x:Key="DiffApplyButtonForegroundBrush" Color="{StaticResource DiffApplyButtonForeground}"/>
+
+    <SolidColorBrush x:Key="DiffCancelButtonBackgroundBrush" Color="{StaticResource DiffCancelButtonBackground}"/>
+    <SolidColorBrush x:Key="DiffCancelButtonHoverBrush" Color="{StaticResource DiffCancelButtonHover}"/>
+    <SolidColorBrush x:Key="DiffCancelButtonBorderBrush" Color="{StaticResource DiffCancelButtonBorder}"/>
+
+    <SolidColorBrush x:Key="DiffNavigationButtonBackgroundBrush" Color="{StaticResource DiffNavigationButtonBackground}"/>
+    <SolidColorBrush x:Key="DiffNavigationButtonHoverBrush" Color="{StaticResource DiffNavigationButtonHover}"/>
+
+    <!-- Stats Brushes -->
+    <SolidColorBrush x:Key="DiffStatsAddedBrush" Color="{StaticResource DiffStatsAddedColor}"/>
+    <SolidColorBrush x:Key="DiffStatsRemovedBrush" Color="{StaticResource DiffStatsRemovedColor}"/>
+    <SolidColorBrush x:Key="DiffStatsModifiedBrush" Color="{StaticResource DiffStatsModifiedColor}"/>
+
+</ResourceDictionary>

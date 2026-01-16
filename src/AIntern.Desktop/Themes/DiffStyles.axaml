@@ -1,0 +1,282 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--
+        DiffStyles.axaml - v0.4.2h Theming & Polish
+        Reusable styles for diff viewer components
+    -->
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         PANEL STYLES
+         Structural container styles for the diff viewer
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="Border.diff-header">
+        <Setter Property="Background" Value="{DynamicResource DiffHeaderBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Setter Property="Padding" Value="12,8"/>
+    </Style>
+
+    <Style Selector="Border.diff-panel">
+        <Setter Property="Background" Value="{DynamicResource DiffPanelBackground}"/>
+    </Style>
+
+    <Style Selector="Border.diff-footer">
+        <Setter Property="Background" Value="{DynamicResource DiffFooterBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="0,1,0,0"/>
+        <Setter Property="Padding" Value="12,8"/>
+    </Style>
+
+    <Style Selector="Border.panel-header">
+        <Setter Property="Background" Value="{DynamicResource DiffPanelHeaderBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Setter Property="Padding" Value="12,6"/>
+    </Style>
+
+    <Style Selector="Border.panel-header TextBlock">
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextMuted}"/>
+    </Style>
+
+    <Style Selector="GridSplitter.diff-splitter">
+        <Setter Property="Background" Value="{DynamicResource DiffSplitterBackground}"/>
+        <Setter Property="MinWidth" Value="4"/>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         LINE STATE STYLES
+         Visual styles for different line change types
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="Grid.added">
+        <Setter Property="Background" Value="{DynamicResource DiffAddedBackground}"/>
+    </Style>
+
+    <Style Selector="Grid.removed">
+        <Setter Property="Background" Value="{DynamicResource DiffRemovedBackground}"/>
+    </Style>
+
+    <Style Selector="Grid.modified">
+        <Setter Property="Background" Value="{DynamicResource DiffModifiedBackground}"/>
+    </Style>
+
+    <Style Selector="Grid.placeholder">
+        <Setter Property="Background" Value="{DynamicResource DiffPlaceholderBackground}"/>
+        <Setter Property="Opacity" Value="0.5"/>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         GUTTER STYLES
+         Line number column styling
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="Border.line-gutter">
+        <Setter Property="Background" Value="{DynamicResource DiffGutterBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource DiffGutterBorder}"/>
+        <Setter Property="BorderThickness" Value="0,0,1,0"/>
+        <Setter Property="MinWidth" Value="48"/>
+        <Setter Property="Padding" Value="8,0"/>
+    </Style>
+
+    <Style Selector="Border.line-gutter TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource DiffGutterForeground}"/>
+        <Setter Property="FontFamily" Value="Cascadia Code, Consolas, monospace"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="TextAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <Style Selector="Grid.added Border.line-gutter">
+        <Setter Property="Background" Value="{DynamicResource DiffAddedGutter}"/>
+    </Style>
+
+    <Style Selector="Grid.removed Border.line-gutter">
+        <Setter Property="Background" Value="{DynamicResource DiffRemovedGutter}"/>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         INLINE CHANGE STYLES
+         Character-level highlighting within modified lines
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="TextBlock.inline-changed">
+        <Setter Property="Background" Value="{DynamicResource DiffInlineAddedBackground}"/>
+    </Style>
+
+    <Style Selector="TextBlock.inline-added">
+        <Setter Property="Background" Value="{DynamicResource DiffInlineAddedBackground}"/>
+        <Setter Property="Foreground" Value="{DynamicResource DiffAddedForeground}"/>
+    </Style>
+
+    <Style Selector="TextBlock.inline-removed">
+        <Setter Property="Background" Value="{DynamicResource DiffInlineRemovedBackground}"/>
+        <Setter Property="Foreground" Value="{DynamicResource DiffRemovedForeground}"/>
+        <Setter Property="TextDecorations" Value="Strikethrough"/>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         HUNK STYLES
+         Change block grouping styles
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="Border.diff-hunk">
+        <Setter Property="BorderBrush" Value="{DynamicResource DiffHunkBorder}"/>
+        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Setter Property="Margin" Value="0,0,0,8"/>
+    </Style>
+
+    <Style Selector="Border.hunk-header">
+        <Setter Property="Background" Value="{DynamicResource DiffHunkHeaderBackground}"/>
+        <Setter Property="Padding" Value="12,4"/>
+    </Style>
+
+    <Style Selector="Border.hunk-header TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource DiffHunkHeaderForeground}"/>
+        <Setter Property="FontFamily" Value="Cascadia Code, Consolas, monospace"/>
+        <Setter Property="FontSize" Value="11"/>
+    </Style>
+
+    <Style Selector="Border.diff-hunk.current">
+        <Setter Property="BorderBrush" Value="{DynamicResource DiffHunkCurrentBorder}"/>
+        <Setter Property="BorderThickness" Value="2,0,0,1"/>
+        <Setter Property="Background" Value="{DynamicResource DiffHunkCurrentBackground}"/>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         BADGE STYLES
+         Status indicators for files
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="Border.new-file-badge">
+        <Setter Property="Background" Value="{DynamicResource DiffAddedBackground}"/>
+        <Setter Property="Padding" Value="6,2"/>
+        <Setter Property="CornerRadius" Value="3"/>
+    </Style>
+
+    <Style Selector="Border.new-file-badge TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource DiffAddedForeground}"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+    </Style>
+
+    <Style Selector="Border.deleted-file-badge">
+        <Setter Property="Background" Value="{DynamicResource DiffRemovedBackground}"/>
+        <Setter Property="Padding" Value="6,2"/>
+        <Setter Property="CornerRadius" Value="3"/>
+    </Style>
+
+    <Style Selector="Border.deleted-file-badge TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource DiffRemovedForeground}"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         BUTTON STYLES
+         Action and navigation button styling
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="Button.diff-apply">
+        <Setter Property="Background" Value="{DynamicResource DiffApplyButtonBackground}"/>
+        <Setter Property="Foreground" Value="{DynamicResource DiffApplyButtonForeground}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="16,8"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+    </Style>
+
+    <Style Selector="Button.diff-apply:pointerover">
+        <Setter Property="Background" Value="{DynamicResource DiffApplyButtonHover}"/>
+    </Style>
+
+    <Style Selector="Button.diff-secondary">
+        <Setter Property="Background" Value="{DynamicResource DiffCancelButtonBackground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource DiffCancelButtonBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+
+    <Style Selector="Button.diff-secondary:pointerover">
+        <Setter Property="Background" Value="{DynamicResource DiffCancelButtonHover}"/>
+    </Style>
+
+    <Style Selector="Button.diff-navigation">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="4"/>
+        <Setter Property="CornerRadius" Value="3"/>
+        <Setter Property="Width" Value="28"/>
+        <Setter Property="Height" Value="28"/>
+    </Style>
+
+    <Style Selector="Button.diff-navigation:pointerover">
+        <Setter Property="Background" Value="{DynamicResource DiffNavigationButtonHover}"/>
+    </Style>
+
+    <Style Selector="Button.diff-navigation:disabled">
+        <Setter Property="Opacity" Value="0.4"/>
+    </Style>
+
+    <Style Selector="ToggleButton.diff-toolbar">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="6"/>
+        <Setter Property="CornerRadius" Value="3"/>
+        <Setter Property="Width" Value="32"/>
+        <Setter Property="Height" Value="32"/>
+    </Style>
+
+    <Style Selector="ToggleButton.diff-toolbar:pointerover">
+        <Setter Property="Background" Value="{DynamicResource DiffNavigationButtonHover}"/>
+    </Style>
+
+    <Style Selector="ToggleButton.diff-toolbar:checked">
+        <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         STATS STYLES
+         Change statistics display
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="TextBlock.diff-stats-added">
+        <Setter Property="Foreground" Value="{DynamicResource DiffStatsAddedColor}"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+    </Style>
+
+    <Style Selector="TextBlock.diff-stats-removed">
+        <Setter Property="Foreground" Value="{DynamicResource DiffStatsRemovedColor}"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         CONTENT STYLES
+         Line content and code display
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="TextBlock.diff-content">
+        <Setter Property="FontFamily" Value="Cascadia Code, Consolas, monospace"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Padding" Value="8,2"/>
+        <Setter Property="TextWrapping" Value="NoWrap"/>
+    </Style>
+
+    <Style Selector="TextBlock.diff-content.word-wrap">
+        <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         KEYBOARD HINTS STYLES
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <Style Selector="TextBlock.keyboard-hint">
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextMuted}"/>
+        <Setter Property="Opacity" Value="0.7"/>
+    </Style>
+
+</Styles>
