@@ -1,0 +1,155 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:AIntern.Desktop.ViewModels"
+             mc:Ignorable="d"
+             x:Class="AIntern.Desktop.Controls.UndoToast"
+             x:DataType="vm:UndoToastViewModel"
+             IsVisible="{Binding IsVisible}"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Bottom"
+             Margin="0,0,0,24">
+
+    <UserControl.Styles>
+        <!-- Entrance Animation -->
+        <Style Selector="UserControl[IsVisible=True]">
+            <Style.Animations>
+                <Animation Duration="0:0:0.25" FillMode="Forward" Easing="CubicEaseOut">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="0" />
+                        <Setter Property="RenderTransform">
+                            <TranslateTransform Y="20" />
+                        </Setter>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="1" />
+                        <Setter Property="RenderTransform">
+                            <TranslateTransform Y="0" />
+                        </Setter>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+
+        <!-- Pulse when expiring soon -->
+        <Style Selector="Border.expiring-soon">
+            <Style.Animations>
+                <Animation Duration="0:0:1" IterationCount="Infinite">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="1" />
+                    </KeyFrame>
+                    <KeyFrame Cue="50%">
+                        <Setter Property="Opacity" Value="0.7" />
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="1" />
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+
+        <!-- Link button style -->
+        <Style Selector="Button.link-button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="4,2" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+
+        <Style Selector="Button.link-button:pointerover TextBlock">
+            <Setter Property="TextDecorations" Value="Underline" />
+        </Style>
+
+        <!-- Icon button style -->
+        <Style Selector="Button.icon-button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="6" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Opacity" Value="0.6" />
+        </Style>
+
+        <Style Selector="Button.icon-button:pointerover">
+            <Setter Property="Opacity" Value="1" />
+        </Style>
+    </UserControl.Styles>
+
+    <Border Classes.expiring-soon="{Binding IsExpiringSoon}"
+            Background="#2C2C2C"
+            BorderBrush="#404040"
+            BorderThickness="1"
+            CornerRadius="8"
+            Padding="16,12"
+            MinWidth="320"
+            MaxWidth="500">
+
+        <Grid ColumnDefinitions="Auto, *, Auto, Auto, Auto">
+
+            <!-- Success Icon -->
+            <Border Grid.Column="0"
+                    Background="#1A4ADE80"
+                    CornerRadius="12"
+                    Width="24"
+                    Height="24"
+                    Margin="0,0,12,0"
+                    VerticalAlignment="Center">
+                <TextBlock Text="✓"
+                           FontSize="14"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Foreground="#4ADE80" />
+            </Border>
+
+            <!-- Message -->
+            <TextBlock Grid.Column="1"
+                       Text="{Binding Message}"
+                       FontSize="13"
+                       VerticalAlignment="Center"
+                       TextTrimming="CharacterEllipsis"
+                       ToolTip.Tip="{Binding FilePath}"
+                       Foreground="White" />
+
+            <!-- Time Remaining -->
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        Spacing="4"
+                        Margin="16,0,0,0"
+                        VerticalAlignment="Center">
+                <TextBlock Text="Undo:"
+                           FontSize="12"
+                           Opacity="0.6"
+                           Foreground="White" />
+                <TextBlock Text="{Binding FormattedTimeRemaining}"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           Foreground="White" />
+            </StackPanel>
+
+            <!-- Undo Button -->
+            <Button Grid.Column="3"
+                    Command="{Binding UndoCommand}"
+                    IsEnabled="{Binding CanUndo}"
+                    Classes="link-button"
+                    Margin="12,0,0,0"
+                    ToolTip.Tip="Undo this change">
+                <TextBlock Text="Undo"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Foreground="#60A5FA" />
+            </Button>
+
+            <!-- Dismiss Button -->
+            <Button Grid.Column="4"
+                    Command="{Binding DismissCommand}"
+                    Classes="icon-button"
+                    Margin="8,0,0,0"
+                    ToolTip.Tip="Dismiss">
+                <TextBlock Text="×"
+                           FontSize="16"
+                           Foreground="White" />
+            </Button>
+        </Grid>
+    </Border>
+</UserControl>

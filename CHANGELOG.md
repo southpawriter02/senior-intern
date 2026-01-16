@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.4.3h] - 2026-01-16
+
+Undo Toast. See [detailed notes](docs/changelog/v0.4.3h.md).
+
+### Added
+
+- `UndoToastViewModel` with live countdown and undo commands
+- `UndoToast.axaml` UserControl with animations
+- Auto-hide behavior (10 second default)
+- Pulse animation when expiring soon
+- 18 unit tests
+
 ## [0.4.3g] - 2026-01-16
 
 Conflict Dialog. See [detailed notes](docs/changelog/v0.4.3g.md).
