@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.4.2b] - 2026-01-16
+
+Diff Service for Diff Engine. See [detailed notes](docs/changelog/v0.4.2b.md).
+
+### Added
+
+- `IDiffService` interface for diff computation
+- `DiffOptions` configuration model with presets
+- `DiffService` implementation using DiffPlex library
+- Synchronous and async diff methods
+- Support for CodeBlock-to-diff conversion
+- Comprehensive unit tests (29)
+
 ## [0.4.2a] - 2026-01-16
 
 Diff Models for Diff Engine. See [detailed notes](docs/changelog/v0.4.2a.md).

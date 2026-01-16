@@ -43,6 +43,9 @@
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="6.0.0" />
 
+    <!-- Diff (v0.4.2b) -->
+    <PackageVersion Include="DiffPlex" Version="1.7.2" />
+
     <!-- Testing -->
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageVersion Include="Moq" Version="4.20.72" />

@@ -226,6 +226,11 @@ public static class ServiceCollectionExtensions
         // Added in v0.4.1d.
         services.AddSingleton<IBlockClassificationService, BlockClassificationService>();
 
+        // Diff Engine: computes line-level diffs for code changes.
+        // Uses DiffPlex library for diff computation.
+        // Added in v0.4.2b.
+        services.AddSingleton<IDiffService, DiffService>();
+
         // File Path Inference: infers target paths for code blocks.
         // Uses ILanguageDetectionService for extension mapping.
         // Added in v0.4.1e.
