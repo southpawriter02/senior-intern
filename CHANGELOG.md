@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.4.4c] - 2026-01-16
+
+Proposal Service. See [detailed notes](docs/changelog/v0.4.4c.md).
+
+### Added
+
+- `ProposalServiceOptions` record for service configuration
+- `OperationCompletedEventArgs` for operation completion events
+- `IFileTreeProposalService` interface for proposal management
+- `FileTreeProposalService` with validation, apply, preview, and undo
+- `ApplyContext` for state tracking during batch apply
+- `RollbackManager` for automatic rollback support
+- 40 unit tests
+
 ## [0.4.4b] - 2026-01-16
 
 File Tree Parser. See [detailed notes](docs/changelog/v0.4.4b.md).
