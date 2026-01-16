@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.4.5c] - 2026-01-16
+
+Partial Snippet Models. See [detailed notes](docs/changelog/v0.4.5c.md).
+
+### Added
+
+- Extended `LineRange` with transformation and conversion methods
+- `ColumnRange` struct for character-level operations
+- `SnippetInsertMode` enum (Replace, InsertBefore, InsertAfter, Append, Prepend, ReplaceFile)
+- `SnippetAnchorType` and `SnippetAnchor` for text-based location
+- `AnchorMatchResult` for anchor search results
+- `IndentationStyle` record for code formatting
+- `SnippetApplyOptions` for snippet application configuration
+- `SnippetContext` for file context analysis
+- 17 new unit tests
+
 ## [0.4.5b] - 2026-01-16
 
 Streaming Diff Preview. See [detailed notes](docs/changelog/v0.4.5b.md).
