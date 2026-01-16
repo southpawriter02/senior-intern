@@ -62,6 +62,23 @@ public partial class EditorPanelViewModel : ViewModelBase, IDisposable
     /// <summary>Number of tabs with unsaved changes.</summary>
     public int UnsavedTabsCount => Tabs.Count(t => t.IsDirty);
 
+    /// <summary>
+    /// Whether there is currently a text selection in the active editor.
+    /// Updated by the view when selection changes (v0.3.4f).
+    /// </summary>
+    [ObservableProperty]
+    private bool _hasSelection;
+
+    /// <summary>
+    /// Updates the HasSelection property based on editor selection state.
+    /// Called by the view when selection changes (v0.3.4f).
+    /// </summary>
+    /// <param name="hasSelection">True if there is a selection.</param>
+    public void UpdateSelectionState(bool hasSelection)
+    {
+        HasSelection = hasSelection;
+    }
+
     #endregion
 
     #region Events

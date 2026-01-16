@@ -8,6 +8,7 @@ using Avalonia.Interactivity;
 using AvaloniaEdit;
 using AvaloniaEdit.Search;
 using AIntern.Core.Models;
+using AIntern.Desktop.Models;
 using AIntern.Desktop.Services;
 using AIntern.Desktop.ViewModels;
 using Microsoft.Extensions.Logging;
@@ -194,7 +195,11 @@ public partial class EditorPanel : UserControl
     /// <summary>
     /// Handles selection changes.
     /// </summary>
-    private void OnSelectionChanged(object? sender, EventArgs e) => UpdateCaretPosition();
+    private void OnSelectionChanged(object? sender, EventArgs e)
+    {
+        UpdateCaretPosition();
+        _viewModel?.UpdateSelectionState(!Editor.TextArea.Selection.IsEmpty);
+    }
 
     /// <summary>
     /// Updates the active tab's caret position from the editor.
@@ -352,6 +357,97 @@ public partial class EditorPanel : UserControl
             e.Handled = true;
             _logger?.LogDebug("[KEY] Ctrl+Shift+Tab - Previous Tab");
         }
+        // Ctrl+Shift+A: Attach selection to chat (v0.3.4f)
+        else if (e.KeyModifiers == (KeyModifiers.Control | KeyModifiers.Shift) && e.Key == Key.A)
+        {
+            AttachSelection();
+            e.Handled = true;
+            _logger?.LogDebug("[KEY] Ctrl+Shift+A - Attach Selection");
+        }
+        // Ctrl+Shift+F: Attach file to chat (v0.3.4f)
+        else if (e.KeyModifiers == (KeyModifiers.Control | KeyModifiers.Shift) && e.Key == Key.F)
+        {
+            AttachCurrentFile();
+            e.Handled = true;
+            _logger?.LogDebug("[KEY] Ctrl+Shift+F - Attach File");
+        }
+    }
+
+    #endregion
+
+    #region Context Attachment (v0.3.4f)
+
+    /// <summary>
+    /// Event raised when user wants to attach content to chat context.
+    /// </summary>
+    public event EventHandler<SelectionAttachmentEventArgs>? AttachSelectionRequested;
+
+    /// <summary>
+    /// Gets the current selection info for attachment.
+    /// </summary>
+    /// <returns>Selection info or null if no selection.</returns>
+    public SelectionInfo? GetCurrentSelection()
+    {
+        if (_viewModel?.ActiveTab == null) return null;
+
+        var selection = Editor.TextArea.Selection;
+        if (selection.IsEmpty) return null;
+
+        return new SelectionInfo
+        {
+            FilePath = _viewModel.ActiveTab.FilePath,
+            FileName = _viewModel.ActiveTab.FileName,
+            Language = _viewModel.ActiveTab.Language,
+            Content = Editor.SelectedText,
+            StartLine = selection.StartPosition.Line,
+            EndLine = selection.EndPosition.Line,
+            StartColumn = selection.StartPosition.Column,
+            EndColumn = selection.EndPosition.Column
+        };
+    }
+
+    /// <summary>
+    /// Attaches the current selection to chat context.
+    /// </summary>
+    public void AttachSelection()
+    {
+        var selection = GetCurrentSelection();
+        if (selection == null)
+        {
+            _logger?.LogDebug("[ATTACH] No selection to attach");
+            return;
+        }
+
+        _logger?.LogDebug("[ATTACH] Attaching selection: {FileName}:{Start}-{End}",
+            selection.FileName, selection.StartLine, selection.EndLine);
+
+        AttachSelectionRequested?.Invoke(this, new SelectionAttachmentEventArgs(selection));
+    }
+
+    /// <summary>
+    /// Attaches the entire current file to chat context.
+    /// </summary>
+    public void AttachCurrentFile()
+    {
+        if (_viewModel?.ActiveTab == null)
+        {
+            _logger?.LogDebug("[ATTACH] No active tab to attach");
+            return;
+        }
+
+        var selection = new SelectionInfo
+        {
+            FilePath = _viewModel.ActiveTab.FilePath,
+            FileName = _viewModel.ActiveTab.FileName,
+            Language = _viewModel.ActiveTab.Language,
+            Content = Editor.Text,
+            IsFullFile = true
+        };
+
+        _logger?.LogDebug("[ATTACH] Attaching file: {FileName} ({Lines} lines)",
+            selection.FileName, selection.LineCount);
+
+        AttachSelectionRequested?.Invoke(this, new SelectionAttachmentEventArgs(selection));
     }
 
     #endregion
