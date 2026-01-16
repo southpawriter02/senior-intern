@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.5a] - 2026-01-15
+
+Workspace Settings ViewModel. See [detailed notes](docs/changelog/v0.3.5a.md).
+
+### Added
+
+- WorkspaceSettingsViewModel with 21 setting properties
+- File Explorer settings (6): restore workspace, hidden files, gitignore, etc.
+- Editor settings (9): font, size, tabs, line numbers, themes, etc.
+- Context settings (6): token limits, file size, warnings
+- Validation logic for all numeric ranges
+- Change tracking with HasChanges property
+- Save, Cancel, ResetToDefaults commands
+- 4 new properties in AppSettings
+
+### Unit Tests
+
+- 18 tests for WorkspaceSettingsViewModel
+
 ## [0.3.4h] - 2026-01-15
 
 Message History Integration. See [detailed notes](docs/changelog/v0.3.4h.md).

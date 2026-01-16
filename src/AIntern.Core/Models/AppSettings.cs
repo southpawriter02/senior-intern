@@ -225,5 +225,33 @@ public sealed class AppSettings
     /// <remarks>Added in v0.3.4a.</remarks>
     public ContextLimitsConfig ContextLimits { get; set; } = new();
 
+    /// <summary>
+    /// Gets or sets whether to show token count in the context bar.
+    /// </summary>
+    /// <remarks>Added in v0.3.5a.</remarks>
+    public bool ShowTokenCount { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets whether to warn when approaching token limit.
+    /// </summary>
+    /// <remarks>Added in v0.3.5a.</remarks>
+    public bool WarnOnTokenLimit { get; set; } = true;
+
+    #endregion
+
+    #region Additional Settings (v0.3.5a)
+
+    /// <summary>
+    /// Gets or sets whether to auto-refresh when external file changes are detected.
+    /// </summary>
+    /// <remarks>Added in v0.3.5a.</remarks>
+    public bool AutoRefreshOnExternalChanges { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the editor syntax highlighting theme.
+    /// </summary>
+    /// <remarks>Added in v0.3.5a.</remarks>
+    public string EditorTheme { get; set; } = "DarkPlus";
+
     #endregion
 }
