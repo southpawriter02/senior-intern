@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.4.3f] - 2026-01-16
+
+Apply Dialog. See [detailed notes](docs/changelog/v0.4.3f.md).
+
+### Added
+
+- `ApplyChangesDialogViewModel` with MVVM pattern
+- `ApplyChangesDialog.axaml` with diff preview layout
+- `ApplyChangesDialog.axaml.cs` with `ShowAsync` factory method
+- `BoolToStringConverter` utility
+- Keyboard shortcuts (Enter/Escape)
+- 10 unit tests for dialog ViewModel
+
 ## [0.4.3e] - 2026-01-16
 
 Conflict Detection. See [detailed notes](docs/changelog/v0.4.3e.md).
