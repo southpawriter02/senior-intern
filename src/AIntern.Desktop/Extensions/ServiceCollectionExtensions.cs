@@ -215,6 +215,16 @@ public static class ServiceCollectionExtensions
         // Added in v0.3.5c.
         services.AddSingleton<IFileIndexService, FileIndexService>();
 
+        // Language Detection: detects and normalizes programming language identifiers.
+        // Singleton for shared language definitions and alias maps.
+        // Added in v0.4.1c.
+        services.AddSingleton<ILanguageDetectionService, LanguageDetectionService>();
+
+        // Block Classification: classifies code blocks by purpose (Command, Config, etc.).
+        // Uses ILanguageDetectionService for shell/config language detection.
+        // Added in v0.4.1d.
+        services.AddSingleton<IBlockClassificationService, BlockClassificationService>();
+
         // Keyboard Shortcuts: centralized shortcut management (v0.3.5g).
         services.AddSingleton<IKeyboardShortcutService, KeyboardShortcutService>();
 

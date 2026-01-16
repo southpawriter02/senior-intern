@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.4.1d] - 2026-01-16
+
+Block Classification Service. See [detailed notes](docs/changelog/v0.4.1d.md).
+
+### Added
+
+- `IBlockClassificationService` interface
+- `BlockClassificationService` with multi-factor classification
+- 16 example indicators, 17 apply indicators, 9 output indicators
+- Language-specific complete file structure detection
+- Classification confidence scoring (0.70 - 0.95)
+- DI registration for ILanguageDetectionService and IBlockClassificationService
+- Comprehensive unit tests (43)
+
 ## [0.4.1c] - 2026-01-15
 
 Language Detection Service. See [detailed notes](docs/changelog/v0.4.1c.md).
