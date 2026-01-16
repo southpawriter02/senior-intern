@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.4.4d] - 2026-01-16
+
+Tree ViewModels. See [detailed notes](docs/changelog/v0.4.4d.md).
+
+### Added
+
+- `SelectionState` enum for directory tri-state checkboxes
+- `TreeNodeSelectionBehavior` enum for selection propagation
+- `TreeBuildingOptions` configuration record
+- `ITreeBuildingService` and `TreeBuildingService` for tree building
+- `TreeNode` data model for hierarchy
+- `FileOperationItemViewModel` for tree item display
+- `FileTreeProposalViewModel` for proposal management
+- 48 unit tests
+
 ## [0.4.4c] - 2026-01-16
 
 Proposal Service. See [detailed notes](docs/changelog/v0.4.4c.md).
