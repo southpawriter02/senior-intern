@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.4.3b] - 2026-01-16
+
+File Change Service. See [detailed notes](docs/changelog/v0.4.3b.md).
+
+### Added
+
+- `IBackupService` interface for backup management
+- `IFileChangeService` interface for apply operations
+- `FileChangeService` implementation with apply, undo, history, and conflict detection
+- Thread-safe operations with semaphore locking
+- 18 unit tests for file change service
+
 ## [0.4.3a] - 2026-01-16
 
 Core Models (Apply Changes). See [detailed notes](docs/changelog/v0.4.3a.md).
