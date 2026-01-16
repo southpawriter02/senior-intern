@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.4.3i] - 2026-01-16
+
+Editor Integration. See [detailed notes](docs/changelog/v0.4.3i.md).
+
+### Added
+
+- `RefreshReason` enum for editor refresh types
+- `EditorRefreshEventArgs` for refresh event data
+- `IEditorRefreshService` interface for coordinating editor refreshes
+- `EditorRefreshService` with event coalescing and suspension support
+- 22 unit tests
+
 ## [0.4.3h] - 2026-01-16
 
 Undo Toast. See [detailed notes](docs/changelog/v0.4.3h.md).
@@ -18,6 +30,7 @@ Undo Toast. See [detailed notes](docs/changelog/v0.4.3h.md).
 - Auto-hide behavior (10 second default)
 - Pulse animation when expiring soon
 - 18 unit tests
+
 
 ## [0.4.3g] - 2026-01-16
 
