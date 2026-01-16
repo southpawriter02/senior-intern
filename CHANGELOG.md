@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.4.4h] - 2026-01-16
+
+Chat Integration. See [detailed notes](docs/changelog/v0.4.4h.md).
+
+### Added
+
+- `IProposalDetectionService` and `ProposalDetectionService` for multi-file proposal detection
+- `ChatProposalCoordinator` for workflow orchestration
+- `ProgressReporterAdapter` and batch undo event args
+- 8 new unit tests
+
 ## [0.4.4g] - 2026-01-16
 
 Progress Overlay. See [detailed notes](docs/changelog/v0.4.4g.md).
