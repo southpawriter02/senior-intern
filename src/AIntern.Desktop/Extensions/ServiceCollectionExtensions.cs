@@ -270,6 +270,11 @@ public static class ServiceCollectionExtensions
         // Added in v0.2.5e.
         services.AddTransient<SearchViewModel>();
 
+        // Welcome: welcome screen ViewModel shown when no workspace is open.
+        // Transient so each display gets fresh recent workspaces.
+        // Added in v0.3.5h.
+        services.AddTransient<WelcomeViewModel>();
+
         return services;
     }
 }

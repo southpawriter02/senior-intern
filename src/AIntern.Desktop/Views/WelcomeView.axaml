@@ -1,0 +1,101 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AIntern.Desktop.ViewModels"
+             x:Class="AIntern.Desktop.Views.WelcomeView"
+             x:DataType="vm:WelcomeViewModel">
+    <!--
+        Welcome Screen (v0.3.5h)
+        Shown when no workspace is open.
+        Displays logo, action buttons, recent workspaces, and keyboard hints.
+    -->
+    <Grid RowDefinitions="*, Auto, *" ColumnDefinitions="*, Auto, *">
+        <StackPanel Grid.Row="1" Grid.Column="1"
+                    Spacing="24"
+                    HorizontalAlignment="Center">
+
+            <!-- Logo and Title -->
+            <StackPanel Spacing="8" HorizontalAlignment="Center">
+                <TextBlock Text="🤖"
+                           FontSize="48"
+                           HorizontalAlignment="Center" />
+                <TextBlock Text="AIntern"
+                           FontSize="24"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center" />
+                <TextBlock Text="Your Local AI Coding Assistant"
+                           FontSize="14"
+                           Foreground="{DynamicResource TextMutedBrush}"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+
+            <!-- Actions -->
+            <StackPanel Spacing="12" Width="280">
+                <Button Classes="primary"
+                        Command="{Binding OpenFolderCommand}"
+                        HorizontalAlignment="Stretch"
+                        Padding="16,12">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <PathIcon Data="{StaticResource FolderOpenIcon}"
+                                  Width="18" Height="18" />
+                        <TextBlock Text="Open Folder" FontWeight="SemiBold" />
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding NewFileCommand}"
+                        HorizontalAlignment="Stretch"
+                        Padding="16,10">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <PathIcon Data="{StaticResource FileIcon}"
+                                  Width="16" Height="16" />
+                        <TextBlock Text="New File" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+
+            <!-- Recent Workspaces -->
+            <StackPanel Spacing="8" IsVisible="{Binding HasRecentWorkspaces}">
+                <TextBlock Text="Recent"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextSecondaryBrush}" />
+                <ItemsControl ItemsSource="{Binding RecentWorkspaces}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:RecentWorkspaceInfo">
+                            <Button Classes="link-button"
+                                    Command="{Binding $parent[UserControl].((vm:WelcomeViewModel)DataContext).OpenRecentCommand}"
+                                    CommandParameter="{Binding RootPath}"
+                                    HorizontalAlignment="Left"
+                                    Margin="0,2"
+                                    Padding="4,4">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <PathIcon Data="{StaticResource FolderIcon}"
+                                              Width="14" Height="14" />
+                                    <TextBlock Text="{Binding DisplayName}" />
+                                </StackPanel>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
+            <!-- Keyboard Shortcuts Hints -->
+            <StackPanel Spacing="4" Opacity="0.7">
+                <TextBlock Text="Quick Tips"
+                           FontSize="11"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextMutedBrush}" />
+                <TextBlock FontSize="11" Foreground="{DynamicResource TextMutedBrush}">
+                    <Run FontFamily="Consolas,Menlo,monospace" FontWeight="SemiBold">Ctrl+O</Run>
+                    <Run Text="  Open folder" />
+                </TextBlock>
+                <TextBlock FontSize="11" Foreground="{DynamicResource TextMutedBrush}">
+                    <Run FontFamily="Consolas,Menlo,monospace" FontWeight="SemiBold">Ctrl+P</Run>
+                    <Run Text="  Quick open file" />
+                </TextBlock>
+                <TextBlock FontSize="11" Foreground="{DynamicResource TextMutedBrush}">
+                    <Run FontFamily="Consolas,Menlo,monospace" FontWeight="SemiBold">Ctrl+,</Run>
+                    <Run Text="   Settings" />
+                </TextBlock>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

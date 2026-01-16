@@ -217,7 +217,16 @@ public partial class MainWindowViewModel : ViewModelBase
     /// <para>Added in v0.3.2g.</para>
     /// </remarks>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowWelcome))]
     private bool _hasOpenWorkspace;
+
+    /// <summary>
+    /// Gets whether the welcome screen should be shown (v0.3.5h).
+    /// </summary>
+    /// <remarks>
+    /// Inverse of <see cref="HasOpenWorkspace"/>.
+    /// </remarks>
+    public bool ShowWelcome => !HasOpenWorkspace;
 
     #endregion
 

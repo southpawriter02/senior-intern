@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.3.5h] - 2026-01-15
+
+Startup Integration. See [detailed notes](docs/changelog/v0.3.5h.md).
+
+### Added
+
+- `WorkspaceState` and `OpenFileState` models for persisting session state
+- `WelcomeViewModel` and `WelcomeView` for welcome screen
+- `ShowWelcome` property on MainWindowViewModel
+- Welcome screen with recent workspaces and keyboard hints
+- Comprehensive unit tests
+
 ## [0.3.5g] - 2026-01-15
 
 Keyboard Shortcuts Manager. See [detailed notes](docs/changelog/v0.3.5g.md).
