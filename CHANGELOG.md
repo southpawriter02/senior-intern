@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.4.5b] - 2026-01-16
+
+Streaming Diff Preview. See [detailed notes](docs/changelog/v0.4.5b.md).
+
+### Added
+
+- `DiffComputationStatus` enum and `DiffComputationState` model
+- `IStreamingDiffCoordinator` interface
+- `StreamingDiffCoordinator` with debouncing and content hashing
+- `DiffComputationQueue` for prioritized request management
+- `StreamingDiffViewModel` for UI binding
+- 6 new unit tests
+
 ## [0.4.5a] - 2026-01-16
 
 Settings Models. See [detailed notes](docs/changelog/v0.4.5a.md).
