@@ -263,6 +263,10 @@ public static class ServiceCollectionExtensions
         // Added in v0.4.5e.
         services.AddSingleton<IPopupHostService, PopupHostService>();
 
+        // Quick Action Service: manages quick action buttons on code blocks.
+        // Added in v0.4.5g.
+        services.AddSingleton<IQuickActionService, QuickActionService>();
+
         // ┌─────────────────────────────────────────────────────────────────┐
         // │ UI INFRASTRUCTURE                                                │
         // └─────────────────────────────────────────────────────────────────┘

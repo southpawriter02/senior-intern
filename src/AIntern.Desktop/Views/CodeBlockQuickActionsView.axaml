@@ -1,0 +1,144 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AIntern.Desktop.ViewModels"
+             x:Class="AIntern.Desktop.Views.CodeBlockQuickActionsView"
+             x:DataType="vm:CodeBlockQuickActionsViewModel">
+    
+    <!-- Quick Actions Bar for Code Blocks (v0.4.5g) -->
+    
+    <Border Classes="quick-actions-bar"
+            Padding="4"
+            CornerRadius="4"
+            Background="{DynamicResource SurfaceBrush}">
+        
+        <Grid ColumnDefinitions="*,Auto">
+            
+            <!-- Primary Actions -->
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal"
+                        Spacing="4">
+                
+                <!-- Apply Button -->
+                <Button Classes="quick-action-button"
+                        Command="{Binding ApplyCommand}"
+                        ToolTip.Tip="Apply this code (Ctrl+Enter)"
+                        IsVisible="{Binding CanApply}">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <PathIcon Data="{StaticResource CheckmarkIcon}" 
+                                  Width="14" Height="14"/>
+                        <TextBlock Text="Apply"/>
+                    </StackPanel>
+                </Button>
+                
+                <!-- Copy Button -->
+                <Button Classes="quick-action-button"
+                        Classes.success="{Binding IsCopied}"
+                        Command="{Binding CopyCommand}"
+                        ToolTip.Tip="Copy to clipboard (Ctrl+C)">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <PathIcon Data="{StaticResource CopyIcon}" 
+                                  Width="14" Height="14"
+                                  IsVisible="{Binding !IsCopied}"/>
+                        <PathIcon Data="{StaticResource CheckmarkIcon}" 
+                                  Width="14" Height="14"
+                                  IsVisible="{Binding IsCopied}"/>
+                        <TextBlock Text="Copy" IsVisible="{Binding !IsCopied}"/>
+                        <TextBlock Text="Copied!" IsVisible="{Binding IsCopied}"/>
+                    </StackPanel>
+                </Button>
+                
+                <!-- Diff Button -->
+                <Button Classes="quick-action-button"
+                        Command="{Binding ShowDiffCommand}"
+                        ToolTip.Tip="Show diff preview (Ctrl+D)"
+                        IsVisible="{Binding CanShowDiff}">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <PathIcon Data="{StaticResource DiffIcon}" 
+                                  Width="14" Height="14"/>
+                        <TextBlock Text="Diff"/>
+                    </StackPanel>
+                </Button>
+                
+                <!-- Open Button -->
+                <Button Classes="quick-action-button"
+                        Command="{Binding OpenInEditorCommand}"
+                        ToolTip.Tip="Open file in editor"
+                        IsVisible="{Binding CanOpenFile}">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <PathIcon Data="{StaticResource ExternalLinkIcon}" 
+                                  Width="14" Height="14"/>
+                        <TextBlock Text="Open"/>
+                    </StackPanel>
+                </Button>
+                
+                <!-- Overflow Menu Button -->
+                <Button Classes="quick-action-button overflow-button"
+                        Command="{Binding ToggleOverflowCommand}"
+                        IsVisible="{Binding HasOverflow}"
+                        ToolTip.Tip="More actions...">
+                    <PathIcon Data="{StaticResource MoreHorizontalIcon}" 
+                              Width="14" Height="14"/>
+                    <Button.Flyout>
+                        <MenuFlyout Placement="BottomEdgeAlignedRight">
+                            <MenuItem Header="Apply with Options..."
+                                      Command="{Binding ShowOptionsCommand}"
+                                      IsEnabled="{Binding CanApply}">
+                                <MenuItem.Icon>
+                                    <PathIcon Data="{StaticResource SettingsIcon}" 
+                                              Width="14" Height="14"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <Separator/>
+                            <MenuItem Header="Reject">
+                                <MenuItem.Icon>
+                                    <PathIcon Data="{StaticResource CrossIcon}" 
+                                              Width="14" Height="14"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </MenuFlyout>
+                    </Button.Flyout>
+                </Button>
+            </StackPanel>
+            
+            <!-- Status Indicator -->
+            <Border Grid.Column="1"
+                    Classes="status-indicator"
+                    Classes.error="{Binding HasError}"
+                    Classes.success="{Binding !HasError}"
+                    IsVisible="{Binding ShowStatus}"
+                    Padding="6,2"
+                    CornerRadius="3"
+                    Margin="8,0,0,0">
+                
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <!-- Loading Spinner -->
+                    <Border Classes="spinner"
+                            IsVisible="{Binding IsExecuting}"
+                            Width="12" Height="12">
+                        <TextBlock Text="⟳" 
+                                   FontSize="12"
+                                   Classes="rotating"/>
+                    </Border>
+                    
+                    <!-- Status Icon for success (not executing) -->
+                    <PathIcon Data="{StaticResource CheckmarkIcon}"
+                              Width="12" Height="12"
+                              IsVisible="{Binding !HasError}"
+                              Foreground="{DynamicResource SuccessBrush}"/>
+                    
+                    <!-- Status Icon for error -->
+                    <PathIcon Data="{StaticResource ErrorIcon}"
+                              Width="12" Height="12"
+                              IsVisible="{Binding HasError}"
+                              Foreground="{DynamicResource ErrorBrush}"/>
+                    
+                    <!-- Status Message -->
+                    <TextBlock Text="{Binding StatusMessage}"
+                               FontSize="11"
+                               VerticalAlignment="Center"
+                               Opacity="0.8"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

@@ -1,0 +1,110 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <!-- Quick Action Styles (v0.4.5g) -->
+    
+    <!-- Quick Actions Bar Container -->
+    <Style Selector="Border.quick-actions-bar">
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="0,1,0,0"/>
+        <Setter Property="Padding" Value="8,6"/>
+    </Style>
+    
+    <!-- Base Quick Action Button -->
+    <Style Selector="Button.quick-action-button">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="MinWidth" Value="32"/>
+        <Setter Property="Height" Value="28"/>
+    </Style>
+    
+    <!-- Hover State -->
+    <Style Selector="Button.quick-action-button:pointerover">
+        <Setter Property="Background" Value="{DynamicResource HoverBrush}"/>
+    </Style>
+    
+    <!-- Pressed State -->
+    <Style Selector="Button.quick-action-button:pressed">
+        <Setter Property="Background" Value="{DynamicResource PressedBrush}"/>
+        <Setter Property="RenderTransform" Value="scale(0.98)"/>
+    </Style>
+    
+    <!-- Disabled State -->
+    <Style Selector="Button.quick-action-button:disabled">
+        <Setter Property="Opacity" Value="0.5"/>
+        <Setter Property="Cursor" Value="Arrow"/>
+    </Style>
+    
+    <!-- Success State (e.g., after copy) -->
+    <Style Selector="Button.quick-action-button.success">
+        <Setter Property="Background" Value="{DynamicResource SuccessBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+    </Style>
+    
+    <!-- Executing State -->
+    <Style Selector="Button.quick-action-button.executing">
+        <Setter Property="Opacity" Value="0.7"/>
+        <Setter Property="IsEnabled" Value="False"/>
+    </Style>
+    
+    <!-- Error State -->
+    <Style Selector="Button.quick-action-button.error">
+        <Setter Property="Background" Value="{DynamicResource ErrorBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}"/>
+    </Style>
+    
+    <!-- Overflow Button -->
+    <Style Selector="Button.quick-action-button.overflow-button">
+        <Setter Property="MinWidth" Value="28"/>
+        <Setter Property="Padding" Value="4"/>
+    </Style>
+    
+    <!-- Status Indicator -->
+    <Style Selector="Border.status-indicator">
+        <Setter Property="Background" Value="{DynamicResource SurfaceVariantBrush}"/>
+        <Setter Property="Opacity" Value="0.9"/>
+    </Style>
+    
+    <Style Selector="Border.status-indicator.success">
+        <Setter Property="Background" Value="{DynamicResource SuccessBackgroundBrush}"/>
+    </Style>
+    
+    <Style Selector="Border.status-indicator.error">
+        <Setter Property="Background" Value="{DynamicResource ErrorBackgroundBrush}"/>
+    </Style>
+    
+    <!-- Rotating Spinner Animation -->
+    <Style Selector="TextBlock.rotating">
+        <Style.Animations>
+            <Animation Duration="0:0:1" IterationCount="INFINITE">
+                <KeyFrame Cue="0%">
+                    <Setter Property="RenderTransform" Value="rotate(0deg)"/>
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="RenderTransform" Value="rotate(360deg)"/>
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+        <Setter Property="RenderTransformOrigin" Value="50%,50%"/>
+    </Style>
+    
+    <!-- PathIcon in quick action buttons -->
+    <Style Selector="Button.quick-action-button PathIcon">
+        <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
+    </Style>
+    
+    <Style Selector="Button.quick-action-button:pointerover PathIcon">
+        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+    </Style>
+    
+    <Style Selector="Button.quick-action-button.success PathIcon">
+        <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+    </Style>
+    
+</Styles>

@@ -12,6 +12,9 @@
         <!-- v0.4.5e: Snippet Options Popup Styles -->
         <StyleInclude Source="avares://AIntern.Desktop/Styles/SnippetOptionsPopup.axaml" />
         
+        <!-- v0.4.5g: Quick Action Styles -->
+        <StyleInclude Source="avares://AIntern.Desktop/Styles/QuickActionStyles.axaml" />
+        
         <!-- Editor Tab Bar Styles (v0.3.3e) -->
         <Style Selector="Button.editor-tab">
             <Setter Property="Background" Value="Transparent" />

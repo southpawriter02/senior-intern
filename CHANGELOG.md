@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.4.5g] - 2026-01-16
+
+Quick Actions. Inline action buttons on code blocks for rapid one-click operations.
+
+### Added
+
+- `QuickActionType` enum with 8 action types (Apply, Copy, ShowDiff, etc.)
+- `QuickActionResult` record with success/failure factory methods and DisplayMessage
+- `QuickAction` record with factory methods for default actions
+- `IQuickActionService` interface for action management and execution
+- `QuickActionService` with event-based action lifecycle hooks
+- `CodeBlockQuickActionsViewModel` with command execution and status feedback
+- `CodeBlockQuickActionsView.axaml` UI with button bar and status indicator
+- `QuickActionStyles.axaml` with hover, pressed, success, and error states
+- 33 new unit tests (14 Core + 19 Desktop)
+
 ## [0.4.5f] - 2026-01-16
 
 Keyboard Shortcuts. Enhanced keyboard shortcut system with context-aware dispatch.
