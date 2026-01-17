@@ -129,6 +129,7 @@ public class UndoToastViewModelTests : IDisposable
     {
         _vm.Show("/test/file.cs", FileChangeType.Modified, TimeSpan.FromMinutes(3));
         Assert.True(_vm.IsVisible);
+        _vm.Hide(); // Cancel background timers
     }
 
     [Fact]
@@ -139,6 +140,7 @@ public class UndoToastViewModelTests : IDisposable
         Assert.Equal("/test/file.cs", _vm.FilePath);
         Assert.Equal("file.cs", _vm.FileName);
         Assert.Equal(FileChangeType.Created, _vm.ChangeType);
+        _vm.Hide(); // Cancel background timers
     }
 
     [Fact]

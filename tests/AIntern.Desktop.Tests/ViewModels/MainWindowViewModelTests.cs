@@ -125,6 +125,7 @@ public class MainWindowViewModelTests : IDisposable
             mockFileSystemService.Object,
             _mockSettingsService.Object,
             null, // IStorageProvider not needed in tests
+            _dispatcher,
             mockFileExplorerLogger.Object);
     }
 
@@ -153,6 +154,9 @@ public class MainWindowViewModelTests : IDisposable
     public void Dispose()
     {
         _chatViewModel.Dispose();
+        _inferenceSettingsViewModel.Dispose();
+        _conversationListViewModel.Dispose();
+        _fileExplorerViewModel.Dispose();
     }
 
     #endregion

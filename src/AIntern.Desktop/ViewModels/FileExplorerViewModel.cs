@@ -1,7 +1,6 @@
 namespace AIntern.Desktop.ViewModels;
 
 using Avalonia.Platform.Storage;
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
@@ -23,6 +22,7 @@ public partial class FileExplorerViewModel : ViewModelBase, IFileTreeItemParent,
     private readonly IFileSystemService _fileSystemService;
     private readonly ISettingsService _settingsService;
     private readonly IStorageProvider? _storageProvider;
+    private readonly IDispatcher _dispatcher;
     private readonly ILogger<FileExplorerViewModel> _logger;
     private readonly Timer _filterDebounceTimer;
 
@@ -93,12 +93,14 @@ public partial class FileExplorerViewModel : ViewModelBase, IFileTreeItemParent,
         IFileSystemService fileSystemService,
         ISettingsService settingsService,
         IStorageProvider? storageProvider,
+        IDispatcher dispatcher,
         ILogger<FileExplorerViewModel> logger)
     {
         _workspaceService = workspaceService ?? throw new ArgumentNullException(nameof(workspaceService));
         _fileSystemService = fileSystemService ?? throw new ArgumentNullException(nameof(fileSystemService));
         _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         _storageProvider = storageProvider; // Null in tests
+        _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         _logger.LogDebug("FileExplorerViewModel created");
@@ -130,7 +132,7 @@ public partial class FileExplorerViewModel : ViewModelBase, IFileTreeItemParent,
 
     private async void OnFilterDebounceElapsed(object? sender, ElapsedEventArgs e)
     {
-        await Dispatcher.UIThread.InvokeAsync(() => ApplyFilter(_pendingFilter));
+        await _dispatcher.InvokeAsync(() => ApplyFilter(_pendingFilter));
     }
 
     private void ApplyFilter(string filter)
@@ -559,7 +561,7 @@ public partial class FileExplorerViewModel : ViewModelBase, IFileTreeItemParent,
                 .ToList();
 
             // Create ViewModels
-            await Dispatcher.UIThread.InvokeAsync(() =>
+            await _dispatcher.InvokeAsync(() =>
             {
                 RootItems.Clear();
                 foreach (var item in filteredContents)
@@ -774,7 +776,7 @@ public partial class FileExplorerViewModel : ViewModelBase, IFileTreeItemParent,
 
     private async void OnWorkspaceChanged(object? sender, WorkspaceChangedEventArgs e)
     {
-        await Dispatcher.UIThread.InvokeAsync(async () =>
+        await _dispatcher.InvokeAsync(async () =>
         {
             switch (e.ChangeType)
             {

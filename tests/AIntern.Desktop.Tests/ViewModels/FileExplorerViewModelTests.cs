@@ -5,6 +5,7 @@ using AIntern.Core.Interfaces;
 using AIntern.Core.Models;
 using AIntern.Core.Events;
 using AIntern.Desktop.ViewModels;
+using AIntern.Desktop.Tests.TestHelpers;
 
 namespace AIntern.Desktop.Tests.ViewModels;
 
@@ -17,6 +18,7 @@ public class FileExplorerViewModelTests : IDisposable
     private readonly Mock<IFileSystemService> _mockFileSystemService;
     private readonly Mock<ISettingsService> _mockSettingsService;
     private readonly Mock<ILogger<FileExplorerViewModel>> _mockLogger;
+    private readonly TestDispatcher _testDispatcher;
     private FileExplorerViewModel? _viewModel;
 
     public FileExplorerViewModelTests()
@@ -25,6 +27,7 @@ public class FileExplorerViewModelTests : IDisposable
         _mockFileSystemService = new Mock<IFileSystemService>();
         _mockSettingsService = new Mock<ISettingsService>();
         _mockLogger = new Mock<ILogger<FileExplorerViewModel>>();
+        _testDispatcher = new TestDispatcher();
 
         // Setup default settings
         _mockSettingsService.Setup(s => s.CurrentSettings)
@@ -43,6 +46,7 @@ public class FileExplorerViewModelTests : IDisposable
             _mockFileSystemService.Object,
             _mockSettingsService.Object,
             null, // StorageProvider not available in tests
+            _testDispatcher,
             _mockLogger.Object);
         return _viewModel;
     }
