@@ -253,6 +253,10 @@ public static class ServiceCollectionExtensions
         // Added in v0.4.1g.
         services.AddSingleton<IClipboardService, ClipboardService>();
 
+        // Popup Host Service: manages popup dialogs for snippet operations.
+        // Added in v0.4.5e.
+        services.AddSingleton<IPopupHostService, PopupHostService>();
+
         // ┌─────────────────────────────────────────────────────────────────┐
         // │ UI INFRASTRUCTURE                                                │
         // └─────────────────────────────────────────────────────────────────┘

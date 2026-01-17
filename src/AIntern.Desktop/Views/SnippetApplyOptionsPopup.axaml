@@ -1,0 +1,278 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AIntern.Desktop.ViewModels"
+             xmlns:converters="using:AIntern.Desktop.Converters"
+             xmlns:models="using:AIntern.Core.Models"
+             x:Class="AIntern.Desktop.Views.SnippetApplyOptionsPopup"
+             x:DataType="vm:SnippetApplyOptionsViewModel"
+             MinWidth="400"
+             MaxWidth="500">
+    
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- Resources                                                           -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <UserControl.Resources>
+        <converters:EnumBoolConverter x:Key="EnumBoolConverter" />
+        <converters:ConfidenceToColorConverter x:Key="ConfidenceToColorConverter" />
+        <converters:FileSizeConverter x:Key="FileSizeConverter" />
+        <converters:BrushConverter x:Key="BrushConverter" />
+    </UserControl.Resources>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- Main Container                                                      -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <Border Classes="popup-container" 
+            Padding="16" 
+            CornerRadius="8"
+            BoxShadow="0 4 12 0 #40000000">
+        
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+            
+            <!-- Row 0: Header with file info -->
+            <StackPanel Grid.Row="0" Spacing="4" Margin="0,0,0,12">
+                <TextBlock Text="{Binding FileName}" 
+                           FontWeight="SemiBold" 
+                           FontSize="16" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{Binding FilePath}" 
+                               Classes="text-muted" 
+                               FontSize="12"
+                               TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <TextBlock FontSize="12" Classes="text-muted">
+                        <Run Text="{Binding TotalLines}" />
+                        <Run Text=" lines" />
+                    </TextBlock>
+                    <TextBlock FontSize="12" 
+                               Classes="text-muted"
+                               Text="{Binding FileSizeBytes, Converter={StaticResource FileSizeConverter}}"
+                               IsVisible="{Binding FileSizeBytes}" />
+                </StackPanel>
+            </StackPanel>
+            
+            <!-- Row 1: Suggestion Banner -->
+            <Border Grid.Row="1" 
+                    Classes="info-banner" 
+                    CornerRadius="4" 
+                    Padding="12,8" 
+                    Margin="0,0,0,12"
+                    IsVisible="{Binding HasSuggestion}">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <!-- Confidence Badge -->
+                    <Border Grid.Column="0" 
+                            Classes="badge"
+                            CornerRadius="4"
+                            Padding="6,2"
+                            Margin="0,0,8,0"
+                            Background="{Binding Suggestion.Confidence, Converter={StaticResource ConfidenceToColorConverter}}">
+                        <TextBlock Text="{Binding SuggestionConfidenceLevel}" 
+                                   FontSize="11"
+                                   Foreground="White" />
+                    </Border>
+                    
+                    <!-- Suggestion Reason -->
+                    <TextBlock Grid.Column="1" 
+                               Text="{Binding Suggestion.Reason}"
+                               VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"
+                               FontSize="13" />
+                    
+                    <!-- Use Button -->
+                    <Button Grid.Column="2" 
+                            Content="Use" 
+                            Classes="small"
+                            Padding="8,4"
+                            Command="{Binding ApplySuggestionCommand}" />
+                </Grid>
+            </Border>
+            
+            <!-- Row 2: Insert Mode Selection -->
+            <StackPanel Grid.Row="2" Spacing="8" Margin="0,0,0,12">
+                <TextBlock Text="Insert Mode" FontWeight="SemiBold" FontSize="13" />
+                
+                <!-- Direct RadioButtons for each mode to avoid complex binding issues -->
+                <RadioButton GroupName="InsertMode" Margin="0,2"
+                             IsChecked="{Binding IsReplaceFileMode}">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="Replace entire file" />
+                        <TextBlock Text="Replace all content with the snippet" Classes="text-muted" FontSize="11" />
+                    </StackPanel>
+                </RadioButton>
+                <RadioButton GroupName="InsertMode" Margin="0,2"
+                             IsChecked="{Binding IsReplaceRangeMode}">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="Replace specific lines" />
+                        <TextBlock Text="Replace a range of lines" Classes="text-muted" FontSize="11" />
+                    </StackPanel>
+                </RadioButton>
+                <RadioButton GroupName="InsertMode" Margin="0,2"
+                             IsChecked="{Binding IsInsertAfterMode}">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="Insert after line" />
+                        <TextBlock Text="Insert snippet after a specific line" Classes="text-muted" FontSize="11" />
+                    </StackPanel>
+                </RadioButton>
+                <RadioButton GroupName="InsertMode" Margin="0,2"
+                             IsChecked="{Binding IsInsertBeforeMode}">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="Insert before line" />
+                        <TextBlock Text="Insert snippet before a specific line" Classes="text-muted" FontSize="11" />
+                    </StackPanel>
+                </RadioButton>
+                <RadioButton GroupName="InsertMode" Margin="0,2"
+                             IsChecked="{Binding IsAppendMode}">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="Append to end" />
+                        <TextBlock Text="Add snippet at the end of the file" Classes="text-muted" FontSize="11" />
+                    </StackPanel>
+                </RadioButton>
+                <RadioButton GroupName="InsertMode" Margin="0,2"
+                             IsChecked="{Binding IsPrependMode}">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="Prepend to beginning" />
+                        <TextBlock Text="Add snippet at the beginning of the file" Classes="text-muted" FontSize="11" />
+                    </StackPanel>
+                </RadioButton>
+                
+                <!-- Target Line Input (InsertBefore/InsertAfter) -->
+                <StackPanel Orientation="Horizontal" 
+                            Spacing="8" 
+                            Margin="24,4,0,0"
+                            IsVisible="{Binding ShowTargetLine}">
+                    <TextBlock Text="Line:" VerticalAlignment="Center" />
+                    <NumericUpDown Value="{Binding TargetLine}" 
+                                   Minimum="1" 
+                                   Maximum="{Binding TotalLines}"
+                                   Classes="compact"
+                                   Width="100" />
+                </StackPanel>
+                
+                <!-- Line Range Inputs (Replace) -->
+                <StackPanel Orientation="Horizontal" 
+                            Spacing="8" 
+                            Margin="24,4,0,0"
+                            IsVisible="{Binding ShowRangeInputs}">
+                    <TextBlock Text="Lines:" VerticalAlignment="Center" />
+                    <NumericUpDown Value="{Binding StartLine}" 
+                                   Minimum="1" 
+                                   Maximum="{Binding TotalLines}"
+                                   Classes="compact"
+                                   Width="80" />
+                    <TextBlock Text="to" VerticalAlignment="Center" />
+                    <NumericUpDown Value="{Binding EndLine}" 
+                                   Minimum="1" 
+                                   Maximum="{Binding TotalLines}"
+                                   Classes="compact"
+                                   Width="80" />
+                </StackPanel>
+            </StackPanel>
+            
+            <!-- Row 3: Additional Options -->
+            <StackPanel Grid.Row="3" Spacing="4" Margin="0,0,0,12">
+                <TextBlock Text="Options" FontWeight="SemiBold" FontSize="13" Margin="0,0,0,4" />
+                
+                <CheckBox IsChecked="{Binding PreserveIndentation}"
+                          Content="Preserve indentation style" />
+                <TextBlock Text="{Binding IndentationDescription}"
+                           Classes="text-muted"
+                           FontSize="11"
+                           Margin="24,0,0,4" />
+                
+                <CheckBox IsChecked="{Binding AddBlankLineBefore}"
+                          Content="Add blank line before" />
+                
+                <CheckBox IsChecked="{Binding AddBlankLineAfter}"
+                          Content="Add blank line after" />
+            </StackPanel>
+            
+            <!-- Row 4: Preview Section -->
+            <Border Grid.Row="4" 
+                    Classes="preview-container"
+                    CornerRadius="4"
+                    Padding="12"
+                    Margin="0,0,0,12"
+                    IsVisible="{Binding HasPreview}">
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Preview" FontWeight="SemiBold" FontSize="13" />
+                    
+                    <!-- Line Stats -->
+                    <StackPanel Orientation="Horizontal" Spacing="16">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBlock Text="+" Foreground="#22C55E" FontWeight="Bold" />
+                            <TextBlock Text="{Binding Preview.LinesAdded}" />
+                            <TextBlock Text="lines" Classes="text-muted" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBlock Text="-" Foreground="#EF4444" FontWeight="Bold" />
+                            <TextBlock Text="{Binding Preview.LinesRemoved}" />
+                            <TextBlock Text="lines" Classes="text-muted" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <TextBlock Text="Net:" Classes="text-muted" />
+                            <TextBlock Text="{Binding Preview.NetLineChange}" />
+                        </StackPanel>
+                    </StackPanel>
+                    
+                    <!-- Affected Range -->
+                    <TextBlock FontSize="12" Classes="text-muted">
+                        <Run Text="Affects lines " />
+                        <Run Text="{Binding Preview.AffectedRange.StartLine}" />
+                        <Run Text="-" />
+                        <Run Text="{Binding Preview.AffectedRange.EndLine}" />
+                    </TextBlock>
+                    
+                    <!-- Warnings -->
+                    <ItemsControl ItemsSource="{Binding Preview.Warnings}"
+                                  IsVisible="{Binding Preview.Warnings.Count}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}"
+                                           Foreground="#F59E0B"
+                                           FontSize="12"
+                                           TextWrapping="Wrap" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+            
+            <!-- Loading Indicator -->
+            <StackPanel Grid.Row="4"
+                        Orientation="Horizontal"
+                        Spacing="8"
+                        HorizontalAlignment="Center"
+                        IsVisible="{Binding IsPreviewLoading}">
+                <TextBlock Text="⟳" FontSize="16" Foreground="{DynamicResource AccentBrush}" />
+                <TextBlock Text="Computing preview..." 
+                           Classes="text-muted" 
+                           FontSize="12" />
+            </StackPanel>
+            
+            <!-- Error Message -->
+            <TextBlock Grid.Row="4"
+                       Text="{Binding ErrorMessage}"
+                       Foreground="#EF4444"
+                       FontSize="12"
+                       TextWrapping="Wrap"
+                       Margin="0,0,0,12"
+                       IsVisible="{Binding HasError}" />
+            
+            <!-- Row 5: Action Buttons -->
+            <StackPanel Grid.Row="5" 
+                        Orientation="Horizontal" 
+                        Spacing="8"
+                        HorizontalAlignment="Right">
+                <Button Content="Cancel" 
+                        Command="{Binding CancelCommand}" />
+                <Button Content="Preview Diff" 
+                        Command="{Binding ShowDiffPreviewCommand}"
+                        IsVisible="{Binding HasPreview}" />
+                <Button Content="Apply" 
+                        Classes="accent"
+                        Command="{Binding ApplyCommand}" />
+            </StackPanel>
+            
+        </Grid>
+    </Border>
+</UserControl>

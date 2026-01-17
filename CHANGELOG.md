@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.4.5e] - 2026-01-16
+
+Snippet Options UI. See [detailed notes](docs/changelog/v0.4.5e.md).
+
+### Added
+
+- `SnippetApplyOptionsViewModel` with 6 insert modes and two-way binding properties
+- `InsertModeDescriptor` record for insert mode metadata
+- `SnippetApplyOptionsPopup` view and code-behind with RadioButton selection
+- `SnippetOptionsPopup.axaml` popup styles
+- `IPopupHostService` interface and `PopupHostService` for popup management
+- `ConfidenceToColorConverter` for confidence-to-brush mapping
+- `FileSizeConverter` for human-readable file size display
+- `BrushConverter` for dynamic resource lookup
+- 42 new unit tests
+
 ## [0.4.5d] - 2026-01-16
 
 Snippet Apply Service. See [detailed notes](docs/changelog/v0.4.5d.md).

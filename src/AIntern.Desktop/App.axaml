@@ -9,6 +9,9 @@
         <!-- v0.4.2h: Diff Viewer Styles -->
         <StyleInclude Source="avares://AIntern.Desktop/Themes/DiffStyles.axaml" />
         
+        <!-- v0.4.5e: Snippet Options Popup Styles -->
+        <StyleInclude Source="avares://AIntern.Desktop/Styles/SnippetOptionsPopup.axaml" />
+        
         <!-- Editor Tab Bar Styles (v0.3.3e) -->
         <Style Selector="Button.editor-tab">
             <Setter Property="Background" Value="Transparent" />

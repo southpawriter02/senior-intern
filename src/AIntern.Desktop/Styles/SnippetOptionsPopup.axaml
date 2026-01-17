@@ -1,0 +1,77 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- Snippet Options Popup Styles (v0.4.5e)                              -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    
+    <!-- Popup Container -->
+    <Style Selector="Border.popup-container">
+        <Setter Property="Background" Value="{DynamicResource PopupBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource PopupBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <!-- Info Banner (Suggestion) -->
+    <Style Selector="Border.info-banner">
+        <Setter Property="Background" Value="{DynamicResource InfoBannerBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InfoBannerBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <!-- Preview Container -->
+    <Style Selector="Border.preview-container">
+        <Setter Property="Background" Value="{DynamicResource PreviewBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource PreviewBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <!-- Badge -->
+    <Style Selector="Border.badge">
+        <Setter Property="Background" Value="{DynamicResource BadgeBackground}" />
+    </Style>
+
+    <!-- Compact NumericUpDown -->
+    <Style Selector="NumericUpDown.compact">
+        <Setter Property="MinWidth" Value="80" />
+        <Setter Property="Height" Value="28" />
+    </Style>
+
+    <!-- Small Button -->
+    <Style Selector="Button.small">
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="FontSize" Value="12" />
+    </Style>
+
+    <!-- Icon Button -->
+    <Style Selector="Button.icon-button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="4" />
+    </Style>
+
+    <Style Selector="Button.icon-button:pointerover">
+        <Setter Property="Background" Value="{DynamicResource ButtonHoverBackground}" />
+    </Style>
+
+    <!-- Accent Button -->
+    <Style Selector="Button.accent">
+        <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource AccentForeground}" />
+    </Style>
+
+    <Style Selector="Button.accent:pointerover">
+        <Setter Property="Background" Value="{DynamicResource AccentHoverBrush}" />
+    </Style>
+
+    <Style Selector="Button.accent:disabled">
+        <Setter Property="Background" Value="{DynamicResource AccentDisabledBrush}" />
+        <Setter Property="Opacity" Value="0.5" />
+    </Style>
+
+    <!-- Muted Text -->
+    <Style Selector="TextBlock.text-muted">
+        <Setter Property="Foreground" Value="{DynamicResource TextMuted}" />
+    </Style>
+
+</Styles>
