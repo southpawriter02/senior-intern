@@ -156,6 +156,26 @@ public static class TerminalServiceExtensions
         //
         services.AddSingleton<ICommandExecutionService, CommandExecutionService>();
 
+        // ─────────────────────────────────────────────────────────────────────
+        // OUTPUT CAPTURE SERVICE (v0.5.4d)
+        // ─────────────────────────────────────────────────────────────────────
+        //
+        // Captures terminal output for AI context with processing.
+        // Features:
+        //   • Stream capture during command execution
+        //   • On-demand buffer capture (full, last N lines, selection)
+        //   • ANSI escape sequence stripping
+        //   • Line ending normalization
+        //   • Intelligent truncation (KeepStart, KeepEnd, KeepBoth)
+        //   • Per-session capture history with automatic pruning
+        //
+        // Registered as singleton because:
+        //   1. Subscribes to terminal output events at startup
+        //   2. Maintains capture history across requests
+        //   3. Must be same instance that started capture to stop it
+        //
+        services.AddSingleton<IOutputCaptureService, OutputCaptureService>();
+
         return services;
     }
 }
