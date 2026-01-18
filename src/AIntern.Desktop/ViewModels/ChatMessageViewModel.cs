@@ -3,8 +3,10 @@ using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.Logging;
 using AIntern.Core.Interfaces;
 using AIntern.Core.Models;
+using AIntern.Core.Models.Terminal;
 using AIntern.Desktop.Messages;
 
 namespace AIntern.Desktop.ViewModels;
@@ -20,6 +22,9 @@ namespace AIntern.Desktop.ViewModels;
 /// </para>
 /// <para>
 /// <b>v0.4.1g:</b> Added code block support with streaming integration.
+/// </para>
+/// <para>
+/// <b>v0.5.4h:</b> Added command block support for terminal command extraction.
 /// </para>
 /// </remarks>
 public partial class ChatMessageViewModel : ViewModelBase
@@ -165,6 +170,93 @@ public partial class ChatMessageViewModel : ViewModelBase
     /// </remarks>
     [ObservableProperty]
     private CodeBlockViewModel? _currentStreamingBlock;
+
+    // ┌─────────────────────────────────────────────────────────────────────────┐
+    // │ COMMAND BLOCK PROPERTIES (v0.5.4h)                                       │
+    // └─────────────────────────────────────────────────────────────────────────┘
+
+    /// <summary>
+    /// Collection of terminal commands extracted from this message.
+    /// </summary>
+    /// <remarks>
+    /// <para>Added in v0.5.4h.</para>
+    /// <para>
+    /// Commands are automatically extracted when Content changes
+    /// for assistant messages using the command extractor service.
+    /// </para>
+    /// </remarks>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowCommandActions))]
+    private ObservableCollection<CommandBlockViewModel> _commandBlocks = new();
+
+    /// <summary>
+    /// Whether this message contains executable commands.
+    /// </summary>
+    /// <remarks>
+    /// <para>Added in v0.5.4h.</para>
+    /// </remarks>
+    public bool HasCommands => CommandBlocks.Count > 0;
+
+    /// <summary>
+    /// Number of commands in the message.
+    /// </summary>
+    /// <remarks>
+    /// <para>Added in v0.5.4h.</para>
+    /// </remarks>
+    public int CommandCount => CommandBlocks.Count;
+
+    /// <summary>
+    /// Number of dangerous commands that require confirmation.
+    /// </summary>
+    /// <remarks>
+    /// <para>Added in v0.5.4h.</para>
+    /// </remarks>
+    public int DangerousCommandCount => CommandBlocks.Count(c => c.IsDangerous);
+
+    /// <summary>
+    /// Whether there are any dangerous commands.
+    /// </summary>
+    /// <remarks>
+    /// <para>Added in v0.5.4h.</para>
+    /// </remarks>
+    public bool HasDangerousCommands => DangerousCommandCount > 0;
+
+    /// <summary>
+    /// Summary text for bulk actions.
+    /// </summary>
+    /// <remarks>
+    /// <para>Added in v0.5.4h.</para>
+    /// </remarks>
+    public string CommandSummary => CommandCount switch
+    {
+        0 => "",
+        1 => "1 command",
+        _ => $"{CommandCount} commands"
+    };
+
+    /// <summary>
+    /// Dangerous commands warning text.
+    /// </summary>
+    /// <remarks>
+    /// <para>Added in v0.5.4h.</para>
+    /// </remarks>
+    public string DangerWarning => DangerousCommandCount switch
+    {
+        0 => "",
+        1 => "⚠️ 1 dangerous command",
+        _ => $"⚠️ {DangerousCommandCount} dangerous commands"
+    };
+
+    /// <summary>
+    /// Whether to show the command actions toolbar.
+    /// </summary>
+    /// <remarks>
+    /// <para>Added in v0.5.4h.</para>
+    /// </remarks>
+    public bool ShowCommandActions =>
+        HasCommands
+        && Role == MessageRole.Assistant
+        && !IsStreaming;
 
     // ┌─────────────────────────────────────────────────────────────────────────┐
     // │ COMPUTED PROPERTIES                                                      │
@@ -586,6 +678,124 @@ public partial class ChatMessageViewModel : ViewModelBase
             block.Reject();
         }
         UpdateCodeBlockStats();
+    }
+
+    // ┌─────────────────────────────────────────────────────────────────────────┐
+    // │ COMMAND BLOCK METHODS (v0.5.4h)                                          │
+    // └─────────────────────────────────────────────────────────────────────────┘
+
+    /// <summary>
+    /// Set the extracted command blocks for this message.
+    /// </summary>
+    /// <param name="commandViewModels">The command block ViewModels to set.</param>
+    /// <remarks>
+    /// <para>Added in v0.5.4h.</para>
+    /// <para>
+    /// Called by ChatViewModel after extracting commands from the message content.
+    /// </para>
+    /// </remarks>
+    public void SetCommandBlocks(IEnumerable<CommandBlockViewModel> commandViewModels)
+    {
+        // Dispose existing commands
+        foreach (var cmd in CommandBlocks)
+        {
+            cmd.Dispose();
+        }
+        CommandBlocks.Clear();
+
+        // Add new commands
+        foreach (var vm in commandViewModels)
+        {
+            CommandBlocks.Add(vm);
+        }
+
+        NotifyCommandProperties();
+    }
+
+    /// <summary>
+    /// Notify all command-related property changes.
+    /// </summary>
+    private void NotifyCommandProperties()
+    {
+        OnPropertyChanged(nameof(HasCommands));
+        OnPropertyChanged(nameof(CommandCount));
+        OnPropertyChanged(nameof(DangerousCommandCount));
+        OnPropertyChanged(nameof(HasDangerousCommands));
+        OnPropertyChanged(nameof(CommandSummary));
+        OnPropertyChanged(nameof(DangerWarning));
+        OnPropertyChanged(nameof(ShowCommandActions));
+    }
+
+    /// <summary>
+    /// Execute all commands in sequence, stopping on first failure.
+    /// </summary>
+    /// <remarks>
+    /// <para>Added in v0.5.4h.</para>
+    /// <para>
+    /// Dangerous commands that have not been confirmed are skipped.
+    /// Execution stops at the first command that fails.
+    /// </para>
+    /// </remarks>
+    [RelayCommand]
+    private async Task ExecuteAllCommandsAsync()
+    {
+        if (!HasCommands)
+            return;
+
+        foreach (var block in CommandBlocks)
+        {
+            // Skip if dangerous and not confirmed
+            if (block.IsDangerous && !block.DangerConfirmed)
+                continue;
+
+            // Skip if not executable
+            if (!block.CanExecute)
+                continue;
+
+            await block.ExecuteCommand.ExecuteAsync(null);
+
+            // Stop if one fails
+            if (block.Status == CommandBlockStatus.Failed)
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Copy all commands to clipboard as a script.
+    /// </summary>
+    /// <remarks>
+    /// <para>Added in v0.5.4h.</para>
+    /// <para>
+    /// Commands are joined with newlines to form an executable script.
+    /// </para>
+    /// </remarks>
+    [RelayCommand]
+    private void CopyAllCommands()
+    {
+        if (!HasCommands)
+            return;
+
+        var allCommands = string.Join("\n", CommandBlocks.Select(b => b.CommandText));
+        WeakReferenceMessenger.Default.Send(
+            new CopyToClipboardRequestMessage(allCommands)
+            {
+                SourceDescription = $"All commands ({CommandBlocks.Count})"
+            });
+    }
+
+    /// <summary>
+    /// Dispose all command blocks when the message is no longer needed.
+    /// </summary>
+    /// <remarks>
+    /// <para>Added in v0.5.4h.</para>
+    /// </remarks>
+    public void DisposeCommands()
+    {
+        foreach (var block in CommandBlocks)
+        {
+            block.Dispose();
+        }
+        CommandBlocks.Clear();
     }
 }
 

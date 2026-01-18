@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.5.4h] - 2026-01-18
+
+Chat Integration. Command block integration into chat messages with bulk operations.
+
+### Changed
+
+- Extended `ChatMessageViewModel` with CommandBlocks collection, bulk ExecuteAll/CopyAll commands, computed properties (HasCommands, DangerousCommandCount, ShowCommandActions)
+
+### Added
+
+- 3 icons: CommandIcon, SelectionIcon, ChevronDownIcon
+- 18 unit tests for command block integration
+
+
 ## [0.5.4g] - 2026-01-18
 
 Terminal Context Attachment. ViewModels for attaching terminal output to AI chat context.
