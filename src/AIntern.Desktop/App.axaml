@@ -240,6 +240,19 @@
             <Setter Property="Padding" Value="12,8" />
             <Setter Property="Margin" Value="0,8,0,0" />
         </Style>
+
+        <!-- ================================================================ -->
+        <!-- Terminal Tab Styles (v0.5.2a)                                     -->
+        <!-- ================================================================ -->
+
+        <!-- Make close button visible on tab hover -->
+        <Style Selector="Button.terminal-tab:pointerover Button.tab-close">
+            <Setter Property="Opacity" Value="0.6" />
+        </Style>
+
+        <Style Selector="Button.terminal-tab.active Button.tab-close">
+            <Setter Property="Opacity" Value="0.6" />
+        </Style>
     </Application.Styles>
 
     <Application.Resources>
@@ -251,6 +264,8 @@
                 <ResourceInclude Source="avares://AIntern.Desktop/Controls/ParameterSlider.axaml" />
                 <!-- v0.3.2g: File explorer icons -->
                 <ResourceInclude Source="avares://AIntern.Desktop/Assets/FileIcons.axaml" />
+                <!-- v0.5.2a: Terminal Icons -->
+                <ResourceInclude Source="avares://AIntern.Desktop/Resources/IconPaths.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

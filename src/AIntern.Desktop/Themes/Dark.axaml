@@ -435,4 +435,103 @@
     <SolidColorBrush x:Key="DiffHunkHeaderForeground" Color="#808080" />
     <SolidColorBrush x:Key="DiffGutterForeground" Color="#6E6E6E" />
 
+    <!-- ============================================================== -->
+    <!-- Terminal Panel Colors (v0.5.2a)                                -->
+    <!-- ============================================================== -->
+    <SolidColorBrush x:Key="TerminalBackground" Color="#1E1E1E" />
+    <SolidColorBrush x:Key="TerminalForeground" Color="#CCCCCC" />
+    <SolidColorBrush x:Key="TerminalTabBarBackground" Color="#252526" />
+    <SolidColorBrush x:Key="TerminalTabBackground" Color="Transparent" />
+    <SolidColorBrush x:Key="TerminalTabActiveBackground" Color="#1E1E1E" />
+    <SolidColorBrush x:Key="TerminalTabHoverBackground" Color="#2D2D30" />
+    <SolidColorBrush x:Key="TerminalTabBorder" Color="#3C3C3C" />
+    <SolidColorBrush x:Key="TerminalScrollBarThumb" Color="#424242" />
+    <SolidColorBrush x:Key="TerminalScrollBarThumbHover" Color="#4F4F4F" />
+
+    <!-- Terminal Tab ControlTheme -->
+    <ControlTheme x:Key="TerminalTab" TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource TerminalTabBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="BorderThickness" Value="1,0,1,0" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="MinWidth" Value="100" />
+        <Setter Property="MaxWidth" Value="200" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+
+        <Style Selector="^:pointerover">
+            <Setter Property="Background" Value="{DynamicResource TerminalTabHoverBackground}" />
+        </Style>
+
+        <Style Selector="^.active">
+            <Setter Property="Background" Value="{DynamicResource TerminalTabActiveBackground}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource TerminalTabBorder}" />
+        </Style>
+    </ControlTheme>
+
+    <!-- Terminal Tab Close Button ControlTheme -->
+    <ControlTheme x:Key="TerminalTabCloseButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource TextMuted}" />
+        <Setter Property="Padding" Value="4" />
+        <Setter Property="CornerRadius" Value="2" />
+        <Setter Property="Width" Value="20" />
+        <Setter Property="Height" Value="20" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Opacity" Value="0" />
+
+        <Style Selector="^:pointerover">
+            <Setter Property="Background" Value="{DynamicResource ControlBackground}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+            <Setter Property="Opacity" Value="1" />
+        </Style>
+    </ControlTheme>
+
+    <!-- Terminal New Tab Button ControlTheme -->
+    <ControlTheme x:Key="TerminalNewTabButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource TextMuted}" />
+        <Setter Property="Padding" Value="8,6" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+
+        <Style Selector="^:pointerover">
+            <Setter Property="Background" Value="{DynamicResource TerminalTabHoverBackground}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        </Style>
+    </ControlTheme>
+
+    <!-- Terminal Icon Button ControlTheme -->
+    <ControlTheme x:Key="TerminalIconButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource TextMuted}" />
+        <Setter Property="Padding" Value="6" />
+        <Setter Property="CornerRadius" Value="4" />
+        <Setter Property="Width" Value="28" />
+        <Setter Property="Height" Value="28" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+
+        <Style Selector="^:pointerover">
+            <Setter Property="Background" Value="{DynamicResource ControlBackground}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        </Style>
+    </ControlTheme>
+
+    <!-- Terminal ScrollBar ControlTheme -->
+    <ControlTheme x:Key="TerminalScrollBar" TargetType="ScrollBar">
+        <Setter Property="Width" Value="10" />
+        <Setter Property="Background" Value="Transparent" />
+
+        <Style Selector="^ /template/ Thumb">
+            <Setter Property="Background" Value="{DynamicResource TerminalScrollBarThumb}" />
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="MinHeight" Value="30" />
+        </Style>
+
+        <Style Selector="^ /template/ Thumb:pointerover">
+            <Setter Property="Background" Value="{DynamicResource TerminalScrollBarThumbHover}" />
+        </Style>
+    </ControlTheme>
+
 </ResourceDictionary>

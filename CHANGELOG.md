@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.5.2a] - 2026-01-17
+
+Theme & Styles. Terminal theme model with 256-color palette, icons, and control themes.
+
+### Added
+
+- `TerminalTheme` model with 256-color palette (ANSI 16 + 6×6×6 color cube + grayscale)
+- `CursorStyle` enum (Block, Underline, Bar)
+- `TerminalThemeColor` enum for semantic color references
+- Built-in theme presets: Dark, Light, Solarized Dark
+- Terminal color brushes and control themes in `Dark.axaml`
+- `IconPaths.axaml` with terminal icons (Terminal, Plus, Close, Maximize, etc.)
+- 47 unit tests for theme and palette functionality
+
 ## [0.5.1f] - 2026-01-17
 
 Integration & Testing. DI registration and comprehensive test verification for terminal subsystem.
