@@ -562,4 +562,24 @@
     <!-- Hover brush for buttons -->
     <SolidColorBrush x:Key="HoverBrush" Color="#3E3E3E" />
 
+    <!-- ============================================================== -->
+    <!-- Terminal Search Bar Colors (v0.5.5c)                           -->
+    <!-- ============================================================== -->
+
+    <!-- Search Bar Container -->
+    <Color x:Key="SearchBarBackgroundColor">#1E1E2E</Color>
+    <Color x:Key="SearchBarBorderColor">#313244</Color>
+
+    <!-- Search Highlight Colors -->
+    <Color x:Key="SearchMatchBackgroundColor">#FFFF00</Color>
+    <Color x:Key="SearchCurrentMatchBackgroundColor">#FF8C00</Color>
+    <Color x:Key="SearchCurrentMatchBorderColor">#FF4500</Color>
+
+    <!-- Search Bar Brushes -->
+    <SolidColorBrush x:Key="SearchBarBackground" Color="{DynamicResource SearchBarBackgroundColor}" />
+    <SolidColorBrush x:Key="SearchBarBorder" Color="{DynamicResource SearchBarBorderColor}" />
+    <SolidColorBrush x:Key="SearchMatchBackground" Color="{DynamicResource SearchMatchBackgroundColor}" />
+    <SolidColorBrush x:Key="SearchCurrentMatchBackground" Color="{DynamicResource SearchCurrentMatchBackgroundColor}" />
+    <SolidColorBrush x:Key="SearchCurrentMatchBorder" Color="{DynamicResource SearchCurrentMatchBorderColor}" />
+
 </ResourceDictionary>

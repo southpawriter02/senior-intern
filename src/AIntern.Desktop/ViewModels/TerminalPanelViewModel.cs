@@ -83,6 +83,16 @@ public partial class TerminalPanelViewModel : ViewModelBase
     /// </summary>
     private readonly ILogger<TerminalPanelViewModel>? _logger;
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // Search Fields (v0.5.5c)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// ViewModel for the terminal search bar.
+    /// </summary>
+    /// <remarks>Added in v0.5.5c.</remarks>
+    private TerminalSearchBarViewModel? _searchBarViewModel;
+
     #endregion
 
     #region Collections
@@ -195,6 +205,22 @@ public partial class TerminalPanelViewModel : ViewModelBase
 
     #endregion
 
+    #region Observable Properties - Search (v0.5.5c)
+
+    /// <summary>
+    /// Gets the search bar ViewModel.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Initialized lazily when the search service is available.
+    /// The search bar is shared across all terminal sessions.
+    /// </para>
+    /// <para>Added in v0.5.5c.</para>
+    /// </remarks>
+    public TerminalSearchBarViewModel? SearchBarViewModel => _searchBarViewModel;
+
+    #endregion
+
     #region Events
 
     /// <summary>
@@ -214,11 +240,13 @@ public partial class TerminalPanelViewModel : ViewModelBase
     /// Creates a new <see cref="TerminalPanelViewModel"/>.
     /// </summary>
     /// <param name="terminalService">The terminal service for session management.</param>
+    /// <param name="searchService">Optional terminal search service for search functionality (v0.5.5c).</param>
     /// <param name="workspaceService">Optional workspace service for initial directory.</param>
     /// <param name="logger">Optional logger for diagnostic output.</param>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="terminalService"/> is null.</exception>
     public TerminalPanelViewModel(
         ITerminalService terminalService,
+        ITerminalSearchService? searchService = null,
         IWorkspaceService? workspaceService = null,
         ILogger<TerminalPanelViewModel>? logger = null)
     {
@@ -231,6 +259,15 @@ public partial class TerminalPanelViewModel : ViewModelBase
         _terminalService.SessionClosed += OnSessionClosed;
         _terminalService.SessionStateChanged += OnSessionStateChanged;
         _terminalService.TitleChanged += OnTitleChanged;
+
+        // ─────────────────────────────────────────────────────────────────
+        // Initialize Search ViewModel (v0.5.5c)
+        // ─────────────────────────────────────────────────────────────────
+        if (searchService != null)
+        {
+            _searchBarViewModel = new TerminalSearchBarViewModel(searchService);
+            _logger?.LogDebug("[TerminalPanelViewModel] SearchBarViewModel initialized");
+        }
 
         _logger?.LogDebug("[TerminalPanelViewModel] Instance created and subscribed to service events");
     }
@@ -496,6 +533,43 @@ public partial class TerminalPanelViewModel : ViewModelBase
                 "[TerminalPanelViewModel] Failed to clear terminal {SessionId}",
                 ActiveSession.Id);
         }
+    }
+
+    #endregion
+
+    #region Commands - Search (v0.5.5c)
+
+    /// <summary>
+    /// Opens the terminal search bar.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Bound to Ctrl+F in the terminal panel.
+    /// The search bar is positioned as a floating overlay.
+    /// </para>
+    /// <para>Added in v0.5.5c.</para>
+    /// </remarks>
+    [RelayCommand]
+    private void OpenSearch()
+    {
+        if (_searchBarViewModel == null)
+        {
+            _logger?.LogDebug("[TerminalPanelViewModel] SearchBarViewModel not initialized");
+            return;
+        }
+
+        // Update the search buffer to the current session's buffer
+        if (ActiveSession != null)
+        {
+            var buffer = _terminalService.GetBuffer(ActiveSession.Id);
+            if (buffer != null)
+            {
+                _searchBarViewModel.SetBuffer(buffer);
+            }
+        }
+
+        _searchBarViewModel.OpenSearch();
+        _logger?.LogDebug("[TerminalPanelViewModel] Opened search bar");
     }
 
     #endregion

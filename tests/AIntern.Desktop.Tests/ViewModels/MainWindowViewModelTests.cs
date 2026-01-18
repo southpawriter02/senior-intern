@@ -129,11 +129,13 @@ public class MainWindowViewModelTests : IDisposable
             _dispatcher,
             mockFileExplorerLogger.Object);
 
-        // TerminalPanelViewModel (v0.5.2f)
+        // TerminalPanelViewModel (v0.5.2f, updated in v0.5.5c with search service)
         var mockTerminalService = new Mock<ITerminalService>();
+        var mockTerminalSearchService = new Mock<ITerminalSearchService>();
         var mockTerminalPanelLogger = new Mock<ILogger<TerminalPanelViewModel>>();
         _terminalPanelViewModel = new TerminalPanelViewModel(
             mockTerminalService.Object,
+            mockTerminalSearchService.Object,
             _mockWorkspaceService.Object,
             mockTerminalPanelLogger.Object);
     }

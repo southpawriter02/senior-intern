@@ -77,6 +77,22 @@ public class TerminalRenderer : Control
     /// </summary>
     private readonly ILogger? _logger;
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // Search Highlighting Fields (v0.5.5c)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Current search state for highlighting results.
+    /// </summary>
+    /// <remarks>Added in v0.5.5c for terminal search UI.</remarks>
+    private TerminalSearchState? _searchState;
+
+    /// <summary>
+    /// Visual style for search result highlighting.
+    /// </summary>
+    /// <remarks>Added in v0.5.5c for terminal search UI.</remarks>
+    private SearchHighlightStyle _highlightStyle = SearchHighlightStyle.Default;
+
     #endregion
 
     #region Styled Properties
@@ -343,6 +359,96 @@ public class TerminalRenderer : Control
         InvalidateVisual();
     }
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // Search Highlighting Methods (v0.5.5c)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Sets the current search state for highlighting results.
+    /// </summary>
+    /// <param name="state">The search state containing results to highlight, or null to clear.</param>
+    /// <remarks>
+    /// <para>
+    /// When a search state is set, all matching results are highlighted
+    /// with the configured <see cref="SearchHighlightStyle"/>. The current
+    /// result is rendered with a distinct style (typically a border).
+    /// </para>
+    /// <para>Added in v0.5.5c.</para>
+    /// </remarks>
+    public void SetSearchState(TerminalSearchState? state)
+    {
+        _searchState = state;
+        _logger?.LogDebug(
+            "[TerminalRenderer] Search state changed: {HasResults} results, Current={Index}",
+            state?.Results.Count ?? 0,
+            state?.CurrentResultIndex ?? -1);
+        InvalidateVisual();
+    }
+
+    /// <summary>
+    /// Sets the highlight style for search results.
+    /// </summary>
+    /// <param name="style">The style to use for highlighting.</param>
+    /// <remarks>Added in v0.5.5c.</remarks>
+    public void SetHighlightStyle(SearchHighlightStyle style)
+    {
+        ArgumentNullException.ThrowIfNull(style);
+        _highlightStyle = style;
+        _logger?.LogDebug("[TerminalRenderer] Highlight style set");
+        InvalidateVisual();
+    }
+
+    /// <summary>
+    /// Scrolls the terminal viewport to ensure the given search result is visible.
+    /// </summary>
+    /// <param name="result">The search result to scroll to.</param>
+    /// <remarks>
+    /// <para>
+    /// If the result is already visible within the current viewport, no scroll
+    /// occurs. Otherwise, the viewport is scrolled to center the result line.
+    /// </para>
+    /// <para>Added in v0.5.5c.</para>
+    /// </remarks>
+    public void ScrollToResult(TerminalSearchResult result)
+    {
+        if (result == null || _buffer == null)
+            return;
+
+        // Calculate current viewport bounds
+        var viewportStart = _buffer.TotalLines - _buffer.Rows - _buffer.ScrollOffset;
+        var viewportEnd = viewportStart + _buffer.Rows;
+
+        // Check if already visible
+        if (result.LineIndex >= viewportStart && result.LineIndex < viewportEnd)
+        {
+            // Already visible, just redraw to update highlight
+            _logger?.LogDebug(
+                "[TerminalRenderer] Result at line {Line} already visible",
+                result.LineIndex);
+            InvalidateVisual();
+            return;
+        }
+
+        // Calculate scroll offset to center the result
+        var targetLine = result.LineIndex - (_buffer.Rows / 2);
+        var maxScroll = Math.Max(0, _buffer.TotalLines - _buffer.Rows);
+        var newOffset = Math.Max(0, Math.Min(maxScroll - targetLine, maxScroll));
+
+        _logger?.LogDebug(
+            "[TerminalRenderer] Scrolling to result: Line={Line}, NewOffset={Offset}",
+            result.LineIndex,
+            newOffset);
+
+        _buffer.ScrollOffset = newOffset;
+        InvalidateVisual();
+    }
+
+    /// <summary>
+    /// Gets the current search state.
+    /// </summary>
+    /// <remarks>Added in v0.5.5c.</remarks>
+    public TerminalSearchState? SearchState => _searchState;
+
     #endregion
 
     #region Rendering
@@ -373,7 +479,9 @@ public class TerminalRenderer : Control
             metrics: _fontMetrics,
             selection: _selection,
             showCursor: _cursorVisible && _buffer.CursorVisible,
-            isFocused: HasTerminalFocus);
+            isFocused: HasTerminalFocus,
+            searchState: _searchState,
+            highlightStyle: _highlightStyle);
 
         context.Custom(renderOperation);
     }
@@ -451,6 +559,22 @@ public class TerminalRenderer : Control
         /// </summary>
         private readonly bool _isFocused;
 
+        // ─────────────────────────────────────────────────────────────────────
+        // Search Highlighting Fields (v0.5.5c)
+        // ─────────────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Search state for result highlighting (null if no search).
+        /// </summary>
+        /// <remarks>Added in v0.5.5c.</remarks>
+        private readonly TerminalSearchState? _searchState;
+
+        /// <summary>
+        /// Visual style for search highlights.
+        /// </summary>
+        /// <remarks>Added in v0.5.5c.</remarks>
+        private readonly SearchHighlightStyle _highlightStyle;
+
         #endregion
 
         #region Constructor
@@ -465,7 +589,9 @@ public class TerminalRenderer : Control
             TerminalFontMetrics metrics,
             TerminalSelection? selection,
             bool showCursor,
-            bool isFocused)
+            bool isFocused,
+            TerminalSearchState? searchState,
+            SearchHighlightStyle highlightStyle)
         {
             _bounds = bounds;
             _buffer = buffer;
@@ -474,6 +600,8 @@ public class TerminalRenderer : Control
             _selection = selection;
             _showCursor = showCursor;
             _isFocused = isFocused;
+            _searchState = searchState;
+            _highlightStyle = highlightStyle;
         }
 
         #endregion
@@ -573,7 +701,12 @@ public class TerminalRenderer : Control
             }
 
             // ─────────────────────────────────────────────────────────────
-            // Step 4: Draw cursor if visible and not scrolled back
+            // Step 4: Draw search result highlights (v0.5.5c)
+            // ─────────────────────────────────────────────────────────────
+            RenderSearchHighlights(canvas, charWidth, lineHeight);
+
+            // ─────────────────────────────────────────────────────────────
+            // Step 5: Draw cursor if visible and not scrolled back
             // ─────────────────────────────────────────────────────────────
             if (_showCursor && _buffer.ScrollOffset == 0)
             {
@@ -771,6 +904,106 @@ public class TerminalRenderer : Control
                 cursorX,
                 cursorY + baseline,
                 textPaint);
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // Search Highlight Rendering (v0.5.5c)
+        // ─────────────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Renders search result highlights on the canvas.
+        /// </summary>
+        /// <param name="canvas">The SkiaSharp canvas.</param>
+        /// <param name="charWidth">Width of a single character cell.</param>
+        /// <param name="lineHeight">Height of a single line.</param>
+        /// <remarks>
+        /// <para>
+        /// Draws overlays for all visible search results. Regular matches
+        /// are rendered with semi-transparent yellow, while the current
+        /// match uses an opaque orange with a border.
+        /// </para>
+        /// <para>Added in v0.5.5c.</para>
+        /// </remarks>
+        private void RenderSearchHighlights(SKCanvas canvas, float charWidth, float lineHeight)
+        {
+            // Skip if no search state or no results
+            if (_searchState == null || !_searchState.HasResults)
+                return;
+
+            // Calculate viewport bounds (absolute line indices)
+            var viewportStart = _buffer.TotalLines - _buffer.Rows - _buffer.ScrollOffset;
+            var viewportEnd = viewportStart + _buffer.Rows;
+
+            // Create paints for regular and current match highlights
+            using var matchPaint = new SKPaint
+            {
+                Color = ParseHighlightColor(_highlightStyle.MatchBackground, (float)_highlightStyle.MatchOpacity),
+                Style = SKPaintStyle.Fill,
+                IsAntialias = true
+            };
+
+            using var currentMatchPaint = new SKPaint
+            {
+                Color = ParseHighlightColor(_highlightStyle.CurrentMatchBackground, 1.0f),
+                Style = SKPaintStyle.Fill,
+                IsAntialias = true
+            };
+
+            using var currentMatchBorderPaint = new SKPaint
+            {
+                Color = ParseHighlightColor(_highlightStyle.CurrentMatchBorder, 1.0f),
+                Style = SKPaintStyle.Stroke,
+                StrokeWidth = _highlightStyle.CurrentMatchBorderThickness,
+                IsAntialias = true
+            };
+
+            // Get current result for comparison
+            var currentResult = _searchState.CurrentResult;
+
+            // Iterate all results (only draw visible ones)
+            foreach (var result in _searchState.Results)
+            {
+                // Skip results outside visible viewport
+                if (result.LineIndex < viewportStart || result.LineIndex >= viewportEnd)
+                    continue;
+
+                // Calculate screen position
+                var screenLine = result.LineIndex - viewportStart;
+                var y = screenLine * lineHeight;
+                var x = result.StartColumn * charWidth;
+                var width = result.Length * charWidth;
+
+                var rect = new SKRect(x, y, x + width, y + lineHeight);
+
+                // Check if this is the current result
+                var isCurrent = currentResult != null &&
+                                result.LineIndex == currentResult.LineIndex &&
+                                result.StartColumn == currentResult.StartColumn;
+
+                // Draw highlight
+                canvas.DrawRect(rect, isCurrent ? currentMatchPaint : matchPaint);
+
+                // Draw border for current match
+                if (isCurrent)
+                {
+                    canvas.DrawRect(rect, currentMatchBorderPaint);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Parses a hex color string to SKColor with opacity.
+        /// </summary>
+        private static SKColor ParseHighlightColor(string hexColor, float opacity)
+        {
+            // Try to parse the hex color
+            if (SKColor.TryParse(hexColor, out var color))
+            {
+                return color.WithAlpha((byte)(255 * opacity));
+            }
+
+            // Fallback to yellow
+            return new SKColor(255, 255, 0, (byte)(255 * opacity));
         }
 
         #endregion

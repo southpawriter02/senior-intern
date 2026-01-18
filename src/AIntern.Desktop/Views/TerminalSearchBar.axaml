@@ -1,0 +1,262 @@
+<!--
+    TerminalSearchBar.axaml - Terminal Search Bar UI Component
+    
+    Version: v0.5.5c
+    Created: 2026-01-18
+    
+    Provides a floating search bar for terminal buffer search with:
+    - Search input with watermark and loading spinner
+    - Results counter display (e.g., "3 of 15")
+    - Case sensitivity toggle (Aa)
+    - Regex mode toggle (.*)
+    - Previous/Next navigation buttons
+    - Close button
+    - Error message display for invalid regex
+    
+    Keyboard Shortcuts (handled in code-behind):
+    - Enter: Next result
+    - Shift+Enter: Previous result
+    - Escape: Close search
+    - Alt+C: Toggle case sensitivity
+    - Alt+R: Toggle regex mode
+-->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AIntern.Desktop.ViewModels"
+             x:Class="AIntern.Desktop.Views.TerminalSearchBar"
+             x:DataType="vm:TerminalSearchBarViewModel">
+
+    <UserControl.Styles>
+        <!-- ============================================================
+             Search Bar Container Style
+             Floating panel with shadow and rounded corners
+             ============================================================ -->
+        <Style Selector="Border.terminal-search-bar">
+            <Setter Property="Background" Value="{DynamicResource PopupBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="8" />
+            <Setter Property="BoxShadow" Value="0 4 16 0 #40000000" />
+        </Style>
+
+        <!-- ============================================================
+             Option Toggle Buttons Style
+             Small toggle buttons for case/regex options
+             ============================================================ -->
+        <Style Selector="ToggleButton.search-option">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="6" />
+            <Setter Property="Width" Value="28" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Foreground" Value="{DynamicResource TextMuted}" />
+        </Style>
+
+        <Style Selector="ToggleButton.search-option:pointerover">
+            <Setter Property="Background" Value="{DynamicResource HoverBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        </Style>
+
+        <Style Selector="ToggleButton.search-option:checked">
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+
+        <!-- ============================================================
+             Search Input Style
+             TextBox for search query entry
+             ============================================================ -->
+        <Style Selector="TextBox.search-input">
+            <Setter Property="MinWidth" Value="220" />
+            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        </Style>
+
+        <Style Selector="TextBox.search-input:focus">
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+        </Style>
+
+        <!-- ============================================================
+             Navigation Button Style
+             Icon buttons for prev/next/close
+             ============================================================ -->
+        <Style Selector="Button.search-nav-button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="4" />
+            <Setter Property="Width" Value="28" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Foreground" Value="{DynamicResource TextMuted}" />
+        </Style>
+
+        <Style Selector="Button.search-nav-button:pointerover">
+            <Setter Property="Background" Value="{DynamicResource HoverBrush}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+        </Style>
+
+        <Style Selector="Button.search-nav-button:disabled">
+            <Setter Property="Opacity" Value="0.4" />
+        </Style>
+
+        <!-- ============================================================
+             Error Text Style
+             Red text for error messages
+             ============================================================ -->
+        <Style Selector="TextBlock.search-error">
+            <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Margin" Value="0,4,0,0" />
+        </Style>
+
+        <!-- ============================================================
+             Spinner Animation Style
+             Rotation animation for loading spinner
+             ============================================================ -->
+        <Style Selector="PathIcon.spinning">
+            <Style.Animations>
+                <Animation Duration="0:0:1" IterationCount="Infinite">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="RotateTransform.Angle" Value="0" />
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="RotateTransform.Angle" Value="360" />
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+            <Setter Property="RenderTransform">
+                <RotateTransform />
+            </Setter>
+            <Setter Property="RenderTransformOrigin" Value="50%,50%" />
+        </Style>
+    </UserControl.Styles>
+
+    <!-- ================================================================
+         Main Search Bar Container
+         Floating at top-right of terminal panel
+         ================================================================ -->
+    <Border Classes="terminal-search-bar"
+            IsVisible="{Binding IsSearchVisible}"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            Margin="16">
+
+        <StackPanel Spacing="4">
+            <!-- ============================================================
+                 Main Search Row
+                 Contains input, counter, toggles, and navigation buttons
+                 ============================================================ -->
+            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+
+                <!-- Search Input -->
+                <TextBox x:Name="SearchTextBox"
+                         Grid.Column="0"
+                         Classes="search-input"
+                         Text="{Binding SearchQuery, Mode=TwoWay}"
+                         Watermark="Search terminal..."
+                         KeyDown="OnSearchKeyDown">
+                    <TextBox.InnerRightContent>
+                        <StackPanel Orientation="Horizontal" Spacing="2" Margin="4,0">
+                            <!-- Loading Spinner (visible during search) -->
+                            <PathIcon Data="{StaticResource SpinnerIcon}"
+                                      Width="14" Height="14"
+                                      IsVisible="{Binding IsSearching}"
+                                      Classes="spinning"
+                                      Foreground="{DynamicResource AccentBrush}" />
+                        </StackPanel>
+                    </TextBox.InnerRightContent>
+                </TextBox>
+
+                <!-- Results Counter -->
+                <TextBlock Grid.Column="1"
+                           Text="{Binding SearchResultsText}"
+                           VerticalAlignment="Center"
+                           Margin="8,0"
+                           MinWidth="60"
+                           FontSize="12"
+                           Foreground="{DynamicResource TextMuted}" />
+
+                <!-- Case Sensitive Toggle -->
+                <ToggleButton Grid.Column="2"
+                              Classes="search-option"
+                              IsChecked="{Binding CaseSensitive}"
+                              ToolTip.Tip="Match Case (Alt+C)">
+                    <TextBlock Text="Aa" 
+                               FontSize="12" 
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center" />
+                </ToggleButton>
+
+                <!-- Regex Toggle -->
+                <ToggleButton Grid.Column="3"
+                              Classes="search-option"
+                              IsChecked="{Binding UseRegex}"
+                              ToolTip.Tip="Use Regular Expression (Alt+R)">
+                    <TextBlock Text=".*" 
+                               FontSize="12" 
+                               FontFamily="Cascadia Code, Consolas, monospace"
+                               HorizontalAlignment="Center" />
+                </ToggleButton>
+
+                <!-- Separator -->
+                <Border Grid.Column="4"
+                        Width="1"
+                        Height="20"
+                        Background="{DynamicResource BorderBrush}"
+                        Margin="4,0" />
+
+                <!-- Previous Result -->
+                <Button Grid.Column="5"
+                        Classes="search-nav-button"
+                        Command="{Binding PreviousSearchResultCommand}"
+                        IsEnabled="{Binding SearchState.HasResults}"
+                        ToolTip.Tip="Previous Match (Shift+Enter)">
+                    <PathIcon Data="{StaticResource ChevronUpIcon}" 
+                              Width="14" Height="14" />
+                </Button>
+
+                <!-- Next Result -->
+                <Button Grid.Column="6"
+                        Classes="search-nav-button"
+                        Command="{Binding NextSearchResultCommand}"
+                        IsEnabled="{Binding SearchState.HasResults}"
+                        ToolTip.Tip="Next Match (Enter)">
+                    <PathIcon Data="{StaticResource ChevronDownIcon}" 
+                              Width="14" Height="14" />
+                </Button>
+
+                <!-- Separator -->
+                <Border Grid.Column="7"
+                        Width="1"
+                        Height="20"
+                        Background="{DynamicResource BorderBrush}"
+                        Margin="4,0" />
+
+                <!-- Close Button -->
+                <Button Grid.Column="8"
+                        Classes="search-nav-button"
+                        Command="{Binding CloseSearchCommand}"
+                        ToolTip.Tip="Close (Escape)">
+                    <PathIcon Data="{StaticResource CloseIcon}" 
+                              Width="12" Height="12" />
+                </Button>
+            </Grid>
+
+            <!-- ============================================================
+                 Error Message Row
+                 Shows invalid regex errors
+                 ============================================================ -->
+            <TextBlock Classes="search-error"
+                       Text="{Binding ErrorMessage}"
+                       IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                       TextWrapping="Wrap"
+                       MaxWidth="350" />
+        </StackPanel>
+    </Border>
+</UserControl>

@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:AIntern.Desktop.ViewModels"
+             xmlns:views="using:AIntern.Desktop.Views"
              xmlns:terminal="using:AIntern.Desktop.Controls.Terminal"
              x:Class="AIntern.Desktop.Views.TerminalPanel"
              x:DataType="vm:TerminalPanelViewModel"
@@ -193,6 +194,15 @@
                         Content="Create Terminal"
                         HorizontalAlignment="Center" />
             </StackPanel>
+
+            <!-- ════════════════════════════════════════════════════════════ -->
+            <!-- Search Bar Overlay (v0.5.5c)                                 -->
+            <!-- Floating at top-right of terminal content area              -->
+            <!-- ════════════════════════════════════════════════════════════ -->
+            <views:TerminalSearchBar x:Name="SearchBar"
+                                     DataContext="{Binding SearchBarViewModel}"
+                                     HorizontalAlignment="Right"
+                                     VerticalAlignment="Top" />
 
         </Grid>
     </Grid>
