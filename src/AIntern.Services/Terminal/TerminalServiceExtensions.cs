@@ -32,6 +32,7 @@ public static class TerminalServiceExtensions
     /// <list type="bullet">
     ///   <item><see cref="IShellDetectionService"/> → <see cref="ShellDetectionService"/></item>
     ///   <item><see cref="ITerminalService"/> → <see cref="TerminalService"/></item>
+    ///   <item><see cref="ITerminalSearchService"/> → <see cref="TerminalSearchService"/> (v0.5.5b)</item>
     /// </list>
     /// </para>
     /// <para>
@@ -45,6 +46,10 @@ public static class TerminalServiceExtensions
     ///     <b>TerminalService:</b> Maintains a registry of active terminal sessions
     ///     that must be shared across the application. Each session manages a PTY
     ///     process that should not be duplicated.
+    ///   </item>
+    ///   <item>
+    ///     <b>TerminalSearchService:</b> Stateless service with compiled regex patterns.
+    ///     Singleton for consistent logging and configuration.
     ///   </item>
     /// </list>
     /// </para>
@@ -175,6 +180,27 @@ public static class TerminalServiceExtensions
         //   3. Must be same instance that started capture to stop it
         //
         services.AddSingleton<IOutputCaptureService, OutputCaptureService>();
+
+        // ─────────────────────────────────────────────────────────────────────
+        // TERMINAL SEARCH SERVICE (v0.5.5b)
+        // ─────────────────────────────────────────────────────────────────────
+        //
+        // Searches terminal buffer content with pattern matching and navigation.
+        // Features:
+        //   • Plain text and regex pattern matching
+        //   • Case-sensitive and case-insensitive modes
+        //   • Background thread execution for responsive UI
+        //   • Cancellation support for long-running searches
+        //   • Result navigation with wrap-around
+        //   • Viewport filtering for rendering optimization
+        //   • Regex pattern validation with timeout protection
+        //
+        // Registered as singleton because:
+        //   1. Stateless service - no per-request data
+        //   2. Consistent logging configuration
+        //   3. Compiled regex patterns can be reused
+        //
+        services.AddSingleton<ITerminalSearchService, TerminalSearchService>();
 
         return services;
     }

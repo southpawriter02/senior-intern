@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.5.5b] - 2026-01-18
+
+Terminal Search Service. Search implementation with regex support and navigation.
+
+### Added
+
+- `ITerminalSearchService` interface with SearchAsync, IncrementalSearchAsync, navigation methods
+- `TerminalSearchService` implementation with plain text/regex search, cancellation support
+- Background thread search execution for responsive UI
+- Regex pattern validation with timeout protection
+- Viewport filtering with `GetVisibleResults` for rendering optimization
+- 36 unit tests for terminal search service
+
+### Extended
+
+- `TerminalBuffer` with TotalLineCount, FirstVisibleLine, VisibleLineCount properties
+- `TerminalBuffer` with GetLineText, GetLineTexts, GetAllTextContent methods for search
+- `TerminalServiceExtensions` with ITerminalSearchService DI registration
+
+
 ## [0.5.5a] - 2026-01-18
 
 Terminal Search Models. Data models for terminal search functionality.

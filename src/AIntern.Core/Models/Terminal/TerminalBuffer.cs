@@ -84,6 +84,39 @@ public sealed class TerminalBuffer
     /// </summary>
     public int ScrollbackLines => Math.Max(0, TotalLines - Rows);
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // Search Support Properties (v0.5.5b)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Gets the total number of lines including scrollback.
+    /// </summary>
+    /// <remarks>
+    /// Alias for <see cref="TotalLines"/> for search service compatibility.
+    /// Added in v0.5.5b.
+    /// </remarks>
+    public int TotalLineCount => TotalLines;
+
+    /// <summary>
+    /// Gets the index of the first visible line in the buffer.
+    /// </summary>
+    /// <remarks>
+    /// Used for viewport-only search to skip scrollback buffer.
+    /// The first visible line is at the end of the line list minus the visible row count.
+    /// Added in v0.5.5b.
+    /// </remarks>
+    public int FirstVisibleLine => Math.Max(0, TotalLines - Rows);
+
+    /// <summary>
+    /// Gets the number of visible lines in the viewport.
+    /// </summary>
+    /// <remarks>
+    /// Equals <see cref="Rows"/> but provides a more descriptive name for search operations.
+    /// Added in v0.5.5b.
+    /// </remarks>
+    public int VisibleLineCount => Rows;
+
+
     /// <summary>
     /// Gets or sets the current text attributes for new characters.
     /// </summary>
@@ -826,6 +859,91 @@ public sealed class TerminalBuffer
                 }
             }
             return result;
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Search Support Methods (v0.5.5b)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Gets the text content of a line by absolute index (0-based, including scrollback).
+    /// </summary>
+    /// <param name="lineIndex">Line index (0 = first line in scrollback).</param>
+    /// <returns>The text content, or empty string if out of range.</returns>
+    /// <remarks>
+    /// <para>
+    /// Unlike <see cref="GetLine(int)"/> which uses screen coordinates,
+    /// this method uses absolute line indices starting from 0 at the beginning
+    /// of the scrollback buffer.
+    /// </para>
+    /// <para>Added in v0.5.5b for search service support.</para>
+    /// </remarks>
+    public string GetLineText(int lineIndex)
+    {
+        lock (_lock)
+        {
+            if (lineIndex < 0 || lineIndex >= _lines.Count)
+            {
+                return string.Empty;
+            }
+            return _lines[lineIndex].GetText();
+        }
+    }
+
+    /// <summary>
+    /// Gets a range of lines as text by absolute indices.
+    /// </summary>
+    /// <param name="startLine">Starting line index (0-based, inclusive).</param>
+    /// <param name="count">Number of lines to retrieve.</param>
+    /// <returns>Text content of each line in range.</returns>
+    /// <remarks>
+    /// <para>
+    /// Used by search service to iterate through buffer content efficiently.
+    /// </para>
+    /// <para>Added in v0.5.5b for search service support.</para>
+    /// </remarks>
+    public IEnumerable<string> GetLineTexts(int startLine, int count)
+    {
+        lock (_lock)
+        {
+            var endLine = Math.Min(startLine + count, _lines.Count);
+            for (int i = Math.Max(0, startLine); i < endLine; i++)
+            {
+                yield return _lines[i].GetText();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets all buffer content as a single string.
+    /// </summary>
+    /// <param name="includeScrollback">Whether to include scrollback buffer.</param>
+    /// <returns>Buffer content with lines separated by newlines.</returns>
+    /// <remarks>
+    /// <para>
+    /// Use sparingly for large buffers as this allocates a complete string copy.
+    /// Prefer <see cref="GetLineText(int)"/> for iterative access.
+    /// </para>
+    /// <para>Added in v0.5.5b for search service support.</para>
+    /// </remarks>
+    public string GetAllTextContent(bool includeScrollback = true)
+    {
+        lock (_lock)
+        {
+            var sb = new StringBuilder();
+            int startLine = includeScrollback ? 0 : FirstVisibleLine;
+            
+            for (int i = startLine; i < _lines.Count; i++)
+            {
+                if (i > startLine)
+                {
+                    sb.AppendLine();
+                }
+                sb.Append(_lines[i].GetText());
+            }
+            
+            return sb.ToString();
         }
     }
 
