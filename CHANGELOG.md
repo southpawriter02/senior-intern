@@ -53,6 +53,17 @@ Profile Management Service. CRUD, JSON persistence, default handling, built-in p
 - `ShellProfileService` with persistence, validation, events, and import/export
 - 22 unit tests
 
+## [0.5.3e] - 2026-01-18
+
+Working Directory Synchronization. Bi-directional sync, OSC 7 parsing, workspace linking.
+
+### Added
+
+- `DirectoryChangeSource` enum and `DirectoryChangedEventArgs`, `Osc7EventArgs` event models
+- `IWorkingDirectorySyncService` interface with 10 methods
+- `WorkingDirectorySyncService` with OSC 7 parsing, WSL path translation, and auto-sync
+- 16 unit tests (14 pass, 2 skipped)
+
 ## [0.5.2f] - 2026-01-18
 
 Main Window Integration. Terminal panel integrated into main window with keyboard shortcuts.
