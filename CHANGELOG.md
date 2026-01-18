@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.5.2d] - 2026-01-18
+
+ViewModels. MVVM ViewModel layer for terminal panel session management and tab navigation.
+
+### Added
+
+- `TerminalSessionViewModel` for individual terminal session (tab) representation
+  - Observable properties: Name, IsActive, State, WorkingDirectory
+  - Shell type detection for bash, zsh, fish, powershell, cmd, nushell
+- `TerminalPanelViewModel` for terminal panel management
+  - Sessions collection with automatic session lifecycle handling
+  - Commands: NewSession, CloseSession, ActivateSession, TogglePanel, NextTab, PreviousTab
+  - Circular tab navigation, adjacent session activation on close
+- 60 unit tests (100% pass rate)
+
 ## [0.5.2c] - 2026-01-18
 
 Terminal Control. Complete terminal control with input handling, selection, clipboard, and cursor animation.
