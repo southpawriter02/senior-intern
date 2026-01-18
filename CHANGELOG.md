@@ -42,6 +42,17 @@ Shell Profile Models. User-configurable profile model with appearance, behavior,
 - 17 terminal settings properties added to `AppSettings`
 - 20 unit tests
 
+## [0.5.3d] - 2026-01-18
+
+Profile Management Service. CRUD, JSON persistence, default handling, built-in profile generation.
+
+### Added
+
+- `ProfileChangeType` enum and `ProfilesChangedEventArgs` event model
+- `IShellProfileService` interface with 12 methods
+- `ShellProfileService` with persistence, validation, events, and import/export
+- 22 unit tests
+
 ## [0.5.2f] - 2026-01-18
 
 Main Window Integration. Terminal panel integrated into main window with keyboard shortcuts.
