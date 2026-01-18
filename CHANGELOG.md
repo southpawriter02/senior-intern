@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.5.1b] - 2026-01-17
+
+Terminal Models. Core model classes for the integrated terminal subsystem.
+
+### Added
+
+- `TerminalSize`, `TerminalColor`, `TerminalAttributes`, `TerminalCell` value types
+- `TerminalLine`, `TerminalSelection`, `TerminalSession`, `TerminalBuffer` classes
+- `TerminalSessionState` enum for session lifecycle
+- 44 unit tests for terminal models
+
 ## [0.5.1a] - 2026-01-17
 
 Project Setup & Dependencies. Terminal infrastructure foundation for v0.5.x.
