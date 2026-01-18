@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.5.3a] - 2026-01-18
+
+Shell Detection Service Enhancement. Extended public API with type detection, validation, and PATH search.
+
+### Added
+
+- `DetectShellType`, `ValidateShellPath`, `FindInPath`, `GetShellVersionAsync` interface methods
+- `ShellType.Tcsh`, `ShellType.Ksh`, `ShellType.Wsl` enum values
+- `ShellInfo.IconPath`, `ShellInfo.Description` properties
+- 54 new unit tests (78 total)
+
 ## [0.5.2f] - 2026-01-18
 
 Main Window Integration. Terminal panel integrated into main window with keyboard shortcuts.

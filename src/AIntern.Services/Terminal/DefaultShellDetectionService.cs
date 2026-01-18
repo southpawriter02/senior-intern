@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 namespace AIntern.Services.Terminal;
 
 // ┌─────────────────────────────────────────────────────────────────────────┐
-// │ DEFAULT SHELL DETECTION SERVICE (v0.5.1d, updated v0.5.1e)              │
+// │ DEFAULT SHELL DETECTION SERVICE (v0.5.1d, updated v0.5.3a)              │
 // │ Simple shell detection fallback without version detection or caching.  │
 // └─────────────────────────────────────────────────────────────────────────┘
 
@@ -13,7 +13,7 @@ namespace AIntern.Services.Terminal;
 /// Simple shell detection service without caching or version detection.
 /// </summary>
 /// <remarks>
-/// <para>Added in v0.5.1d. Updated in v0.5.1e.</para>
+/// <para>Added in v0.5.1d. Updated in v0.5.1e. Extended in v0.5.3a.</para>
 /// <para>
 /// This provides a lightweight implementation for cases where the full
 /// <see cref="ShellDetectionService"/> is not needed. It is faster but
@@ -114,6 +114,53 @@ public sealed class DefaultShellDetectionService : IShellDetectionService
         var exists = File.Exists(path);
         _logger.LogDebug("Shell availability check for {Path}: {Exists}", path, exists);
         return Task.FromResult(exists);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // IShellDetectionService v0.5.3a Methods
+    // ─────────────────────────────────────────────────────────────────────
+
+    /// <inheritdoc />
+    public ShellType DetectShellType(string shellPath)
+    {
+        if (string.IsNullOrWhiteSpace(shellPath))
+        {
+            return ShellType.Unknown;
+        }
+
+        return DetermineShellType(shellPath);
+    }
+
+    /// <inheritdoc />
+    public bool ValidateShellPath(string shellPath)
+    {
+        if (string.IsNullOrWhiteSpace(shellPath))
+        {
+            return false;
+        }
+
+        return File.Exists(shellPath);
+    }
+
+    /// <inheritdoc />
+    public string? FindInPath(string executableName)
+    {
+        if (string.IsNullOrWhiteSpace(executableName))
+        {
+            return null;
+        }
+
+        return FindExecutable(executableName);
+    }
+
+    /// <inheritdoc />
+    public Task<string?> GetShellVersionAsync(
+        string shellPath,
+        CancellationToken cancellationToken = default)
+    {
+        // DefaultShellDetectionService does not support version detection
+        _logger.LogDebug("GetShellVersionAsync: version detection not supported in default implementation");
+        return Task.FromResult<string?>(null);
     }
 
     // ─────────────────────────────────────────────────────────────────────
@@ -351,6 +398,7 @@ public sealed class DefaultShellDetectionService : IShellDetectionService
     {
         var name = Path.GetFileName(path).ToLowerInvariant();
 
+        // v0.5.3a: Added Tcsh, Ksh, and Wsl types
         return name switch
         {
             "bash" or "bash.exe" => ShellType.Bash,
@@ -361,6 +409,9 @@ public sealed class DefaultShellDetectionService : IShellDetectionService
             "powershell.exe" or "powershell" => ShellType.PowerShell,
             "pwsh.exe" or "pwsh" => ShellType.PowerShellCore,
             "nu" or "nu.exe" => ShellType.Nushell,
+            "tcsh" or "tcsh.exe" or "csh" or "csh.exe" => ShellType.Tcsh,
+            "ksh" or "ksh.exe" or "ksh93" or "mksh" => ShellType.Ksh,
+            "wsl" or "wsl.exe" => ShellType.Wsl,
             _ => ShellType.Unknown
         };
     }

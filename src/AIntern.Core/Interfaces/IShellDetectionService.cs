@@ -1,7 +1,7 @@
 namespace AIntern.Core.Interfaces;
 
 // ┌─────────────────────────────────────────────────────────────────────────┐
-// │ SHELL DETECTION SERVICE INTERFACE (v0.5.1e)                             │
+// │ SHELL DETECTION SERVICE INTERFACE (v0.5.3a)                             │
 // │ Cross-platform shell discovery and identification.                      │
 // └─────────────────────────────────────────────────────────────────────────┘
 
@@ -9,7 +9,7 @@ namespace AIntern.Core.Interfaces;
 /// Service for detecting available shells on the system.
 /// </summary>
 /// <remarks>
-/// <para>Added in v0.5.1d. Enhanced in v0.5.1e.</para>
+/// <para>Added in v0.5.1d. Enhanced in v0.5.1e. Extended in v0.5.3a.</para>
 /// <para>
 /// This service provides cross-platform shell detection capabilities:
 /// <list type="bullet">
@@ -121,10 +121,85 @@ public interface IShellDetectionService
     /// </para>
     /// </remarks>
     Task<bool> IsShellAvailableAsync(string path, CancellationToken cancellationToken = default);
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Shell Type Detection (v0.5.3a)
+    // ─────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Detects the shell type from an executable path.
+    /// </summary>
+    /// <param name="shellPath">Path to the shell executable.</param>
+    /// <returns>The detected shell type based on the executable name.</returns>
+    /// <remarks>
+    /// <para>Added in v0.5.3a.</para>
+    /// <para>
+    /// Detection is based on the executable filename, not file contents.
+    /// Returns <see cref="ShellType.Unknown"/> if the shell type cannot
+    /// be determined.
+    /// </para>
+    /// </remarks>
+    ShellType DetectShellType(string shellPath);
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Path Validation (v0.5.3a)
+    // ─────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Validates that a shell path exists and is a file.
+    /// </summary>
+    /// <param name="shellPath">Path to validate.</param>
+    /// <returns>True if the path exists and is a file; false otherwise.</returns>
+    /// <remarks>
+    /// <para>Added in v0.5.3a.</para>
+    /// <para>
+    /// This is a synchronous, lightweight validation that only checks
+    /// file existence. For full validation including executability,
+    /// use <see cref="IsShellAvailableAsync"/>.
+    /// </para>
+    /// </remarks>
+    bool ValidateShellPath(string shellPath);
+
+    // ─────────────────────────────────────────────────────────────────────
+    // PATH Search (v0.5.3a)
+    // ─────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Searches the PATH environment variable for an executable.
+    /// </summary>
+    /// <param name="executableName">Name of the executable (without extension on Windows).</param>
+    /// <returns>Full path to the executable if found; null otherwise.</returns>
+    /// <remarks>
+    /// <para>Added in v0.5.3a.</para>
+    /// <para>
+    /// On Windows, automatically appends common executable extensions
+    /// (.exe, .cmd, .bat, .com) when searching.
+    /// </para>
+    /// </remarks>
+    string? FindInPath(string executableName);
+
+    // ─────────────────────────────────────────────────────────────────────
+    // Version Extraction (v0.5.3a)
+    // ─────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Gets the version string from a shell executable.
+    /// </summary>
+    /// <param name="shellPath">Path to the shell executable.</param>
+    /// <param name="cancellationToken">Token to cancel the operation.</param>
+    /// <returns>Version string if detected; null otherwise.</returns>
+    /// <remarks>
+    /// <para>Added in v0.5.3a.</para>
+    /// <para>
+    /// Executes the shell with --version argument and parses the output.
+    /// A timeout of 2 seconds is applied.
+    /// </para>
+    /// </remarks>
+    Task<string?> GetShellVersionAsync(string shellPath, CancellationToken cancellationToken = default);
 }
 
 // ┌─────────────────────────────────────────────────────────────────────────┐
-// │ SHELL INFO RECORD (v0.5.1e)                                            │
+// │ SHELL INFO RECORD (v0.5.3a)                                            │
 // │ Metadata about a detected shell installation.                          │
 // └─────────────────────────────────────────────────────────────────────────┘
 
@@ -132,7 +207,7 @@ public interface IShellDetectionService
 /// Information about an available shell.
 /// </summary>
 /// <remarks>
-/// <para>Added in v0.5.1d. Enhanced in v0.5.1e.</para>
+/// <para>Added in v0.5.1d. Enhanced in v0.5.1e. Extended in v0.5.3a.</para>
 /// <para>
 /// This record contains metadata about a detected shell, including
 /// its display name, path, type classification, version information,
@@ -220,6 +295,27 @@ public sealed record ShellInfo
     /// </remarks>
     public bool IsDefault { get; init; }
 
+    /// <summary>
+    /// Gets the path to an icon representing this shell (optional).
+    /// </summary>
+    /// <remarks>
+    /// <para>Added in v0.5.3a.</para>
+    /// <para>Path to an image file for UI display, or null if unavailable.</para>
+    /// </remarks>
+    public string? IconPath { get; init; }
+
+    /// <summary>
+    /// Gets a description of this shell variant (optional).
+    /// </summary>
+    /// <remarks>
+    /// <para>Added in v0.5.3a.</para>
+    /// <para>
+    /// Examples: "Windows Subsystem for Linux", "Git for Windows Bash",
+    /// "PowerShell Core (cross-platform)".
+    /// </para>
+    /// </remarks>
+    public string? Description { get; init; }
+
     // ─────────────────────────────────────────────────────────────────────
     // Display
     // ─────────────────────────────────────────────────────────────────────
@@ -233,7 +329,7 @@ public sealed record ShellInfo
 }
 
 // ┌─────────────────────────────────────────────────────────────────────────┐
-// │ SHELL TYPE ENUM (v0.5.1e)                                              │
+// │ SHELL TYPE ENUM (v0.5.3a)                                              │
 // │ Classification of known shell types.                                   │
 // └─────────────────────────────────────────────────────────────────────────┘
 
@@ -241,7 +337,7 @@ public sealed record ShellInfo
 /// Known shell types.
 /// </summary>
 /// <remarks>
-/// <para>Added in v0.5.1d. Enhanced in v0.5.1e.</para>
+/// <para>Added in v0.5.1d. Enhanced in v0.5.1e. Extended in v0.5.3a.</para>
 /// <para>
 /// This enum identifies the type of shell for determining
 /// shell-specific behaviors and commands.
@@ -316,5 +412,32 @@ public enum ShellType
     /// <remarks>
     /// Modern shell with structured data support.
     /// </remarks>
-    Nushell
+    Nushell,
+
+    /// <summary>
+    /// TENEX C Shell (tcsh).
+    /// </summary>
+    /// <remarks>
+    /// <para>Added in v0.5.3a.</para>
+    /// <para>Enhanced C shell with command-line editing.</para>
+    /// </remarks>
+    Tcsh,
+
+    /// <summary>
+    /// Korn Shell (ksh).
+    /// </summary>
+    /// <remarks>
+    /// <para>Added in v0.5.3a.</para>
+    /// <para>Includes ksh93 and mksh variants.</para>
+    /// </remarks>
+    Ksh,
+
+    /// <summary>
+    /// Windows Subsystem for Linux (wsl).
+    /// </summary>
+    /// <remarks>
+    /// <para>Added in v0.5.3a.</para>
+    /// <para>WSL provides Linux shell access on Windows.</para>
+    /// </remarks>
+    Wsl
 }

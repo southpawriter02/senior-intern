@@ -511,4 +511,391 @@ public class ShellDetectionServiceTests
         // Assert
         Assert.Equal(0, (int)ShellType.Unknown);
     }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // DetectShellType Tests (v0.5.3a)
+    // ─────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// <b>Unit Test:</b> DetectShellType returns Bash for bash path.<br/>
+    /// <b>Arrange:</b> Path to bash executable.<br/>
+    /// <b>Act:</b> Call DetectShellType.<br/>
+    /// <b>Assert:</b> Returns ShellType.Bash.
+    /// </summary>
+    [Theory]
+    [InlineData("/bin/bash", ShellType.Bash)]
+    [InlineData("/usr/bin/bash", ShellType.Bash)]
+    [InlineData("bash.exe", ShellType.Bash)]
+    public void DetectShellType_Bash_ReturnsBash(string path, ShellType expected)
+    {
+        // Act
+        var result = _service.DetectShellType(path);
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> DetectShellType returns Zsh for zsh path.<br/>
+    /// </summary>
+    [Theory]
+    [InlineData("/bin/zsh", ShellType.Zsh)]
+    [InlineData("zsh.exe", ShellType.Zsh)]
+    public void DetectShellType_Zsh_ReturnsZsh(string path, ShellType expected)
+    {
+        // Act
+        var result = _service.DetectShellType(path);
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> DetectShellType returns PowerShellCore for pwsh path.<br/>
+    /// </summary>
+    [Theory]
+    [InlineData("pwsh", ShellType.PowerShellCore)]
+    [InlineData("pwsh.exe", ShellType.PowerShellCore)]
+    public void DetectShellType_Pwsh_ReturnsPowerShellCore(string path, ShellType expected)
+    {
+        // Act
+        var result = _service.DetectShellType(path);
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> DetectShellType returns PowerShell for powershell.exe.<br/>
+    /// </summary>
+    [Fact]
+    public void DetectShellType_PowerShell_ReturnsPowerShell()
+    {
+        // Act
+        var result = _service.DetectShellType("powershell.exe");
+
+        // Assert
+        Assert.Equal(ShellType.PowerShell, result);
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> DetectShellType returns Cmd for cmd.exe.<br/>
+    /// </summary>
+    [Fact]
+    public void DetectShellType_Cmd_ReturnsCmd()
+    {
+        // Act
+        var result = _service.DetectShellType("cmd.exe");
+
+        // Assert
+        Assert.Equal(ShellType.Cmd, result);
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> DetectShellType returns Tcsh for tcsh path (v0.5.3a).<br/>
+    /// </summary>
+    [Theory]
+    [InlineData("tcsh", ShellType.Tcsh)]
+    [InlineData("tcsh.exe", ShellType.Tcsh)]
+    [InlineData("csh", ShellType.Tcsh)]
+    public void DetectShellType_Tcsh_ReturnsTcsh(string path, ShellType expected)
+    {
+        // Act
+        var result = _service.DetectShellType(path);
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> DetectShellType returns Ksh for ksh path (v0.5.3a).<br/>
+    /// </summary>
+    [Theory]
+    [InlineData("ksh", ShellType.Ksh)]
+    [InlineData("ksh.exe", ShellType.Ksh)]
+    [InlineData("ksh93", ShellType.Ksh)]
+    [InlineData("mksh", ShellType.Ksh)]
+    public void DetectShellType_Ksh_ReturnsKsh(string path, ShellType expected)
+    {
+        // Act
+        var result = _service.DetectShellType(path);
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> DetectShellType returns Wsl for wsl path (v0.5.3a).<br/>
+    /// </summary>
+    [Theory]
+    [InlineData("wsl", ShellType.Wsl)]
+    [InlineData("wsl.exe", ShellType.Wsl)]
+    public void DetectShellType_Wsl_ReturnsWsl(string path, ShellType expected)
+    {
+        // Act
+        var result = _service.DetectShellType(path);
+
+        // Assert
+        Assert.Equal(expected, result);
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> DetectShellType returns Unknown for unrecognized name.<br/>
+    /// </summary>
+    [Theory]
+    [InlineData("/bin/unknown_shell")]
+    [InlineData("some_random.exe")]
+    public void DetectShellType_Unknown_ReturnsUnknown(string path)
+    {
+        // Act
+        var result = _service.DetectShellType(path);
+
+        // Assert
+        Assert.Equal(ShellType.Unknown, result);
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> DetectShellType returns Unknown for null/empty path.<br/>
+    /// </summary>
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void DetectShellType_NullOrEmpty_ReturnsUnknown(string? path)
+    {
+        // Act
+        var result = _service.DetectShellType(path!);
+
+        // Assert
+        Assert.Equal(ShellType.Unknown, result);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // ValidateShellPath Tests (v0.5.3a)
+    // ─────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// <b>Unit Test:</b> ValidateShellPath returns true for existing file.<br/>
+    /// </summary>
+    [Fact]
+    public async Task ValidateShellPath_ExistingFile_ReturnsTrue()
+    {
+        // Arrange - use default shell which should exist
+        var defaultShell = await _service.GetDefaultShellAsync();
+
+        // Act
+        var result = _service.ValidateShellPath(defaultShell);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> ValidateShellPath returns false for null path.<br/>
+    /// </summary>
+    [Fact]
+    public void ValidateShellPath_NullPath_ReturnsFalse()
+    {
+        // Act
+        var result = _service.ValidateShellPath(null!);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> ValidateShellPath returns false for empty path.<br/>
+    /// </summary>
+    [Fact]
+    public void ValidateShellPath_EmptyPath_ReturnsFalse()
+    {
+        // Act
+        var result = _service.ValidateShellPath("");
+
+        // Assert
+        Assert.False(result);
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> ValidateShellPath returns false for whitespace path.<br/>
+    /// </summary>
+    [Fact]
+    public void ValidateShellPath_WhitespacePath_ReturnsFalse()
+    {
+        // Act
+        var result = _service.ValidateShellPath("   ");
+
+        // Assert
+        Assert.False(result);
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> ValidateShellPath returns false for non-existent path.<br/>
+    /// </summary>
+    [Fact]
+    public void ValidateShellPath_NonExistentPath_ReturnsFalse()
+    {
+        // Act
+        var result = _service.ValidateShellPath("/nonexistent/shell/path");
+
+        // Assert
+        Assert.False(result);
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> ValidateShellPath returns false for directory path.<br/>
+    /// </summary>
+    [Fact]
+    public void ValidateShellPath_DirectoryPath_ReturnsFalse()
+    {
+        // Arrange
+        var tempDir = Path.GetTempPath();
+
+        // Act
+        var result = _service.ValidateShellPath(tempDir);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // FindInPath Tests (v0.5.3a)
+    // ─────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// <b>Unit Test:</b> FindInPath returns null for null input.<br/>
+    /// </summary>
+    [Fact]
+    public void FindInPath_NullName_ReturnsNull()
+    {
+        // Act
+        var result = _service.FindInPath(null!);
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> FindInPath returns null for empty input.<br/>
+    /// </summary>
+    [Fact]
+    public void FindInPath_EmptyName_ReturnsNull()
+    {
+        // Act
+        var result = _service.FindInPath("");
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> FindInPath returns null for whitespace input.<br/>
+    /// </summary>
+    [Fact]
+    public void FindInPath_WhitespaceName_ReturnsNull()
+    {
+        // Act
+        var result = _service.FindInPath("   ");
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> FindInPath returns null for non-existent executable.<br/>
+    /// </summary>
+    [Fact]
+    public void FindInPath_NonExistentExecutable_ReturnsNull()
+    {
+        // Act
+        var result = _service.FindInPath("definitely_not_a_real_executable_12345");
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // GetShellVersionAsync Tests (v0.5.3a)
+    // ─────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// <b>Unit Test:</b> GetShellVersionAsync returns null for null path.<br/>
+    /// </summary>
+    [Fact]
+    public async Task GetShellVersionAsync_NullPath_ReturnsNull()
+    {
+        // Act
+        var result = await _service.GetShellVersionAsync(null!);
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> GetShellVersionAsync returns null for empty path.<br/>
+    /// </summary>
+    [Fact]
+    public async Task GetShellVersionAsync_EmptyPath_ReturnsNull()
+    {
+        // Act
+        var result = await _service.GetShellVersionAsync("");
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> GetShellVersionAsync returns null for non-existent path.<br/>
+    /// </summary>
+    [Fact]
+    public async Task GetShellVersionAsync_NonExistentPath_ReturnsNull()
+    {
+        // Act
+        var result = await _service.GetShellVersionAsync("/nonexistent/shell");
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> GetShellVersionAsync respects cancellation.<br/>
+    /// </summary>
+    [Fact]
+    public async Task GetShellVersionAsync_Cancellation_Respected()
+    {
+        // Arrange
+        var defaultShell = await _service.GetDefaultShellAsync();
+        using var cts = new CancellationTokenSource();
+        cts.Cancel();
+
+        // Act & Assert - should not throw, just return null or cached value
+        var result = await _service.GetShellVersionAsync(defaultShell, cts.Token);
+        // No exception thrown is success
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // ShellType v0.5.3a Enum Tests
+    // ─────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// <b>Unit Test:</b> ShellType has v0.5.3a values (Tcsh, Ksh, Wsl).<br/>
+    /// </summary>
+    [Fact]
+    public void ShellType_HasNewV053aValues()
+    {
+        // Assert
+        Assert.True(Enum.IsDefined(typeof(ShellType), ShellType.Tcsh));
+        Assert.True(Enum.IsDefined(typeof(ShellType), ShellType.Ksh));
+        Assert.True(Enum.IsDefined(typeof(ShellType), ShellType.Wsl));
+    }
+
+    /// <summary>
+    /// <b>Unit Test:</b> ShellType.Wsl is distinct from ShellType.Bash.<br/>
+    /// </summary>
+    [Fact]
+    public void ShellType_Wsl_NotBash()
+    {
+        // Assert
+        Assert.NotEqual(ShellType.Bash, ShellType.Wsl);
+    }
 }

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 namespace AIntern.Services.Terminal;
 
 // ┌─────────────────────────────────────────────────────────────────────────┐
-// │ SHELL DETECTION SERVICE (v0.5.1e)                                       │
+// │ SHELL DETECTION SERVICE (v0.5.3a)                                       │
 // │ Cross-platform shell discovery and identification.                      │
 // └─────────────────────────────────────────────────────────────────────────┘
 
@@ -15,7 +15,7 @@ namespace AIntern.Services.Terminal;
 /// Cross-platform shell detection service.
 /// </summary>
 /// <remarks>
-/// <para>Added in v0.5.1e.</para>
+/// <para>Added in v0.5.1e. Extended in v0.5.3a.</para>
 /// <para>
 /// Detects available shells on Windows, macOS, and Linux using
 /// platform-specific mechanisms. Features include:
@@ -300,6 +300,81 @@ public sealed partial class ShellDetectionService : IShellDetectionService
             _logger.LogDebug(ex, "Error checking shell availability at: {Path}", path);
             return false;
         }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // IShellDetectionService Implementation - v0.5.3a Methods
+    // ─────────────────────────────────────────────────────────────────────
+
+    /// <inheritdoc />
+    public ShellType DetectShellType(string shellPath)
+    {
+        if (string.IsNullOrWhiteSpace(shellPath))
+        {
+            _logger.LogDebug("DetectShellType called with null/empty path, returning Unknown");
+            return ShellType.Unknown;
+        }
+
+        var result = DetermineShellType(shellPath);
+        _logger.LogDebug("DetectShellType for '{Path}' returned: {Type}", shellPath, result);
+        return result;
+    }
+
+    /// <inheritdoc />
+    public bool ValidateShellPath(string shellPath)
+    {
+        if (string.IsNullOrWhiteSpace(shellPath))
+        {
+            _logger.LogDebug("ValidateShellPath called with null/empty path");
+            return false;
+        }
+
+        try
+        {
+            // Check that path is to an existing file (not directory)
+            var exists = File.Exists(shellPath);
+            _logger.LogDebug("ValidateShellPath for '{Path}': {Result}", shellPath, exists);
+            return exists;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "ValidateShellPath error for '{Path}'", shellPath);
+            return false;
+        }
+    }
+
+    /// <inheritdoc />
+    public string? FindInPath(string executableName)
+    {
+        if (string.IsNullOrWhiteSpace(executableName))
+        {
+            _logger.LogDebug("FindInPath called with null/empty name");
+            return null;
+        }
+
+        var result = FindExecutable(executableName);
+        _logger.LogDebug("FindInPath for '{Name}': {Result}", executableName, result ?? "(not found)");
+        return result;
+    }
+
+    /// <inheritdoc />
+    public async Task<string?> GetShellVersionAsync(
+        string shellPath,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(shellPath))
+        {
+            _logger.LogDebug("GetShellVersionAsync called with null/empty path");
+            return null;
+        }
+
+        if (!ValidateShellPath(shellPath))
+        {
+            _logger.LogDebug("GetShellVersionAsync: path does not exist '{Path}'", shellPath);
+            return null;
+        }
+
+        return await GetVersionAsync(shellPath, "--version", cancellationToken);
     }
 
     // ─────────────────────────────────────────────────────────────────────
@@ -860,6 +935,7 @@ public sealed partial class ShellDetectionService : IShellDetectionService
     {
         var name = Path.GetFileName(path).ToLowerInvariant();
 
+        // v0.5.3a: Added Tcsh, Ksh, and Wsl types
         return name switch
         {
             "bash" or "bash.exe" => ShellType.Bash,
@@ -870,7 +946,9 @@ public sealed partial class ShellDetectionService : IShellDetectionService
             "powershell.exe" => ShellType.PowerShell,
             "pwsh" or "pwsh.exe" => ShellType.PowerShellCore,
             "nu" or "nu.exe" => ShellType.Nushell,
-            "wsl.exe" => ShellType.Bash, // WSL typically provides bash
+            "tcsh" or "tcsh.exe" or "csh" or "csh.exe" => ShellType.Tcsh,
+            "ksh" or "ksh.exe" or "ksh93" or "mksh" => ShellType.Ksh,
+            "wsl" or "wsl.exe" => ShellType.Wsl,
             _ => ShellType.Unknown
         };
     }
