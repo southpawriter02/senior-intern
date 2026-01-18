@@ -337,6 +337,12 @@ public static class ServiceCollectionExtensions
         // Added in v0.5.2f.
         services.AddSingleton<TerminalPanelViewModel>();
 
+        // Command Block ViewModel Factory: creates CommandBlockViewModels with DI.
+        // Singleton for shared factory instance with injected services.
+        // Used to create ViewModels for command blocks extracted from AI responses.
+        // Added in v0.5.4e.
+        services.AddSingleton<CommandBlockViewModelFactory>();
+
         // Search: spotlight-style search dialog ViewModel with debounced search.
         // Transient so each dialog gets its own instance with fresh state.
         // Uses ISearchService for FTS5 search operations.

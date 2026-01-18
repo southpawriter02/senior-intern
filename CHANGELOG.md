@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.5.4e] - 2026-01-18
+
+Command Block ViewModel. MVVM presentation layer for command blocks with user interactions.
+
+### Added
+
+- `CommandBlockViewModel` with 7 observable, 17 computed properties, 6 commands, StatusChanged/SessionStateChanged events
+- `CommandBlockViewModelFactory` with Create(), CreateRange(), CreateFromResult(), CreateList() methods
+- Dangerous command confirmation workflow with warning overlay
+- DI registration in ServiceCollectionExtensions
+- 40 unit tests covering properties, commands, events, and factory
+
+
 ## [0.5.4d] - 2026-01-18
 
 Output Capture System. Captures terminal output for AI context with ANSI stripping and truncation.
