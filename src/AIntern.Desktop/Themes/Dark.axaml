@@ -533,5 +533,33 @@
             <Setter Property="Background" Value="{DynamicResource TerminalScrollBarThumbHover}" />
         </Style>
     </ControlTheme>
+    <!-- ============================================================== -->
+    <!-- Command Block Colors (v0.5.4f)                                   -->
+    <!-- ============================================================== -->
+
+    <!-- Command Block Container -->
+    <SolidColorBrush x:Key="CommandBlockBorder" Color="#3E3E3E" />
+
+    <!-- Code area styling -->
+    <SolidColorBrush x:Key="TerminalPromptColor" Color="#569CD6" />
+
+    <!-- Badge styling -->
+    <SolidColorBrush x:Key="BadgeBackground" Color="#3E3E3E" />
+    <SolidColorBrush x:Key="BadgeForeground" Color="#CCCCCC" />
+
+    <!-- Status badge -->
+    <SolidColorBrush x:Key="StatusBadgeBackground" Color="#4E4E4E" />
+
+    <!-- Danger warning panel -->
+    <SolidColorBrush x:Key="DangerBackgroundBrush" Color="#3D1F1F" />
+
+    <!-- Error brush (alias for danger) -->
+    <SolidColorBrush x:Key="ErrorBrush" Color="#F48771" />
+
+    <!-- Info brush -->
+    <SolidColorBrush x:Key="InfoBrush" Color="#569CD6" />
+
+    <!-- Hover brush for buttons -->
+    <SolidColorBrush x:Key="HoverBrush" Color="#3E3E3E" />
 
 </ResourceDictionary>

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.5.4f] - 2026-01-18
+
+Command Block UI. Avalonia XAML control for command blocks with visual styles and interactions.
+
+### Added
+
+- `CommandBlockControl.axaml` with styles for container, status badges, danger warning, action buttons
+- `EqualityConverter` and `BoolToTextConverter` for XAML bindings
+- `PlayIcon` and `SpinnerIcon` for Run button states
+- Theme resources: CommandBlockBorder, StatusBadgeBackground, DangerBackgroundBrush, etc.
+- 16 unit tests for converters
+
+
 ## [0.5.4e] - 2026-01-18
 
 Command Block ViewModel. MVVM presentation layer for command blocks with user interactions.
