@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.5.2e] - 2026-01-18
+
+Terminal Panel. Complete terminal panel view with tab bar, session management, and content area.
+
+### Added
+
+- `TerminalPanel` UserControl integrating all v0.5.2 components
+  - Tab bar with scrollable session tabs (icon, name, close button)
+  - Panel actions: Maximize/Restore, Hide
+  - Terminal content area with TerminalControl
+  - Empty state display when no sessions
+- Session attachment management via `Initialize(ITerminalService)`
+- Focus transfer to terminal on session change
+- 4 unit tests (100% pass rate)
+
 ## [0.5.2d] - 2026-01-18
 
 ViewModels. MVVM ViewModel layer for terminal panel session management and tab navigation.

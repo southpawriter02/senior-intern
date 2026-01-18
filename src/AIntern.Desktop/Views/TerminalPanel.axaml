@@ -1,0 +1,200 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AIntern.Desktop.ViewModels"
+             xmlns:terminal="using:AIntern.Desktop.Controls.Terminal"
+             x:Class="AIntern.Desktop.Views.TerminalPanel"
+             x:DataType="vm:TerminalPanelViewModel"
+             Background="{DynamicResource TerminalBackground}">
+
+    <!--
+        Terminal Panel Layout (v0.5.2e)
+        
+        Visual Structure:
+        ┌────────────────────────────────────────────────────────────┐
+        │  Tab Bar (Auto height)                                      │
+        │  ┌─────────────────────────────────────────────────┬──────┐│
+        │  │  [Tab 1] [Tab 2] [Tab 3] ... [+]               │ ⬜ ˅ ││
+        │  │  (Scrollable tabs)                              │ Panel││
+        │  │                                                 │Actions││
+        │  └─────────────────────────────────────────────────┴──────┘│
+        ├────────────────────────────────────────────────────────────┤
+        │  Terminal Content (* fills remaining)                       │
+        │  ┌────────────────────────────────────────────────────────┐│
+        │  │                                                        ││
+        │  │    TerminalControl (when HasActiveSession)             ││
+        │  │    or Empty State (when !HasActiveSession)             ││
+        │  │                                                        ││
+        │  └────────────────────────────────────────────────────────┘│
+        └────────────────────────────────────────────────────────────┘
+    -->
+    <Grid RowDefinitions="Auto, *">
+
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <!-- Row 0: Tab Bar                                                   -->
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource TerminalTabBarBackground}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="4,0">
+            <Grid ColumnDefinitions="*, Auto">
+
+                <!-- ──────────────────────────────────────────────────────── -->
+                <!-- Column 0: Scrollable Tabs                                -->
+                <!-- ──────────────────────────────────────────────────────── -->
+                <ScrollViewer Grid.Column="0"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Disabled">
+                    <StackPanel Orientation="Horizontal" Spacing="0">
+
+                        <!-- Session Tab Items -->
+                        <ItemsControl ItemsSource="{Binding Sessions}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:TerminalSessionViewModel">
+                                    <!--
+                                        Session Tab Button
+                                        - Uses TerminalTab theme from v0.5.2a
+                                        - Classes.active toggles active styling
+                                        - Command binds to parent ViewModel
+                                    -->
+                                    <Button Theme="{DynamicResource TerminalTab}"
+                                            Classes="terminal-tab"
+                                            Classes.active="{Binding IsActive}"
+                                            Command="{Binding $parent[UserControl].((vm:TerminalPanelViewModel)DataContext).ActivateSessionCommand}"
+                                            CommandParameter="{Binding}">
+                                        <Grid ColumnDefinitions="Auto, *, Auto" MinWidth="80">
+                                            <!-- Shell Icon -->
+                                            <PathIcon Grid.Column="0"
+                                                      Data="{StaticResource TerminalIcon}"
+                                                      Width="14" Height="14"
+                                                      Foreground="{DynamicResource TextMuted}"
+                                                      Margin="0,0,6,0" />
+
+                                            <!-- Tab Name (with ellipsis for long names) -->
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding Name}"
+                                                       VerticalAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       MaxWidth="120" />
+
+                                            <!-- Close Button -->
+                                            <Button Grid.Column="2"
+                                                    Theme="{DynamicResource TerminalTabCloseButton}"
+                                                    Classes="tab-close"
+                                                    Command="{Binding $parent[UserControl].((vm:TerminalPanelViewModel)DataContext).CloseSessionCommand}"
+                                                    CommandParameter="{Binding}"
+                                                    ToolTip.Tip="Close terminal">
+                                                <PathIcon Data="{StaticResource CloseIcon}"
+                                                          Width="10" Height="10" />
+                                            </Button>
+                                        </Grid>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- New Tab Button -->
+                        <Button Theme="{DynamicResource TerminalNewTabButton}"
+                                Command="{Binding NewSessionCommand}"
+                                ToolTip.Tip="New terminal (Ctrl+Shift+`)">
+                            <PathIcon Data="{StaticResource PlusIcon}"
+                                      Width="12" Height="12" />
+                        </Button>
+
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- ──────────────────────────────────────────────────────── -->
+                <!-- Column 1: Panel Action Buttons                           -->
+                <!-- ──────────────────────────────────────────────────────── -->
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            Spacing="2"
+                            Margin="8,0,0,0">
+
+                    <!-- Split Terminal (Future Feature - Hidden) -->
+                    <Button Theme="{DynamicResource TerminalIconButton}"
+                            ToolTip.Tip="Split terminal"
+                            IsVisible="False">
+                        <PathIcon Data="{StaticResource SplitHorizontalIcon}"
+                                  Width="14" Height="14" />
+                    </Button>
+
+                    <!-- Maximize/Restore Button -->
+                    <Button Theme="{DynamicResource TerminalIconButton}"
+                            Command="{Binding ToggleMaximizeCommand}">
+                        <Button.Styles>
+                            <Style Selector="Button">
+                                <Style Selector="^:not(.maximized)">
+                                    <Setter Property="ToolTip.Tip" Value="Maximize terminal" />
+                                </Style>
+                            </Style>
+                        </Button.Styles>
+                        <Panel>
+                            <!-- Show MaximizeIcon when not maximized -->
+                            <PathIcon Data="{StaticResource MaximizeIcon}"
+                                      Width="14" Height="14"
+                                      IsVisible="{Binding !IsMaximized}" />
+                            <!-- Show MinimizeIcon when maximized -->
+                            <PathIcon Data="{StaticResource MinimizeIcon}"
+                                      Width="14" Height="14"
+                                      IsVisible="{Binding IsMaximized}" />
+                        </Panel>
+                    </Button>
+
+                    <!-- Hide Panel Button -->
+                    <Button Theme="{DynamicResource TerminalIconButton}"
+                            Command="{Binding HidePanelCommand}"
+                            ToolTip.Tip="Hide terminal panel (Ctrl+`)">
+                        <PathIcon Data="{StaticResource ChevronDownIcon}"
+                                  Width="14" Height="14" />
+                    </Button>
+
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <!-- Row 1: Terminal Content Area                                     -->
+        <!-- ════════════════════════════════════════════════════════════════ -->
+        <Grid Grid.Row="1">
+
+            <!-- Terminal Control (visible when session is active) -->
+            <terminal:TerminalControl x:Name="TerminalView"
+                                       TerminalFontFamily="{Binding FontFamily}"
+                                       TerminalFontSize="{Binding FontSize}"
+                                       TerminalTheme="{Binding Theme}"
+                                       IsVisible="{Binding HasActiveSession}" />
+
+            <!-- Empty State (visible when no active session) -->
+            <StackPanel HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="16"
+                        IsVisible="{Binding !HasActiveSession}">
+                
+                <!-- Terminal Icon -->
+                <PathIcon Data="{StaticResource TerminalIcon}"
+                          Width="48" Height="48"
+                          Foreground="{DynamicResource TextMuted}" />
+                
+                <!-- Message -->
+                <TextBlock Text="No terminal sessions"
+                           Foreground="{DynamicResource TextMuted}"
+                           HorizontalAlignment="Center" />
+                
+                <!-- Create Terminal Button -->
+                <Button Theme="{DynamicResource PrimaryButton}"
+                        Command="{Binding NewSessionCommand}"
+                        Content="Create Terminal"
+                        HorizontalAlignment="Center" />
+            </StackPanel>
+
+        </Grid>
+    </Grid>
+
+</UserControl>
