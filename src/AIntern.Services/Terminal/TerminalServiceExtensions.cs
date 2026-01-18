@@ -135,6 +135,27 @@ public static class TerminalServiceExtensions
         //
         services.AddSingleton<ICommandExtractorService, CommandExtractorService>();
 
+        // ─────────────────────────────────────────────────────────────────────
+        // COMMAND EXECUTION SERVICE (v0.5.4c)
+        // ─────────────────────────────────────────────────────────────────────
+        //
+        // Executes commands in terminal sessions with status tracking.
+        // Features:
+        //   • Clipboard integration for copy operations
+        //   • Send-to-terminal without execute (user presses Enter)
+        //   • Execute with Enter key (command + newline)
+        //   • Sequential multi-command execution
+        //   • Execution cancellation via SIGINT
+        //   • Status tracking with event notifications
+        //   • Session management with shell type preferences
+        //
+        // Registered as singleton because:
+        //   1. Maintains status tracking dictionary across requests
+        //   2. Shares session reuse logic across the application
+        //   3. Event subscribers expect consistent source
+        //
+        services.AddSingleton<ICommandExecutionService, CommandExecutionService>();
+
         return services;
     }
 }
