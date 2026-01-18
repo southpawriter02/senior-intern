@@ -7,6 +7,7 @@ using AIntern.Desktop.Services;
 using AIntern.Desktop.ViewModels;
 using AIntern.Services;
 using AIntern.Services.Factories;
+using AIntern.Services.Terminal;
 using Serilog;
 
 namespace AIntern.Desktop.Extensions;
@@ -274,6 +275,15 @@ public static class ServiceCollectionExtensions
         // Status Bar Service: manages status bar items and aggregates status from services.
         // Added in v0.4.5i.
         services.AddSingleton<IStatusBarService, StatusBarService>();
+
+        // ┌─────────────────────────────────────────────────────────────────┐
+        // │ TERMINAL SERVICES (v0.5.1f)                                      │
+        // └─────────────────────────────────────────────────────────────────┘
+
+        // Terminal: integrated terminal with PTY support.
+        // Registers IShellDetectionService and ITerminalService as singletons.
+        // See TerminalServiceExtensions for implementation details.
+        services.AddTerminalServices();
 
         // ┌─────────────────────────────────────────────────────────────────┐
         // │ UI INFRASTRUCTURE                                                │

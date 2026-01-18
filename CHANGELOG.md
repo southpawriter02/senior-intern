@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.5.1f] - 2026-01-17
+
+Integration & Testing. DI registration and comprehensive test verification for terminal subsystem.
+
+### Added
+
+- `TerminalServiceExtensions.AddTerminalServices()` extension method for DI registration
+- Terminal service integration in `ServiceCollectionExtensions.AddAInternServices()`
+- 8 unit tests for DI registration, singleton behavior, and dependency resolution
+- Completes v0.5.1 Terminal Foundation series
+
 ## [0.5.1e] - 2026-01-17
 
 Shell Detection Service. Enhanced shell detection with caching, version detection, and validation.
