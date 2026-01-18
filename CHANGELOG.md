@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.5.2c] - 2026-01-18
+
+Terminal Control. Complete terminal control with input handling, selection, clipboard, and cursor animation.
+
+### Added
+
+- `TerminalControl` UserControl wrapping TerminalRenderer with full input handling
+- Keyboard input with VT100/xterm escape sequence generation (all function keys, arrows, navigation, Ctrl+key)
+- Mouse text selection (single, double, triple click for char/word/line selection)
+- Clipboard integration (Ctrl+Shift+C/V, right-click paste)
+- Cursor blink animation with theme-configurable interval
+- Terminal size synchronization with PTY via `TerminalSizeChanged` event
+- Scrollbar overlay for buffer navigation
+- 42 unit tests for key sequence mapping and word character detection
+
 ## [0.5.2b] - 2026-01-17
 
 Terminal Renderer. SkiaSharp-based hardware-accelerated terminal rendering with full text attribute support.

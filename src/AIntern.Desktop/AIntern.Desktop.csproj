@@ -8,6 +8,11 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
 
+  <!-- Allow test projects to access internal members -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="AIntern.Desktop.Tests" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\AIntern.Core\AIntern.Core.csproj" />
     <ProjectReference Include="..\AIntern.Data\AIntern.Data.csproj" />

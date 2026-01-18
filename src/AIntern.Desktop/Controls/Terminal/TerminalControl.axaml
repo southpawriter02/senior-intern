@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    TerminalControl.axaml (v0.5.2c)
+    ═══════════════════════════════════════════════════════════════════════════
+    Complete terminal control with input handling, selection, and clipboard.
+    Wraps TerminalRenderer and manages terminal session attachment.
+    
+    Features:
+    - Keyboard input with VT100/xterm escape sequence generation
+    - Mouse text selection (single, double, triple click)
+    - Clipboard integration (Ctrl+Shift+C/V)
+    - Cursor blink animation
+    - Terminal size synchronization
+    ═══════════════════════════════════════════════════════════════════════════
+-->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:AIntern.Desktop.Controls.Terminal"
+             x:Class="AIntern.Desktop.Controls.Terminal.TerminalControl"
+             Focusable="True"
+             Background="Transparent">
+
+    <!--
+        Terminal Control Layout
+        ════════════════════════════════════════════════════════════════════════
+        Grid structure with TerminalRenderer and vertical scrollbar overlay.
+        The scrollbar is positioned on the right edge with low opacity until hover.
+    -->
+    <Grid>
+        <!-- Terminal Renderer - Main display area -->
+        <local:TerminalRenderer x:Name="Renderer"
+                                FontFamily="{Binding FontFamily, RelativeSource={RelativeSource AncestorType=local:TerminalControl}}"
+                                FontSize="{Binding FontSize, RelativeSource={RelativeSource AncestorType=local:TerminalControl}}" />
+
+        <!-- Vertical Scrollbar - Overlay on right edge -->
+        <ScrollBar x:Name="VerticalScrollBar"
+                   Orientation="Vertical"
+                   HorizontalAlignment="Right"
+                   VerticalAlignment="Stretch"
+                   Minimum="0"
+                   Opacity="0"
+                   Width="10"
+                   Margin="0,0,2,0"
+                   Theme="{DynamicResource TerminalScrollBar}" />
+    </Grid>
+
+</UserControl>
