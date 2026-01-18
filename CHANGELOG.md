@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.5.4a] - 2026-01-18
+
+Command Block Models. Core models for command extraction, execution tracking, and output capture.
+
+### Added
+
+- `TextRange` record struct with Extract(), Contains(), Overlaps(), Offset(), Union(), Intersect() methods
+- `CommandBlockStatus` enum (7 states) with IsTerminal(), WasAttempted(), ToDisplayString(), ToIconName() extensions
+- `OutputCaptureMode` enum (5 modes) with ToDescription(), GetDefaultMaxCharacters() extensions
+- `CommandBlock` model with identity, content, detection, execution, and source mapping properties
+- `TerminalOutputCapture` model with ToContextString(), ToSummary(), Truncate() methods
+- `CommandExtractionResult` container with filtering methods and aggregate statistics
+- 62 new unit tests (150 Core tests total)
+
 ## [0.5.3a] - 2026-01-18
 
 Shell Detection Service Enhancement. Extended public API with type detection, validation, and PATH search.
