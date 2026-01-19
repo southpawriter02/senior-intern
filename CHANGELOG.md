@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.5.5g] - 2026-01-19
+
+Shell Profile Editor. Modal dialog for creating/editing shell profiles with validation and auto-detection.
+
+### Added
+
+- `ShellProfileEditorViewModel` with validation, shell detection, environment parsing
+- `ShellProfileEditor.axaml` modal dialog with form fields and keyboard shortcuts
+- Integration with `TerminalSettingsPanel` for profile edit workflow
+- 30+ unit tests for ViewModel functionality
+
 ## [0.5.5f] - 2026-01-19
 
 Terminal Settings Panel. Full settings UI with live preview, unsaved changes tracking, and shell profile management.
