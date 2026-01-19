@@ -1,0 +1,382 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AIntern.Desktop.ViewModels"
+             xmlns:converters="using:AIntern.Desktop.Converters"
+             x:Class="AIntern.Desktop.Views.TerminalSettingsPanel"
+             x:DataType="vm:TerminalSettingsViewModel">
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         TerminalSettingsPanel (v0.5.5f)
+         Settings panel for terminal appearance, behavior, and shell profiles.
+         ═══════════════════════════════════════════════════════════════════════ -->
+
+    <UserControl.Resources>
+        <converters:ShellTypeToIconConverter x:Key="ShellTypeToIconConverter" />
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <!-- Section Header -->
+        <Style Selector="TextBlock.section-header">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+            <Setter Property="Margin" Value="0,0,0,12" />
+        </Style>
+
+        <!-- Section Container -->
+        <Style Selector="Border.section">
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="20" />
+            <Setter Property="Margin" Value="0,0,0,16" />
+        </Style>
+
+        <!-- Setting Row -->
+        <Style Selector="Grid.setting-row">
+            <Setter Property="Margin" Value="0,0,0,16" />
+        </Style>
+
+        <!-- Setting Label -->
+        <Style Selector="TextBlock.setting-label">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
+        </Style>
+
+        <!-- Checkbox Label -->
+        <Style Selector="CheckBox.setting-checkbox">
+            <Setter Property="Margin" Value="0,4,0,0" />
+        </Style>
+
+        <!-- Profile ListBox -->
+        <Style Selector="ListBox.profile-list">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+
+        <Style Selector="ListBox.profile-list ListBoxItem">
+            <Setter Property="Padding" Value="8" />
+            <Setter Property="CornerRadius" Value="4" />
+        </Style>
+    </UserControl.Styles>
+
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto">
+        <Border Padding="24">
+        <StackPanel MaxWidth="640">
+
+            <!-- ==================== HEADER ==================== -->
+            <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,24">
+                <StackPanel>
+                    <TextBlock Text="Terminal Settings" 
+                               FontSize="24" 
+                               FontWeight="SemiBold" />
+                    <TextBlock Text="Configure terminal appearance and behavior"
+                               FontSize="13"
+                               Foreground="{DynamicResource TextMuted}"
+                               Margin="0,4,0,0" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" 
+                            Orientation="Horizontal" 
+                            Spacing="8"
+                            VerticalAlignment="Center">
+                    <Button Content="Reset to Defaults"
+                            Command="{Binding ResetToDefaultsCommand}"
+                            Classes="secondary" />
+                    <Button Content="Save Changes"
+                            Command="{Binding SaveSettingsCommand}"
+                            IsEnabled="{Binding HasUnsavedChanges}"
+                            Classes="primary" />
+                </StackPanel>
+            </Grid>
+
+            <!-- ==================== VALIDATION ERROR ==================== -->
+            <Border Background="{DynamicResource ErrorBackgroundBrush}"
+                    BorderBrush="{DynamicResource ErrorBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Padding="12"
+                    Margin="0,0,0,16"
+                    IsVisible="{Binding ValidationError, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <PathIcon Data="{StaticResource ErrorIcon}"
+                              Width="16" Height="16"
+                              Foreground="{DynamicResource ErrorBrush}" />
+                    <TextBlock Text="{Binding ValidationError}"
+                               Foreground="{DynamicResource ErrorBrush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- ==================== APPEARANCE SECTION ==================== -->
+            <Border Classes="section">
+                <StackPanel>
+                    <TextBlock Classes="section-header" Text="Appearance" />
+
+                    <!-- Font Family -->
+                    <Grid Classes="setting-row" ColumnDefinitions="160, *">
+                        <TextBlock Classes="setting-label" Text="Font Family" />
+                        <ComboBox Grid.Column="1"
+                                  ItemsSource="{Binding AvailableFonts}"
+                                  SelectedItem="{Binding SelectedFontFamily}"
+                                  HorizontalAlignment="Stretch">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" FontFamily="{Binding}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
+
+                    <!-- Font Size -->
+                    <Grid Classes="setting-row" ColumnDefinitions="160, *, 60">
+                        <TextBlock Classes="setting-label" Text="Font Size" />
+                        <Slider Grid.Column="1"
+                                Minimum="8" Maximum="32"
+                                Value="{Binding SelectedFontSize}"
+                                TickFrequency="1"
+                                IsSnapToTickEnabled="True" />
+                        <TextBlock Grid.Column="2"
+                                   Text="{Binding SelectedFontSize, StringFormat={}{0:F0}pt}"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Right"
+                                   FontFamily="{Binding SelectedFontFamily}" />
+                    </Grid>
+
+                    <!-- Line Height -->
+                    <Grid Classes="setting-row" ColumnDefinitions="160, *, 60">
+                        <TextBlock Classes="setting-label" Text="Line Height" />
+                        <Slider Grid.Column="1"
+                                Minimum="1.0" Maximum="2.0"
+                                Value="{Binding LineHeight}"
+                                TickFrequency="0.1"
+                                IsSnapToTickEnabled="True" />
+                        <TextBlock Grid.Column="2"
+                                   Text="{Binding LineHeight, StringFormat={}{0:F1}}"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Right" />
+                    </Grid>
+
+                    <!-- Theme -->
+                    <Grid Classes="setting-row" ColumnDefinitions="160, *">
+                        <TextBlock Classes="setting-label" Text="Color Theme" />
+                        <ComboBox Grid.Column="1"
+                                  ItemsSource="{Binding AvailableThemes}"
+                                  SelectedItem="{Binding SelectedThemeName}"
+                                  HorizontalAlignment="Stretch" />
+                    </Grid>
+
+                    <!-- Cursor Style -->
+                    <Grid Classes="setting-row" ColumnDefinitions="160, *">
+                        <TextBlock Classes="setting-label" Text="Cursor Style" />
+                        <ComboBox Grid.Column="1"
+                                  ItemsSource="{Binding CursorStyles}"
+                                  SelectedItem="{Binding SelectedCursorStyle}"
+                                  HorizontalAlignment="Stretch" />
+                    </Grid>
+
+                    <!-- Cursor Options -->
+                    <CheckBox Classes="setting-checkbox"
+                              Content="Blinking cursor"
+                              IsChecked="{Binding CursorBlink}" />
+
+                    <CheckBox Classes="setting-checkbox"
+                              Content="Render bold text as bright colors"
+                              IsChecked="{Binding BoldIsBright}" />
+
+                    <CheckBox Classes="setting-checkbox"
+                              Content="Enable font ligatures"
+                              IsChecked="{Binding EnableLigatures}" />
+                </StackPanel>
+            </Border>
+
+            <!-- ==================== BEHAVIOR SECTION ==================== -->
+            <Border Classes="section">
+                <StackPanel>
+                    <TextBlock Classes="section-header" Text="Behavior" />
+
+                    <!-- Scrollback Lines -->
+                    <Grid Classes="setting-row" ColumnDefinitions="160, *, 80">
+                        <TextBlock Classes="setting-label" Text="Scrollback Lines" />
+                        <Slider Grid.Column="1"
+                                Minimum="1000" Maximum="100000"
+                                Value="{Binding ScrollbackLines}"
+                                TickFrequency="1000" />
+                        <TextBlock Grid.Column="2"
+                                   Text="{Binding ScrollbackLines, StringFormat={}{0:N0}}"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Right" />
+                    </Grid>
+
+                    <!-- Bell Settings -->
+                    <CheckBox Classes="setting-checkbox"
+                              Content="Enable terminal bell"
+                              IsChecked="{Binding BellEnabled}" />
+
+                    <Grid Classes="setting-row" 
+                          ColumnDefinitions="160, *" 
+                          Margin="24,8,0,0"
+                          IsVisible="{Binding BellEnabled}">
+                        <TextBlock Classes="setting-label" Text="Bell Style" />
+                        <ComboBox Grid.Column="1"
+                                  ItemsSource="{Binding BellStyles}"
+                                  SelectedItem="{Binding BellStyle}"
+                                  HorizontalAlignment="Stretch" />
+                    </Grid>
+
+                    <!-- Clipboard -->
+                    <CheckBox Classes="setting-checkbox"
+                              Content="Copy text on selection"
+                              IsChecked="{Binding CopyOnSelect}" />
+
+                    <!-- Scrolling -->
+                    <CheckBox Classes="setting-checkbox"
+                              Content="Scroll to bottom on keyboard input"
+                              IsChecked="{Binding ScrollOnInput}" />
+
+                    <CheckBox Classes="setting-checkbox"
+                              Content="Scroll to bottom on new output"
+                              IsChecked="{Binding ScrollOnOutput}" />
+
+                    <!-- Integration -->
+                    <CheckBox Classes="setting-checkbox"
+                              Content="Sync terminal directory with workspace"
+                              IsChecked="{Binding SyncWithWorkspace}" />
+
+                    <CheckBox Classes="setting-checkbox"
+                              Content="Confirm before closing terminal with running process"
+                              IsChecked="{Binding ConfirmOnClose}" />
+                </StackPanel>
+            </Border>
+
+            <!-- ==================== SHELL PROFILES SECTION ==================== -->
+            <Border Classes="section">
+                <StackPanel>
+                    <!-- Section Header with Add Button -->
+                    <Grid ColumnDefinitions="*, Auto" Margin="0,0,0,12">
+                        <TextBlock Classes="section-header" Text="Shell Profiles" Margin="0" />
+                        <Button Grid.Column="1"
+                                Command="{Binding AddProfileCommand}"
+                                Classes="secondary">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <PathIcon Data="{StaticResource AddIcon}" 
+                                          Width="12" Height="12" />
+                                <TextBlock Text="Add Profile" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <!-- Profile List -->
+                    <Border BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            MinHeight="120"
+                            MaxHeight="240">
+                        <ListBox Classes="profile-list"
+                                 ItemsSource="{Binding ShellProfiles}"
+                                 SelectedItem="{Binding SelectedProfile}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnDefinitions="Auto, *, Auto, Auto" Margin="4">
+                                        <!-- Shell Icon -->
+                                        <PathIcon Data="{Binding ShellType, Converter={StaticResource ShellTypeToIconConverter}}"
+                                                  Width="20" Height="20"
+                                                  Margin="0,0,12,0"
+                                                  Foreground="{DynamicResource TextSecondary}" />
+
+                                        <!-- Name and Path -->
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <TextBlock Text="{Binding Name}" 
+                                                           FontWeight="Medium" />
+                                                <Border Background="{DynamicResource AccentBrush}"
+                                                        CornerRadius="2"
+                                                        Padding="4,1"
+                                                        IsVisible="{Binding IsBuiltIn}">
+                                                    <TextBlock Text="Built-in" 
+                                                               FontSize="10"
+                                                               Foreground="{DynamicResource AccentForeground}" />
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding ShellPath}"
+                                                       FontSize="11"
+                                                       Foreground="{DynamicResource TextMuted}"
+                                                       TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+
+                                        <!-- Edit Button -->
+                                        <Button Grid.Column="2"
+                                                Classes="icon-button"
+                                                Command="{Binding $parent[UserControl].((vm:TerminalSettingsViewModel)DataContext).EditProfileCommand}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip.Tip="Edit Profile"
+                                                Margin="4,0">
+                                            <PathIcon Data="{StaticResource EditIcon}" 
+                                                      Width="14" Height="14" />
+                                        </Button>
+
+                                        <!-- Delete Button (only for custom profiles) -->
+                                        <Button Grid.Column="3"
+                                                Classes="icon-button"
+                                                Command="{Binding $parent[UserControl].((vm:TerminalSettingsViewModel)DataContext).DeleteProfileCommand}"
+                                                CommandParameter="{Binding}"
+                                                IsVisible="{Binding !IsBuiltIn}"
+                                                ToolTip.Tip="Delete Profile">
+                                            <PathIcon Data="{StaticResource DeleteIcon}" 
+                                                      Width="14" Height="14" />
+                                        </Button>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Border>
+
+                    <!-- Default Profile Selector -->
+                    <Grid Classes="setting-row" ColumnDefinitions="160, *" Margin="0,16,0,0">
+                        <TextBlock Classes="setting-label" Text="Default Profile" />
+                        <ComboBox Grid.Column="1"
+                                  ItemsSource="{Binding ShellProfiles}"
+                                  SelectedItem="{Binding DefaultProfile}"
+                                  HorizontalAlignment="Stretch">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- ==================== UNSAVED CHANGES BANNER ==================== -->
+            <Border Background="{DynamicResource WarningBackgroundBrush}"
+                    BorderBrush="{DynamicResource WarningBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="16"
+                    IsVisible="{Binding HasUnsavedChanges}">
+                <Grid ColumnDefinitions="Auto, *, Auto">
+                    <PathIcon Data="{StaticResource WarningIcon}"
+                              Width="20" Height="20"
+                              Foreground="{DynamicResource WarningBrush}" />
+                    <TextBlock Grid.Column="1"
+                               Text="You have unsaved changes"
+                               VerticalAlignment="Center"
+                               Margin="12,0" />
+                    <StackPanel Grid.Column="2" 
+                                Orientation="Horizontal" 
+                                Spacing="8">
+                        <Button Content="Discard"
+                                Command="{Binding DiscardChangesCommand}"
+                                Classes="secondary" />
+                        <Button Content="Save"
+                                Command="{Binding SaveSettingsCommand}"
+                                Classes="primary" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+        </StackPanel>
+        </Border>
+    </ScrollViewer>
+</UserControl>

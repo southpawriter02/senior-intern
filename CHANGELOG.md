@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.5.5f] - 2026-01-19
+
+Terminal Settings Panel. Full settings UI with live preview, unsaved changes tracking, and shell profile management.
+
+### Added
+
+- `TerminalSettingsViewModel` with observable properties and commands
+- `TerminalSettingsPanel.axaml` with appearance, behavior, and shell profile sections
+- `ShellTypeToIconConverter` for shell type to icon mapping
+- 15 unit tests for ViewModel functionality
+
 ## [0.5.5e] - 2026-01-19
 
 Terminal Settings Models. Comprehensive settings for terminal appearance, behavior, and font detection.
