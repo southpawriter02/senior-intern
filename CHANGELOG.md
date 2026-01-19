@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.5.5e] - 2026-01-19
+
+Terminal Settings Models. Comprehensive settings for terminal appearance, behavior, and font detection.
+
+### Added
+
+- `TerminalSettings` model with appearance, behavior, and shell configuration
+- `IFontService` interface for font detection and management
+- `FontService` with lazy monospace font discovery and platform recommendations
+- 40 unit tests (23 TerminalSettingsTests + 17 FontServiceTests)
+
 ## [0.5.5d] - 2026-01-18
 
 Keyboard Shortcuts System. Comprehensive shortcut registry with customization, PTY pass-through, and conflict detection.

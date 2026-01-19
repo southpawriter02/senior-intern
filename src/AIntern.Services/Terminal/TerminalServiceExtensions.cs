@@ -222,6 +222,24 @@ public static class TerminalServiceExtensions
         //
         services.AddSingleton<ITerminalShortcutService, TerminalShortcutService>();
 
+        // ─────────────────────────────────────────────────────────────────────
+        // FONT SERVICE (v0.5.5e)
+        // ─────────────────────────────────────────────────────────────────────
+        //
+        // Detects and manages available system fonts for terminal use.
+        // Features:
+        //   • Lazy detection of available monospace fonts
+        //   • Platform-specific font recommendations
+        //   • Font fallback chain resolution
+        //   • Caching for performance
+        //
+        // Registered as singleton because:
+        //   1. Font detection is expensive (system API calls)
+        //   2. Results are cached and don't change during runtime
+        //   3. Single source of truth for font availability
+        //
+        services.AddSingleton<IFontService, FontService>();
+
         return services;
     }
 }
