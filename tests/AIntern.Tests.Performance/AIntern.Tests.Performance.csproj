@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>AIntern.Tests.Performance</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\AIntern.Core\AIntern.Core.csproj" />
+    <ProjectReference Include="..\..\src\AIntern.Services\AIntern.Services.csproj" />
+    <ProjectReference Include="..\AIntern.Tests.Integration\AIntern.Tests.Integration.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" />
+  </ItemGroup>
+
+</Project>

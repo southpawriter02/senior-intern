@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 For detailed release notes, see the [docs/changelog/](docs/changelog/) directory.
 
+## [0.5.5i] - 2026-01-19
+
+History Management. Terminal command history with SQLite persistence and export.
+
+### Added
+
+- `TerminalHistoryEntry` model with command metadata and display helpers
+- `TerminalSessionHistory` model for session-level grouping
+- `HistoryExportFormat` enum (Json, Csv, Text)
+- `ITerminalHistoryService` interface with CRUD, search, and export operations
+- `TerminalHistoryService` with SQLite persistence via EF Core
+- `TerminalHistoryEntity` database entity with indexed columns
+- `TerminalHistoryConfiguration` for EF Core table mapping
+- 75+ unit tests for service and model functionality
+
+### Database
+
+- Added `TerminalHistory` table with indexes on SessionId, ExecutedAt, Command
+
 ## [0.5.5h] - 2026-01-19
 
 Status Bar Integration. Terminal status section in main window status bar with session info.

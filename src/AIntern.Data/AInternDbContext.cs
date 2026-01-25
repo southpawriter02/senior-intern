@@ -361,6 +361,18 @@ public class AInternDbContext : DbContext
     /// </remarks>
     public DbSet<FileContextEntity> FileContextHistory => Set<FileContextEntity>();
 
+    /// <summary>
+    /// Gets the set of terminal command history entries in the database.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Terminal history stores executed commands with metadata including
+    /// exit code, duration, working directory, and session association.
+    /// </para>
+    /// <para>Added in v0.5.5i.</para>
+    /// </remarks>
+    public DbSet<TerminalHistoryEntity> TerminalHistory => Set<TerminalHistoryEntity>();
+
     #endregion
 
     #region DbContext Overrides
@@ -403,7 +415,8 @@ public class AInternDbContext : DbContext
                 InferencePresetConfiguration.TableName,
                 AppVersionConfiguration.TableName,
                 RecentWorkspaceConfiguration.TableName,
-                FileContextConfiguration.TableName
+                FileContextConfiguration.TableName,
+                TerminalHistoryConfiguration.TableName
             }));
     }
 

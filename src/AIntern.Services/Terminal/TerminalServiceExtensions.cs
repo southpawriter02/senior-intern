@@ -33,6 +33,7 @@ public static class TerminalServiceExtensions
     ///   <item><see cref="IShellDetectionService"/> → <see cref="ShellDetectionService"/></item>
     ///   <item><see cref="ITerminalService"/> → <see cref="TerminalService"/></item>
     ///   <item><see cref="ITerminalSearchService"/> → <see cref="TerminalSearchService"/> (v0.5.5b)</item>
+    ///   <item><see cref="ITerminalHistoryService"/> → <see cref="TerminalHistoryService"/> (v0.5.5i)</item>
     /// </list>
     /// </para>
     /// <para>
@@ -239,6 +240,26 @@ public static class TerminalServiceExtensions
         //   3. Single source of truth for font availability
         //
         services.AddSingleton<IFontService, FontService>();
+
+        // ─────────────────────────────────────────────────────────────────────
+        // TERMINAL HISTORY SERVICE (v0.5.5i)
+        // ─────────────────────────────────────────────────────────────────────
+        //
+        // Manages terminal command history with SQLite persistence.
+        // Features:
+        //   • Command persistence with metadata (exit code, duration)
+        //   • Working directory tracking
+        //   • Session-level history grouping
+        //   • Search with pattern matching
+        //   • Export to JSON, CSV, Text formats
+        //   • Automatic cleanup of old history
+        //
+        // Registered as singleton because:
+        //   1. History state is shared across the application
+        //   2. Event subscribers expect consistent source
+        //   3. Write lock requires stable instance
+        //
+        services.AddSingleton<ITerminalHistoryService, TerminalHistoryService>();
 
         return services;
     }
